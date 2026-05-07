@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "299795092052",
+    "project_id": "purramedics-a4301",
+    "storage_bucket": "purramedics-a4301.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:299795092052:android:83884ff2b5b8cf99a413c1",
+        "android_client_info": {
+          "package_name": "com.example.purramedics"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBp6VCF4_trJnRW2X6SrUItjOUkScqhVAg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,24 @@
+{
+  "buildCommand": "flutter build web --release --pwa-strategy=offline-first",
+  "outputDirectory": "build/web",
+  "installCommand": "if [ ! -d flutter ]; then git clone --depth 1 -b stable https://github.com/flutter/flutter.git; fi && export PATH=\"$PATH:$PWD/flutter/bin\" && flutter --version && flutter config --enable-web && flutter pub get",
+  "framework": null,
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/flutter_service_worker.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+    },
+    {
+      "source": "/index.html",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
+}

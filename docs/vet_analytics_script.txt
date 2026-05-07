@@ -1,0 +1,5 @@
+Short Spoken Script (30–60s)
+
+"Quick overview: the vet analytics has two parts. Descriptive analytics aggregates live Firestore appointment data into a 7‑day rolling view and all‑time KPIs — weekly volume, busiest weekday, and top visit reasons — displayed with a smooth line chart and breakdown bars. Predictive is a lightweight, rule‑based forecast: we call Open‑Meteo for current conditions, map the weather code and temperature to a human risk label and brief advice, and fall back to month‑based seasonal heuristics if live data is unavailable. Important caveats: timestamps should be normalized for timezone consistency, the weather location is currently hardcoded, and the predictive part is deterministic heuristics rather than an ML model. Next steps would be timezone normalization, storing aggregated metrics for performance, and moving to a simple ML model if we collect enough historical data."
+
+Use this as your spoken script; it maps directly to the one-page slide content.

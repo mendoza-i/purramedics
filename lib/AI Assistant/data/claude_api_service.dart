@@ -30,19 +30,45 @@ Rules:
 ''';
 
 class ClaudeApiService {
-  static const String _model = 'claude-sonnet-4-5-20250929';
+  // API Constants
+  static const String _directUrl = 'https://api.anthropic.com/v1/messages';
+  static const String _apiVersion = '2023-06-01';
+
+  // MODEL: 
+  static const String _model = 'claude-sonnet-4-5-20250929'; 
   static const int _maxTokens = 1024;
 
-  final String _proxyUrl;
+  final String _apiKey;
+  final String _endpointUrl;
 
-  ClaudeApiService({required String proxyUrl}) : _proxyUrl = proxyUrl;
+  /// [proxyUrl] – when provided (e.g. '/api/chat' on Vercel), calls the proxy
+  /// instead of Anthropic directly. The proxy adds the API key server-side,
+  /// so the key never reaches the browser.
+  ClaudeApiService({required String apiKey, String? proxyUrl})
+      : _apiKey = apiKey,
+        _endpointUrl = proxyUrl ?? _directUrl;
 
+  bool get _isProxied => _endpointUrl != _directUrl;
+
+  /// STREAMING VERSION
   Future<void> sendMessageStream(
     String content,
     Function(String textChunk) onChunk,
   ) async {
-    final request = http.Request('POST', Uri.parse(_proxyUrl));
-    request.headers['Content-Type'] = 'application/json';
+    final request = http.Request('POST', Uri.parse(_endpointUrl));
+
+    final headers = <String, String>{
+      "Content-Type": "application/json",
+      "anthropic-version": _apiVersion,
+    };
+
+    // Only attach the API key when calling Anthropic directly (native platforms).
+    // On web the Vercel proxy adds it server-side.
+    if (!_isProxied) {
+      headers["x-api-key"] = _apiKey;
+    }
+
+    request.headers.addAll(headers);
     request.body = jsonEncode({
       'model': _model,
       'max_tokens': _maxTokens,
@@ -63,22 +89,22 @@ class ClaudeApiService {
         return;
       }
 
-      await for (final chunk in streamedResponse.stream.transform(utf8.decoder)) {
-        for (final line in chunk.split('\n')) {
-          if (line.startsWith('data: ')) {
-            final jsonString = line.substring(6).trim();
-            if (jsonString == '[DONE]') continue;
-            try {
-              final Map<String, dynamic> jsonData = jsonDecode(jsonString);
-              if (jsonData['type'] == 'content_block_delta') {
-                final delta = jsonData['delta'];
-                if (delta != null && delta['text'] != null) {
-                  onChunk(delta['text']);
-                }
+      await for (final line in streamedResponse.stream
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())) {
+        if (line.startsWith('data: ')) {
+          final jsonString = line.substring(6).trim();
+          if (jsonString == '[DONE]') continue;
+          try {
+            final Map<String, dynamic> jsonData = jsonDecode(jsonString);
+            if (jsonData['type'] == 'content_block_delta') {
+              final delta = jsonData['delta'];
+              if (delta != null && delta['text'] != null) {
+                onChunk(delta['text']);
               }
-            } catch (_) {
-              continue;
             }
+          } catch (_) {
+            continue;
           }
         }
       }

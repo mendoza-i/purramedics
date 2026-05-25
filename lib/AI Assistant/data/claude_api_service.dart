@@ -35,7 +35,7 @@ class ClaudeApiService {
   static const String _apiVersion = '2023-06-01';
 
   // MODEL: 
-  static const String _model = 'claude-sonnet-4-5-20250929'; 
+  static const String _model = 'claude-3-haiku-20240307'; 
   static const int _maxTokens = 1024;
 
   final String _apiKey;

@@ -29,6 +29,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
   final List<String> selectedSymptoms = [];
   final TextEditingController descriptionController = TextEditingController();
   final ScrollController _mainScrollController = ScrollController();
+  final GlobalKey _analysisKey = GlobalKey();
   bool _isGenerating = false;
 
   @override
@@ -103,11 +104,12 @@ class _SymptomsPageState extends State<SymptomsPage> {
     setState(() => _isGenerating = true);
 
     Future.delayed(const Duration(milliseconds: 100), () {
-      if (_mainScrollController.hasClients) {
-        _mainScrollController.animateTo(
-          _mainScrollController.position.maxScrollExtent,
+      if (_analysisKey.currentContext != null) {
+        Scrollable.ensureVisible(
+          _analysisKey.currentContext!,
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeOut,
+          alignment: 0.1, // Aligns slightly near the top
         );
       }
     });
@@ -276,6 +278,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
 
   Widget _buildAnalysisPanel(ChatProvider chat) {
     return Column(
+      key: _analysisKey,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(

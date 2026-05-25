@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -48,7 +49,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => ChatProvider(
-            apiService: ClaudeApiService(proxyUrl: claudeProxyUrl),
+            apiService: ClaudeApiService(
+              apiKey: kIsWeb ? '' : claudeApiKey,
+              proxyUrl: kIsWeb ? Uri.base.resolve('/api/chat').toString() : null,
+            ),
           ),
         ),
       ],

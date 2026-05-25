@@ -12,7 +12,7 @@ class ChatProvider with ChangeNotifier {
   final ClaudeApiService apiService;
 
   ChatProvider({ClaudeApiService? apiService})
-      : apiService = apiService ?? ClaudeApiService(proxyUrl: '/api/claude');
+      : apiService = apiService ?? ClaudeApiService(apiKey: '', proxyUrl: '/api/chat');
 
   final List<Message> _messages = [];
   bool _isLoading = false;

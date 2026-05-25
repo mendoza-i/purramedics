@@ -89,22 +89,22 @@ class ClaudeApiService {
         return;
       }
 
-      await for (final chunk in streamedResponse.stream.transform(utf8.decoder)) {
-        for (final line in chunk.split('\n')) {
-          if (line.startsWith('data: ')) {
-            final jsonString = line.substring(6).trim();
-            if (jsonString == '[DONE]') continue;
-            try {
-              final Map<String, dynamic> jsonData = jsonDecode(jsonString);
-              if (jsonData['type'] == 'content_block_delta') {
-                final delta = jsonData['delta'];
-                if (delta != null && delta['text'] != null) {
-                  onChunk(delta['text']);
-                }
+      await for (final line in streamedResponse.stream
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())) {
+        if (line.startsWith('data: ')) {
+          final jsonString = line.substring(6).trim();
+          if (jsonString == '[DONE]') continue;
+          try {
+            final Map<String, dynamic> jsonData = jsonDecode(jsonString);
+            if (jsonData['type'] == 'content_block_delta') {
+              final delta = jsonData['delta'];
+              if (delta != null && delta['text'] != null) {
+                onChunk(delta['text']);
               }
-            } catch (_) {
-              continue;
             }
+          } catch (_) {
+            continue;
           }
         }
       }

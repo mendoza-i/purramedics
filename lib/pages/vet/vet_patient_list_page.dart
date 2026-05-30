@@ -136,16 +136,40 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
             }
 
             List<Map<String, dynamic>> pets = snapshot.data!;
+            final Map<String, List<Map<String, dynamic>>> grouped = {};
+            
+            for (var ownerEmail in ownerNameMap.keys) {
+              grouped[ownerEmail] = [];
+            }
+            
+            List<Map<String, dynamic>> filteredPets = pets;
             if (_searchQuery.isNotEmpty) {
-              pets = pets.where((pet) {
+              filteredPets = pets.where((pet) {
                 final name = (pet['name'] ?? '').toString().toLowerCase();
                 final email = (pet['ownerEmail'] ?? '').toString().toLowerCase();
                 final ownerName = (ownerNameMap[email] ?? '').toString().toLowerCase();
                 return name.contains(_searchQuery) || email.contains(_searchQuery) || ownerName.contains(_searchQuery);
               }).toList();
             }
+            
+            for (var pet in filteredPets) {
+              final email = (pet['ownerEmail'] ?? '').toString().toLowerCase();
+              grouped.putIfAbsent(email, () => []).add(pet);
+            }
+            
+            List<String> matchingEmails = [];
+            if (_searchQuery.isNotEmpty) {
+              for (var email in grouped.keys) {
+                final ownerName = (ownerNameMap[email] ?? '').toString().toLowerCase();
+                if (email.contains(_searchQuery) || ownerName.contains(_searchQuery) || grouped[email]!.isNotEmpty) {
+                  matchingEmails.add(email);
+                }
+              }
+            } else {
+              matchingEmails = grouped.keys.toList();
+            }
 
-            if (pets.isEmpty) {
+            if (matchingEmails.isEmpty) {
               return const EmptyState(
                 icon: Icons.search_off_rounded,
                 title: 'No matches',
@@ -153,12 +177,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
               );
             }
 
-            final Map<String, List<Map<String, dynamic>>> grouped = {};
-            for (var pet in pets) {
-              final email = (pet['ownerEmail'] ?? '').toString().toLowerCase();
-              grouped.putIfAbsent(email, () => []).add(pet);
-            }
-            final sortedEmails = grouped.keys.toList()..sort();
+            final sortedEmails = matchingEmails..sort();
 
             return RefreshIndicator(
               onRefresh: () async => Future.delayed(const Duration(milliseconds: 600)),

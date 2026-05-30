@@ -109,9 +109,9 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
   Future<void> _savePrices() async {
     setState(() => _isPriceSaving = true);
     try {
-      final prices = <String, int>{};
+      final prices = <String, String>{};
       for (final key in _serviceNames) {
-        prices[key] = int.tryParse(_priceControllers[key]?.text ?? '500') ?? 500;
+        prices[key] = _priceControllers[key]?.text ?? '500';
       }
       await _firestoreService.updateServicePrices(prices);
       if (mounted) {
@@ -175,6 +175,68 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      AppCard(
+                        padding: const EdgeInsets.all(AppSpacing.xxxl),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const IconAvatar(
+                                  icon: Icons.attach_money_rounded,
+                                  color: AppColors.success,
+                                  background: AppColors.successSurface,
+                                ),
+                                AppSpacing.hMd,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Service Pricing', style: AppTypography.titleLarge),
+                                      Text(
+                                        'Set consultation fees (₱) shown to pet owners',
+                                        style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            AppSpacing.vXxl,
+                            for (final key in _serviceNames) ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text(
+                                      _serviceLabels[key] ?? key,
+                                      style: AppTypography.titleSmall,
+                                    ),
+                                  ),
+                                  AppSpacing.hMd,
+                                  Expanded(
+                                    flex: 2,
+                                    child: AppTextField(
+                                      controller: _priceControllers[key] ?? TextEditingController(),
+                                      prefixIcon: Icons.payments_outlined,
+                                      keyboardType: TextInputType.text,
+                                      textInputAction: TextInputAction.next,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              AppSpacing.vMd,
+                            ],
+                            AppSpacing.vMd,
+                            PrimaryButton(
+                              label: 'Save prices',
+                              onPressed: _savePrices,
+                              isLoading: _isPriceSaving,
+                            ),
+                          ],
+                        ),
+                      ),
+                      AppSpacing.vHuge,
                       AppCard(
                         padding: const EdgeInsets.all(AppSpacing.xxxl),
                         child: Column(
@@ -251,69 +313,6 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                                 isLoading: _isSaving,
                               ),
                             ],
-                          ],
-                        ),
-                      ),
-                      AppSpacing.vHuge,
-                      AppCard(
-                        padding: const EdgeInsets.all(AppSpacing.xxxl),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const IconAvatar(
-                                  icon: Icons.attach_money_rounded,
-                                  color: AppColors.success,
-                                  background: AppColors.successSurface,
-                                ),
-                                AppSpacing.hMd,
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Service Pricing', style: AppTypography.titleLarge),
-                                      Text(
-                                        'Set consultation fees (₱) shown to pet owners',
-                                        style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            AppSpacing.vXxl,
-                            for (final key in _serviceNames) ...[
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text(
-                                      _serviceLabels[key] ?? key,
-                                      style: AppTypography.titleSmall,
-                                    ),
-                                  ),
-                                  AppSpacing.hMd,
-                                  Expanded(
-                                    flex: 2,
-                                    child: AppTextField(
-                                      controller: _priceControllers[key] ?? TextEditingController(),
-                                      prefixIcon: Icons.payments_outlined,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                      textInputAction: TextInputAction.next,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              AppSpacing.vMd,
-                            ],
-                            AppSpacing.vMd,
-                            PrimaryButton(
-                              label: 'Save prices',
-                              onPressed: _savePrices,
-                              isLoading: _isPriceSaving,
-                            ),
                           ],
                         ),
                       ),

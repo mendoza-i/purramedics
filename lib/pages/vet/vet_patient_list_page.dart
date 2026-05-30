@@ -77,17 +77,6 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
         elevation: 0,
         centerTitle: false,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.lg),
-            child: PrimaryButton(
-              label: 'Add Pet',
-              icon: Icons.add_rounded,
-              size: AppButtonSize.small,
-              onPressed: () => _showOwnerSelectorDialog(context),
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: Padding(

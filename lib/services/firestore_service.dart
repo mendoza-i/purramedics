@@ -444,29 +444,29 @@ class FirestoreService {
   // SERVICE PRICING
   // ==========================================
 
-  Future<Map<String, int>> getServicePrices() async {
+  Future<Map<String, String>> getServicePrices() async {
     final doc = await _settingsCollection.doc('service_prices').get();
     if (!doc.exists || doc.data() == null) {
       // Seed with defaults
-      const defaults = {'checkup': 500, 'vaccination': 800, 'grooming': 400, 'surgery': 3000, 'others': 500};
+      const defaults = {'checkup': '500', 'vaccination': '800', 'grooming': '400', 'surgery': '3000', 'others': '500'};
       await _settingsCollection.doc('service_prices').set(defaults);
       return defaults;
     }
     final data = doc.data() as Map<String, dynamic>;
-    return data.map((k, v) => MapEntry(k, (v as num).toInt()));
+    return data.map((k, v) => MapEntry(k, v.toString()));
   }
 
-  Stream<Map<String, int>> getServicePricesStream() {
+  Stream<Map<String, String>> getServicePricesStream() {
     return _settingsCollection.doc('service_prices').snapshots().map((snapshot) {
       if (!snapshot.exists || snapshot.data() == null) {
-        return {'checkup': 500, 'vaccination': 800, 'grooming': 400, 'surgery': 3000, 'others': 500};
+        return {'checkup': '500', 'vaccination': '800', 'grooming': '400', 'surgery': '3000', 'others': '500'};
       }
       final data = snapshot.data() as Map<String, dynamic>;
-      return data.map((k, v) => MapEntry(k, (v as num).toInt()));
+      return data.map((k, v) => MapEntry(k, v.toString()));
     });
   }
 
-  Future<void> updateServicePrices(Map<String, int> prices) async {
+  Future<void> updateServicePrices(Map<String, String> prices) async {
     await _settingsCollection.doc('service_prices').set(prices);
   }
 

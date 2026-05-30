@@ -353,6 +353,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
         final count = snapshot.data ?? 0;
         return Stack(
           clipBehavior: Clip.none,
+          fit: StackFit.expand,
           children: [
             card,
             if (count > 0)

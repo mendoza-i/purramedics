@@ -553,7 +553,7 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                                     ),
                                     AppSpacing.vMd,
                                     const SizedBox(height: AppSpacing.lg),
-                                    StreamBuilder<Map<String, int>>(
+                                    StreamBuilder<Map<String, String>>(
                                       stream: FirestoreService().getServicePricesStream(),
                                       builder: (context, priceSnap) {
                                         final prices = priceSnap.data ?? {};
@@ -581,24 +581,6 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                                         validator: (v) => v == null || v.trim().isEmpty ? 'Please specify' : null,
                                       ),
                                     ],
-                                    AppSpacing.vXl,
-                                    _section('Consultation type'),
-                                    AppSpacing.vSm,
-                                    Row(
-                                      children: [
-                                        for (final method in consultMethods)
-                                          Expanded(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                right: method == consultMethods.first ? AppSpacing.sm : 0,
-                                              ),
-                                              child: _consultPill(method, selectedMethod == method, () {
-                                                setDialogState(() => selectedMethod = method);
-                                              }),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
                                     AppSpacing.vXl,
                                     _section('Select date'),
                                     AppSpacing.vSm,

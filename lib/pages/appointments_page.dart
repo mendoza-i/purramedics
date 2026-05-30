@@ -552,16 +552,25 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                                       validator: (v) => v == null || v.trim().isEmpty ? 'Please enter a pet name' : null,
                                     ),
                                     AppSpacing.vMd,
-                                    DropdownButtonFormField<String>(
-                                      initialValue: selectedVisitType,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Visit type',
-                                        prefixIcon: Icon(Icons.medical_services_outlined),
-                                      ),
-                                      items: visitTypes
-                                          .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                                          .toList(),
-                                      onChanged: (v) => setDialogState(() => selectedVisitType = v!),
+                                    const SizedBox(height: AppSpacing.lg),
+                                    StreamBuilder<Map<String, int>>(
+                                      stream: FirestoreService().getServicePricesStream(),
+                                      builder: (context, priceSnap) {
+                                        final prices = priceSnap.data ?? {};
+                                        return DropdownButtonFormField<String>(
+                                          value: selectedVisitType,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Visit type',
+                                            prefixIcon: Icon(Icons.medical_services_outlined),
+                                          ),
+                                          items: visitTypes.map((t) {
+                                            final price = prices[t.toLowerCase()];
+                                            final label = price != null ? '$t — ₱$price' : t;
+                                            return DropdownMenuItem(value: t, child: Text(label));
+                                          }).toList(),
+                                          onChanged: (v) => setDialogState(() => selectedVisitType = v!),
+                                        );
+                                      },
                                     ),
                                     if (selectedVisitType == 'Others') ...[
                                       AppSpacing.vMd,
@@ -650,22 +659,48 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                                             ),
                                           );
                                         }
-                                        if (selectedTimeSlot == null || !availableSlots.contains(selectedTimeSlot)) {
-                                          selectedTimeSlot = availableSlots.first;
+                                        if (selectedTimeSlot != null && !availableSlots.contains(selectedTimeSlot)) {
+                                          selectedTimeSlot = null;
                                         }
                                         return Wrap(
                                           spacing: AppSpacing.sm,
                                           runSpacing: AppSpacing.sm,
                                           children: [
                                             for (final slot in allTimeSlots)
-                                              _timeSlot(
-                                                slot,
-                                                available: availableSlots.contains(slot),
-                                                selected: selectedTimeSlot == slot,
-                                                onTap: availableSlots.contains(slot)
-                                                    ? () => setDialogState(() => selectedTimeSlot = slot)
-                                                    : null,
-                                              ),
+                                              if (!availableSlots.contains(slot))
+                                                _timeSlot(
+                                                  slot,
+                                                  available: false,
+                                                  selected: false,
+                                                  onTap: null,
+                                                )
+                                              else
+                                                FutureBuilder<bool>(
+                                                  future: _firestoreService.isSlotTaken(
+                                                    'Pet Treasure',
+                                                    "${selectedDate.toLocal()}".split(' ')[0],
+                                                    slot,
+                                                    includePending: true,
+                                                  ),
+                                                  builder: (ctx, takenSnap) {
+                                                    final taken = takenSnap.data ?? false;
+                                                    if (taken) {
+                                                      return _timeSlot(
+                                                        slot,
+                                                        available: false,
+                                                        selected: false,
+                                                        onTap: null,
+                                                        labelOverride: 'Booked',
+                                                      );
+                                                    }
+                                                    return _timeSlot(
+                                                      slot,
+                                                      available: true,
+                                                      selected: selectedTimeSlot == slot,
+                                                      onTap: () => setDialogState(() => selectedTimeSlot = slot),
+                                                    );
+                                                  },
+                                                ),
                                           ],
                                         );
                                       },
@@ -692,15 +727,57 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                                           );
                                           return;
                                         }
+                                        final finalVisitType = selectedVisitType == 'Others'
+                                            ? otherVisitController.text.trim()
+                                            : selectedVisitType;
+                                        final dateString = "${selectedDate.toLocal()}".split(' ')[0];
+
+                                        final confirmed = await showDialog<bool>(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                            shape: RoundedRectangleBorder(borderRadius: AppRadii.rLg),
+                                            title: Row(
+                                              children: [
+                                                const Icon(Icons.event_available_rounded, color: AppColors.primary),
+                                                AppSpacing.hSm,
+                                                Text('Confirm booking?', style: AppTypography.headlineSmall),
+                                              ],
+                                            ),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                _confirmRow(Icons.pets_rounded, 'Pet', petController.text.trim()),
+                                                _confirmRow(Icons.medical_services_outlined, 'Visit', finalVisitType),
+                                                _confirmRow(Icons.calendar_today_outlined, 'Date', dateString),
+                                                _confirmRow(Icons.access_time_outlined, 'Time', selectedTimeSlot!),
+                                                _confirmRow(
+                                                  selectedMethod.contains('Online') ? Icons.videocam_outlined : Icons.local_hospital_outlined,
+                                                  'Method',
+                                                  selectedMethod,
+                                                ),
+                                              ],
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(ctx, false),
+                                                child: Text('Go back', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+                                              ),
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(ctx, true),
+                                                child: Text('Confirm booking', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+
+                                        if (confirmed != true) return;
+
                                         setDialogState(() => isBooking = true);
                                         try {
-                                          final finalVisitType = selectedVisitType == 'Others'
-                                              ? otherVisitController.text.trim()
-                                              : selectedVisitType;
                                           await _firestoreService.addAppointment(
                                             'Pet Treasure',
                                             '',
-                                            "${selectedDate.toLocal()}".split(' ')[0],
+                                            dateString,
                                             selectedTimeSlot!,
                                             petController.text.trim(),
                                             finalVisitType,
@@ -746,6 +823,20 @@ class _AppointmentsPageState extends State<AppointmentsPage>
 
   Widget _section(String label) => Text(label, style: AppTypography.labelLarge);
 
+  Widget _confirmRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs + 1),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: AppColors.primary),
+          AppSpacing.hMd,
+          Text('$label: ', style: AppTypography.labelMedium),
+          Expanded(child: Text(value, style: AppTypography.bodyMedium)),
+        ],
+      ),
+    );
+  }
+
   Widget _consultPill(String method, bool selected, VoidCallback onTap) {
     final isOnline = method == 'Online Consultation';
     return GestureDetector(
@@ -778,7 +869,7 @@ class _AppointmentsPageState extends State<AppointmentsPage>
     );
   }
 
-  Widget _timeSlot(String slot, {required bool available, required bool selected, VoidCallback? onTap}) {
+  Widget _timeSlot(String slot, {required bool available, required bool selected, VoidCallback? onTap, String? labelOverride}) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -799,16 +890,30 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                     : AppColors.primary.withOpacity(0.35),
           ),
         ),
-        child: Text(
-          slot,
-          style: AppTypography.labelMedium.copyWith(
-            color: !available
-                ? AppColors.textTertiary
-                : selected
-                    ? AppColors.textInverse
-                    : AppColors.primaryDark,
-            decoration: !available ? TextDecoration.lineThrough : null,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              slot,
+              style: AppTypography.labelMedium.copyWith(
+                color: !available
+                    ? AppColors.textTertiary
+                    : selected
+                        ? AppColors.textInverse
+                        : AppColors.primaryDark,
+                decoration: !available && labelOverride == null ? TextDecoration.lineThrough : null,
+              ),
+            ),
+            if (labelOverride != null)
+              Text(
+                labelOverride,
+                style: AppTypography.labelSmall.copyWith(
+                  color: AppColors.danger,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+          ],
         ),
       ),
     );

@@ -19,6 +19,12 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
   int _selectedYear = DateTime.now().year;
   final Map<String, bool> _expandedMonths = {};
 
+  @override
+  void initState() {
+    super.initState();
+    firestoreService.markAppointmentsAsRead();
+  }
+
   void _updateStatus(String docId, String newStatus) {
     FirebaseFirestore.instance.collection('appointments').doc(docId).update({'status': newStatus});
   }

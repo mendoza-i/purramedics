@@ -108,6 +108,7 @@ class FirestoreService {
       'additionalInfo': additionalInfo,
       'consultationMethod': consultationMethod,
       'status': 'Pending',
+      'isRead': false,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
@@ -385,7 +386,26 @@ class FirestoreService {
     return _appointmentsCollection
         .where('status', isEqualTo: 'Pending')
         .snapshots()
-        .map((snapshot) => snapshot.docs.length);
+        .map((snapshot) => snapshot.docs.where((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return data['isRead'] == false;
+            }).length);
+  }
+  
+  // Mark Pending Appointments as Read
+  Future<void> markAppointmentsAsRead() async {
+    final query = await _appointmentsCollection
+        .where('status', isEqualTo: 'Pending')
+        .get();
+    
+    final batch = FirebaseFirestore.instance.batch();
+    for (var doc in query.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      if (data['isRead'] == false) {
+        batch.update(doc.reference, {'isRead': true});
+      }
+    }
+    await batch.commit();
   }
   
   // Get count of Pending Requests

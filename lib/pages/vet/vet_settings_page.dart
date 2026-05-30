@@ -22,11 +22,26 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
   bool _isLoading = false;
   bool _isSaving = false;
   bool _isEditing = false;
+  
+  bool _isPriceSaving = false;
+  final Map<String, TextEditingController> _priceControllers = {};
+  static const _serviceNames = ['checkup', 'vaccination', 'grooming', 'surgery', 'others'];
+  static const _serviceLabels = {'checkup': 'Checkup', 'vaccination': 'Vaccination', 'grooming': 'Grooming', 'surgery': 'Surgery', 'others': 'Others'};
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
+    _loadPrices();
+  }
+
+  Future<void> _loadPrices() async {
+    final prices = await _firestoreService.getServicePrices();
+    setState(() {
+      for (final key in _serviceNames) {
+        _priceControllers[key] = TextEditingController(text: '${prices[key] ?? 500}');
+      }
+    });
   }
 
   Future<void> _loadSettings() async {
@@ -91,6 +106,33 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
     }
   }
 
+  Future<void> _savePrices() async {
+    setState(() => _isPriceSaving = true);
+    try {
+      final prices = <String, String>{};
+      for (final key in _serviceNames) {
+        prices[key] = _priceControllers[key]?.text ?? '500';
+      }
+      await _firestoreService.updateServicePrices(prices);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Service prices updated'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.danger),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isPriceSaving = false);
+    }
+  }
+
   void _confirmSignOut() {
     FirebaseAuth.instance.signOut();
     Navigator.pushAndRemoveUntil(
@@ -98,6 +140,17 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
       MaterialPageRoute(builder: (_) => const IntroPage()),
       (_) => false,
     );
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _emailController.dispose();
+    _addressController.dispose();
+    for (final c in _priceControllers.values) {
+      c.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -122,6 +175,68 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      AppCard(
+                        padding: const EdgeInsets.all(AppSpacing.xxxl),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const IconAvatar(
+                                  icon: Icons.attach_money_rounded,
+                                  color: AppColors.success,
+                                  background: AppColors.successSurface,
+                                ),
+                                AppSpacing.hMd,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Service Pricing', style: AppTypography.titleLarge),
+                                      Text(
+                                        'Set consultation fees (₱) shown to pet owners',
+                                        style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            AppSpacing.vXxl,
+                            for (final key in _serviceNames) ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text(
+                                      _serviceLabels[key] ?? key,
+                                      style: AppTypography.titleSmall,
+                                    ),
+                                  ),
+                                  AppSpacing.hMd,
+                                  Expanded(
+                                    flex: 2,
+                                    child: AppTextField(
+                                      controller: _priceControllers[key] ?? TextEditingController(),
+                                      prefixIcon: Icons.payments_outlined,
+                                      keyboardType: TextInputType.text,
+                                      textInputAction: TextInputAction.next,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              AppSpacing.vMd,
+                            ],
+                            AppSpacing.vMd,
+                            PrimaryButton(
+                              label: 'Save prices',
+                              onPressed: _savePrices,
+                              isLoading: _isPriceSaving,
+                            ),
+                          ],
+                        ),
+                      ),
+                      AppSpacing.vHuge,
                       AppCard(
                         padding: const EdgeInsets.all(AppSpacing.xxxl),
                         child: Column(

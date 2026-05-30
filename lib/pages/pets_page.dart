@@ -36,18 +36,16 @@ class _PetsPageState extends State<PetsPage> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      floatingActionButton: isVet
-          ? FloatingActionButton.extended(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.textInverse,
-              onPressed: () async {
-                await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddPetPage()));
-                setState(() {});
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Add patient'),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textInverse,
+        onPressed: () async {
+          await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddPetPage()));
+          setState(() {});
+        },
+        icon: const Icon(Icons.add),
+        label: Text(isVet ? 'Add patient' : 'Add pet'),
+      ),
       body: SafeArea(
         child: StreamBuilder<List<Map<String, dynamic>>>(
           stream: _firestoreService.getUserPetsStream(_currentUser!.email ?? ''),
@@ -219,7 +217,7 @@ class _PetsPageState extends State<PetsPage> {
                     children: [
                       Expanded(child: _statItem('Age', calculatedAge, Icons.cake_outlined)),
                       _statDivider(),
-                      Expanded(child: _statItem('Gender', gender, Icons.wc_outlined)),
+                      Expanded(child: _statItem('Gender', gender, Icons.pets_outlined)),
                       _statDivider(),
                       Expanded(child: _statItem('Weight', weight, Icons.monitor_weight_outlined)),
                     ],
@@ -242,39 +240,6 @@ class _PetsPageState extends State<PetsPage> {
                   Text('Health overview', style: AppTypography.headlineSmall),
                   AppSpacing.vLg,
                   _buildSessionNotes(currentPet['id'] as String),
-                  if (!isVet) ...[
-                    AppSpacing.vXl,
-                    const Divider(),
-                    AppSpacing.vLg,
-                    Text('Manage profile', style: AppTypography.headlineSmall),
-                    AppSpacing.vXs,
-                    Text(
-                      'Only verified veterinarians can edit or delete medical records. You can submit a request below.',
-                      style: AppTypography.bodySmall,
-                    ),
-                    AppSpacing.vLg,
-                    Row(
-                      children: [
-                        Expanded(
-                          child: SecondaryButton(
-                            label: 'Request change',
-                            icon: Icons.edit_note_outlined,
-                            size: AppButtonSize.medium,
-                            onPressed: () => _showRequestDialog(context, currentPet['id'] as String, name, 'Edit Request'),
-                          ),
-                        ),
-                        AppSpacing.hMd,
-                        Expanded(
-                          child: SecondaryButton(
-                            label: 'Request deletion',
-                            icon: Icons.delete_outline_rounded,
-                            size: AppButtonSize.medium,
-                            onPressed: () => _showRequestDialog(context, currentPet['id'] as String, name, 'Delete Request'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
                 ],
               ),
             ),

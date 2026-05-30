@@ -21,10 +21,23 @@ class SymptomsPage extends StatefulWidget {
 }
 
 class _SymptomsPageState extends State<SymptomsPage> {
+  static bool _hasShownDisclaimer = false;
+
   final List<String> symptoms = const [
     'Loss of appetite', 'Vomiting', 'Diarrhea', 'Lethargy',
     'Coughing', 'Limping', 'Scratching', 'Difficulty breathing',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_hasShownDisclaimer) {
+      _hasShownDisclaimer = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showTrustInfo();
+      });
+    }
+  }
 
   final List<String> selectedSymptoms = [];
   final TextEditingController descriptionController = TextEditingController();
@@ -194,7 +207,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(child: Text('Symptom Checker', style: AppTypography.displayMedium)),
+            Expanded(child: Text('AI-Powered Pet Triage', style: AppTypography.displayMedium)),
             IconButton(
               onPressed: _showTrustInfo,
               icon: const Icon(Icons.info_outline_rounded, color: AppColors.textTertiary),

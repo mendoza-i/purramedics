@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:purramedics/services/firestore_service.dart';
@@ -25,6 +26,41 @@ class VetDashboardPage extends StatefulWidget {
 class _VetDashboardPageState extends State<VetDashboardPage> {
   final FirestoreService _firestoreService = FirestoreService();
   final User? currentUser = FirebaseAuth.instance.currentUser;
+  
+  int _lastPendingCount = -1;
+  StreamSubscription<int>? _pendingSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _pendingSub = _firestoreService.getPendingAppointmentsCountStream().listen((count) {
+      if (_lastPendingCount >= 0 && count > _lastPendingCount && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                const Expanded(child: Text('🔔 New appointment has been booked!')),
+              ],
+            ),
+            backgroundColor: AppColors.primary,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+      _lastPendingCount = count;
+    });
+  }
+
+  @override
+  void dispose() {
+    _pendingSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,11 +92,11 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
                   children: [
                     _buildHeader(),
                     AppSpacing.vXxl,
-                    if (Responsive.isWide(context)) _buildWideLayout() else _buildMobileLayout(),
-                    AppSpacing.vXxl,
                     Text('Practice Tools', style: AppTypography.headlineMedium),
                     AppSpacing.vMd,
                     _buildToolsGrid(),
+                    AppSpacing.vXxl,
+                    if (Responsive.isWide(context)) _buildWideLayout() else _buildMobileLayout(),
                   ],
                 ),
               ),
@@ -261,7 +297,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
       }),
       _Tool('Appointments', 'View schedule', Icons.calendar_today_rounded, AppColors.warning, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VetAppointmentListPage()));
-      }),
+      }, badgeStream: _firestoreService.getPendingAppointmentsCountStream()),
       _Tool('My Patients', 'Manage records', Icons.pets_rounded, AppColors.info, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VetPatientListPage()));
       }),
@@ -288,7 +324,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
   }
 
   Widget _buildToolCard(_Tool t) {
-    return AppCard(
+    final card = AppCard(
       onTap: t.onTap,
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
@@ -308,6 +344,46 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
         ],
       ),
     );
+
+    if (t.badgeStream == null) return card;
+
+    return StreamBuilder<int>(
+      stream: t.badgeStream,
+      builder: (context, snapshot) {
+        final count = snapshot.data ?? 0;
+        return Stack(
+          clipBehavior: Clip.none,
+          fit: StackFit.expand,
+          children: [
+            card,
+            if (count > 0)
+              Positioned(
+                top: -4,
+                right: -4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.danger,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: AppShadows.colored(AppColors.danger, opacity: 0.4),
+                  ),
+                  constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                  child: Center(
+                    child: Text(
+                      '$count',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -317,5 +393,6 @@ class _Tool {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
-  _Tool(this.title, this.subtitle, this.icon, this.color, this.onTap);
+  final Stream<int>? badgeStream;
+  _Tool(this.title, this.subtitle, this.icon, this.color, this.onTap, {this.badgeStream});
 }

@@ -108,6 +108,7 @@ class FirestoreService {
       'additionalInfo': additionalInfo,
       'consultationMethod': consultationMethod,
       'status': 'Pending',
+      'isRead': false,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
@@ -380,6 +381,33 @@ class FirestoreService {
   // DASHBOARD QUICK STATS (NEW)
   // ==========================================
   
+  // Get count of Pending Appointments
+  Stream<int> getPendingAppointmentsCountStream() {
+    return _appointmentsCollection
+        .where('status', isEqualTo: 'Pending')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.where((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return data['isRead'] == false;
+            }).length);
+  }
+  
+  // Mark Pending Appointments as Read
+  Future<void> markAppointmentsAsRead() async {
+    final query = await _appointmentsCollection
+        .where('status', isEqualTo: 'Pending')
+        .get();
+    
+    final batch = FirebaseFirestore.instance.batch();
+    for (var doc in query.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      if (data['isRead'] == false) {
+        batch.update(doc.reference, {'isRead': true});
+      }
+    }
+    await batch.commit();
+  }
+  
   // Get count of Pending Requests
   Stream<int> getPendingRequestsCountStream() {
     return _petRequestsCollection
@@ -430,6 +458,36 @@ class FirestoreService {
 
   Stream<DocumentSnapshot> getClinicSettingsStream() {
     return _settingsCollection.doc('clinic_profile').snapshots();
+  }
+
+  // ==========================================
+  // SERVICE PRICING
+  // ==========================================
+
+  Future<Map<String, String>> getServicePrices() async {
+    final doc = await _settingsCollection.doc('service_prices').get();
+    if (!doc.exists || doc.data() == null) {
+      // Seed with defaults
+      const defaults = {'checkup': '500', 'vaccination': '800', 'grooming': '400', 'surgery': '3000', 'others': '500'};
+      await _settingsCollection.doc('service_prices').set(defaults);
+      return defaults;
+    }
+    final data = doc.data() as Map<String, dynamic>;
+    return data.map((k, v) => MapEntry(k, v.toString()));
+  }
+
+  Stream<Map<String, String>> getServicePricesStream() {
+    return _settingsCollection.doc('service_prices').snapshots().map((snapshot) {
+      if (!snapshot.exists || snapshot.data() == null) {
+        return {'checkup': '500', 'vaccination': '800', 'grooming': '400', 'surgery': '3000', 'others': '500'};
+      }
+      final data = snapshot.data() as Map<String, dynamic>;
+      return data.map((k, v) => MapEntry(k, v.toString()));
+    });
+  }
+
+  Future<void> updateServicePrices(Map<String, String> prices) async {
+    await _settingsCollection.doc('service_prices').set(prices);
   }
 
   // ==========================================

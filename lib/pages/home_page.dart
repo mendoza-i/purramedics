@@ -14,6 +14,8 @@ import '../../models/event.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive.dart';
 import '../widgets/widgets.dart';
+import 'dart:async';
+import '../utils/audio_utils.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,6 +26,72 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  int _lastConfirmedCount = -1;
+  int _lastUnreadCount = -1;
+  StreamSubscription<List<Map<String, dynamic>>>? _appointmentsSub;
+  StreamSubscription<int>? _unreadSub;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _appointmentsSub = FirestoreService().getUserAppointmentsStream(user.uid).listen((appointments) {
+        final confirmedCount = appointments.where((a) => a['status'] == 'Confirmed').length;
+        if (_lastConfirmedCount >= 0 && confirmedCount > _lastConfirmedCount && mounted) {
+          AudioUtils.playNotificationSound();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  const Expanded(child: Text('✅ Your appointment has been confirmed!')),
+                ],
+              ),
+              backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.all(16),
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+        _lastConfirmedCount = confirmedCount;
+      });
+
+      _unreadSub = FirestoreService().getUserUnreadCountStream(user.uid).listen((count) {
+        if (_lastUnreadCount >= 0 && count > _lastUnreadCount && mounted) {
+          AudioUtils.playNotificationSound();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.mark_chat_unread_rounded, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  const Expanded(child: Text('💬 You have a new message from the clinic!')),
+                ],
+              ),
+              backgroundColor: AppColors.info,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.all(16),
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+        _lastUnreadCount = count;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _appointmentsSub?.cancel();
+    _unreadSub?.cancel();
+    super.dispose();
+  }
+
   void navigateBottomBar(int index) {
     setState(() {
       _selectedIndex = index;

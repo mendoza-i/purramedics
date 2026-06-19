@@ -605,6 +605,14 @@ class FirestoreService {
     return _chatsCollection.doc(chatId).snapshots();
   }
 
+  Stream<int> getUserUnreadCountStream(String userId) {
+    return _chatsCollection.doc(userId).snapshots().map((snapshot) {
+      if (!snapshot.exists || snapshot.data() == null) return 0;
+      final data = snapshot.data() as Map<String, dynamic>;
+      return ((data['unreadByUser'] ?? 0) as num).toInt();
+    });
+  }
+
   // Mark chat as read
   Future<void> markChatAsRead(String chatId, bool isVet) async {
     final chatDoc = _chatsCollection.doc(chatId);

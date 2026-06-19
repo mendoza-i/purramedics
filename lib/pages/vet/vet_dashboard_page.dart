@@ -14,6 +14,7 @@ import 'package:purramedics/pages/vet/widgets/descriptive_analytics_widget.dart'
 import 'package:purramedics/pages/vet/widgets/revenue_stats_widget.dart';
 import 'package:purramedics/theme/app_theme.dart';
 import 'package:purramedics/utils/responsive.dart';
+import 'package:purramedics/utils/audio_utils.dart';
 import 'package:purramedics/widgets/widgets.dart';
 
 class VetDashboardPage extends StatefulWidget {
@@ -28,13 +29,16 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
   final User? currentUser = FirebaseAuth.instance.currentUser;
   
   int _lastPendingCount = -1;
+  int _lastUnreadCount = -1;
   StreamSubscription<int>? _pendingSub;
+  StreamSubscription<int>? _unreadSub;
 
   @override
   void initState() {
     super.initState();
     _pendingSub = _firestoreService.getPendingAppointmentsCountStream().listen((count) {
       if (_lastPendingCount >= 0 && count > _lastPendingCount && mounted) {
+        AudioUtils.playNotificationSound();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -54,11 +58,35 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
       }
       _lastPendingCount = count;
     });
+
+    _unreadSub = _firestoreService.getVetUnreadCountStream().listen((count) {
+      if (_lastUnreadCount >= 0 && count > _lastUnreadCount && mounted) {
+        AudioUtils.playNotificationSound();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.mark_chat_unread_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                const Expanded(child: Text('💬 You have a new message!')),
+              ],
+            ),
+            backgroundColor: AppColors.info,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+      _lastUnreadCount = count;
+    });
   }
 
   @override
   void dispose() {
     _pendingSub?.cancel();
+    _unreadSub?.cancel();
     super.dispose();
   }
 
@@ -90,7 +118,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
       _SidebarItem('Dashboard', Icons.dashboard_rounded, null),
       _SidebarItem('Appointments', Icons.calendar_today_rounded, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VetAppointmentListPage()));
-      }),
+      }, badgeStream: _firestoreService.getPendingAppointmentsCountStream()),
       _SidebarItem('My Patients', Icons.pets_rounded, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VetPatientListPage()));
       }),
@@ -105,7 +133,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
       }),
       _SidebarItem('Inbox', Icons.inbox_rounded, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VetInboxPage()));
-      }),
+      }, badgeStream: _firestoreService.getVetUnreadCountStream()),
       _SidebarItem('Settings', Icons.settings_rounded, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VetSettingsPage()));
       }),
@@ -176,6 +204,26 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
                               ),
                             ),
                           ),
+                          if (item.badgeStream != null)
+                            StreamBuilder<int>(
+                              stream: item.badgeStream,
+                              builder: (context, snapshot) {
+                                final count = snapshot.data ?? 0;
+                                if (count == 0) return const SizedBox.shrink();
+                                return Container(
+                                  margin: const EdgeInsets.only(right: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.danger,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '$count',
+                                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                  ),
+                                );
+                              },
+                            ),
                           if (isActive)
                             Container(
                               width: 4,
@@ -526,5 +574,6 @@ class _SidebarItem {
   final String label;
   final IconData icon;
   final VoidCallback? onTap;
-  _SidebarItem(this.label, this.icon, this.onTap);
+  final Stream<int>? badgeStream;
+  _SidebarItem(this.label, this.icon, this.onTap, {this.badgeStream});
 }

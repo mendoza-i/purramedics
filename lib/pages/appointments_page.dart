@@ -112,6 +112,7 @@ class AppointmentsPage extends StatefulWidget {
                             children: [
                               Form(
                                 key: formKey,
+                                autovalidateMode: AutovalidateMode.always,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

@@ -113,7 +113,7 @@ class FirestoreService {
     });
   }
 
-  // Count active (non-declined) bookings for a user
+  // Count active bookings (Pending or Confirmed) for a user
   Future<int> getActiveBookingCount(String userId) async {
     final query = await _appointmentsCollection
         .where('userId', isEqualTo: userId)
@@ -121,7 +121,7 @@ class FirestoreService {
     return query.docs.where((doc) {
       final data = doc.data() as Map<String, dynamic>;
       final status = (data['status'] ?? '').toString();
-      return status != 'Declined';
+      return status == 'Pending' || status == 'Confirmed';
     }).length;
   }
 

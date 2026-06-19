@@ -113,6 +113,18 @@ class FirestoreService {
     });
   }
 
+  // Count active (non-declined) bookings for a user
+  Future<int> getActiveBookingCount(String userId) async {
+    final query = await _appointmentsCollection
+        .where('userId', isEqualTo: userId)
+        .get();
+    return query.docs.where((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      final status = (data['status'] ?? '').toString();
+      return status != 'Declined';
+    }).length;
+  }
+
   // Get Appointments Stream (For specific User)
   Stream<List<Map<String, dynamic>>> getUserAppointmentsStream(String userId) {
     return _appointmentsCollection

@@ -64,6 +64,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isWide = Responsive.isWide(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -72,34 +73,158 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
         toolbarHeight: 0,
       ),
       body: SafeArea(
-        child: RefreshIndicator(
-          color: AppColors.primary,
-          onRefresh: () async {
-            await Future.delayed(const Duration(milliseconds: 600));
-            setState(() {});
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(
-              horizontal: Responsive.pagePadding(context),
-              vertical: AppSpacing.xxl,
-            ),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: Responsive.contentMaxWidth(context)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(),
-                    AppSpacing.vXxl,
-                    Text('Practice Tools', style: AppTypography.headlineMedium),
-                    AppSpacing.vMd,
-                    _buildToolsGrid(),
-                    AppSpacing.vXxl,
-                    if (Responsive.isWide(context)) _buildWideLayout() else _buildMobileLayout(),
-                  ],
+        child: isWide
+            ? Row(
+                children: [
+                  _buildSidebar(),
+                  Expanded(child: _buildMainContent()),
+                ],
+              )
+            : _buildMainContent(),
+      ),
+    );
+  }
+
+  Widget _buildSidebar() {
+    final items = [
+      _SidebarItem('Dashboard', Icons.dashboard_rounded, null),
+      _SidebarItem('Appointments', Icons.calendar_today_rounded, () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetAppointmentListPage()));
+      }),
+      _SidebarItem('My Patients', Icons.pets_rounded, () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetPatientListPage()));
+      }),
+      _SidebarItem('Availability', Icons.event_available_rounded, () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetAvailabilityPage()));
+      }),
+      _SidebarItem('Events', Icons.event_rounded, () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetEventListPage()));
+      }),
+      _SidebarItem('Requests', Icons.medical_services_rounded, () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetRequestsPage()));
+      }),
+      _SidebarItem('Inbox', Icons.inbox_rounded, () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetInboxPage()));
+      }),
+      _SidebarItem('Settings', Icons.settings_rounded, () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetSettingsPage()));
+      }),
+    ];
+
+    return Container(
+      width: 220,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border(right: BorderSide(color: AppColors.divider)),
+        boxShadow: AppShadows.sm,
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primarySurface,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.local_hospital_rounded, color: AppColors.primary, size: 20),
                 ),
-              ),
+                AppSpacing.hMd,
+                Expanded(
+                  child: Text(
+                    'Purramedics',
+                    style: AppTypography.titleMedium.copyWith(color: AppColors.primary),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: AppColors.divider),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+              children: items.map((item) {
+                final isActive = item.onTap == null;
+                return Material(
+                  color: isActive ? AppColors.primarySurface : Colors.transparent,
+                  child: InkWell(
+                    onTap: item.onTap,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                        vertical: AppSpacing.md + 2,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            item.icon,
+                            size: 20,
+                            color: isActive ? AppColors.primary : AppColors.textSecondary,
+                          ),
+                          AppSpacing.hMd,
+                          Expanded(
+                            child: Text(
+                              item.label,
+                              style: AppTypography.titleSmall.copyWith(
+                                color: isActive ? AppColors.primary : AppColors.textPrimary,
+                                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          if (isActive)
+                            Container(
+                              width: 4,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: () async {
+        await Future.delayed(const Duration(milliseconds: 600));
+        setState(() {});
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.pagePadding(context),
+          vertical: AppSpacing.xxl,
+        ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: Responsive.contentMaxWidth(context)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                AppSpacing.vXxl,
+                Text('Practice Tools', style: AppTypography.headlineMedium),
+                AppSpacing.vMd,
+                _buildToolsGrid(),
+                AppSpacing.vXxl,
+                if (Responsive.isWide(context)) _buildWideLayout() else _buildMobileLayout(),
+              ],
             ),
           ),
         ),
@@ -395,4 +520,11 @@ class _Tool {
   final VoidCallback onTap;
   final Stream<int>? badgeStream;
   _Tool(this.title, this.subtitle, this.icon, this.color, this.onTap, {this.badgeStream});
+}
+
+class _SidebarItem {
+  final String label;
+  final IconData icon;
+  final VoidCallback? onTap;
+  _SidebarItem(this.label, this.icon, this.onTap);
 }

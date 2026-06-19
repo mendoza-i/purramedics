@@ -24,9 +24,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-
   void navigateBottomBar(int index) {
-    setState(() => _selectedIndex = index);
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   Widget _buildHome() {
@@ -181,13 +182,7 @@ class _HomePageState extends State<HomePage> {
               icon: s.icon,
               color: s.color,
               onTap: () {
-                navigateBottomBar(1);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Booking: ${s.type}'),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
+                AppointmentsPage.showBookDialog(context, initialVisitType: s.title);
               },
             ),
         ],

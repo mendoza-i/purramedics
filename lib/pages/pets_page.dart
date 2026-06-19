@@ -24,6 +24,108 @@ class _PetsPageState extends State<PetsPage> {
 
   int selectedPet = 0;
 
+  void _showEditPetDialog(Map<String, dynamic> pet) {
+    final nameCtrl = TextEditingController(text: pet['name'] ?? '');
+    final breedCtrl = TextEditingController(text: pet['breed'] ?? '');
+    final weightCtrl = TextEditingController(text: pet['weight'] ?? '');
+    final colorCtrl = TextEditingController(text: pet['color'] ?? '');
+    final emojiCtrl = TextEditingController(text: pet['emoji'] ?? '🐾');
+    bool isNeutered = pet['isNeutered'] ?? false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: AppRadii.rLg),
+          title: Text('Edit ${pet['name']}', style: AppTypography.headlineSmall),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppTextField(controller: nameCtrl, label: 'Name', prefixIcon: Icons.pets_rounded),
+                AppSpacing.vMd,
+                AppTextField(controller: breedCtrl, label: 'Breed', prefixIcon: Icons.category_outlined),
+                AppSpacing.vMd,
+                AppTextField(controller: weightCtrl, label: 'Weight (kg)', prefixIcon: Icons.monitor_weight_outlined),
+                AppSpacing.vMd,
+                AppTextField(controller: colorCtrl, label: 'Color', prefixIcon: Icons.palette_outlined),
+                AppSpacing.vMd,
+                AppTextField(controller: emojiCtrl, label: 'Emoji', prefixIcon: Icons.emoji_emotions_outlined),
+                AppSpacing.vMd,
+                SwitchListTile(
+                  title: Text('Neutered / Spayed', style: AppTypography.bodyMedium),
+                  value: isNeutered,
+                  activeColor: AppColors.primary,
+                  onChanged: (v) => setDialogState(() => isNeutered = v),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _firestoreService.updatePet(
+                  pet['id'],
+                  name: nameCtrl.text.trim(),
+                  breed: breedCtrl.text.trim(),
+                  birthdate: pet['birthdate'] ?? '',
+                  weight: weightCtrl.text.trim(),
+                  color: colorCtrl.text.trim(),
+                  isNeutered: isNeutered,
+                  emoji: emojiCtrl.text.trim(),
+                );
+                if (mounted) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Pet updated successfully 🐾')),
+                  );
+                }
+              },
+              child: Text('Save', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confirmDeletePet(Map<String, dynamic> pet) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.rLg),
+        title: Text('Delete ${pet['name']}?', style: AppTypography.headlineSmall),
+        content: Text(
+          'This will permanently remove ${pet['name']} and all their health records. This action cannot be undone.',
+          style: AppTypography.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () async {
+              await _firestoreService.deletePet(pet['id']);
+              if (mounted) {
+                Navigator.pop(ctx);
+                setState(() => selectedPet = 0);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Pet removed')),
+                );
+              }
+            },
+            child: Text('Delete', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_currentUser == null) {
@@ -207,6 +309,27 @@ class _PetsPageState extends State<PetsPage> {
                         Text(name, style: AppTypography.displaySmall),
                         AppSpacing.vXs,
                         AppBadge(label: breed, tone: BadgeTone.neutral),
+                        if (!isVet) ...[
+                          AppSpacing.vLg,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () => _showEditPetDialog(currentPet),
+                                icon: const Icon(Icons.edit_outlined, size: 18),
+                                label: const Text('Edit'),
+                                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                              ),
+                              AppSpacing.hMd,
+                              TextButton.icon(
+                                onPressed: () => _confirmDeletePet(currentPet),
+                                icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                                label: const Text('Delete'),
+                                style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
                   ),

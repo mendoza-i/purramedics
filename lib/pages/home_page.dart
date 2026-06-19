@@ -182,6 +182,7 @@ class _HomePageState extends State<HomePage> {
               icon: s.icon,
               color: s.color,
               onTap: () {
+                navigateBottomBar(1);
                 AppointmentsPage.showBookDialog(context, initialVisitType: s.title);
               },
             ),

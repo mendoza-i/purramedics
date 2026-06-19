@@ -222,14 +222,7 @@ class AppointmentsPage extends StatefulWidget {
                                           runSpacing: AppSpacing.sm,
                                           children: [
                                             for (final slot in allTimeSlots)
-                                              if (!availableSlots.contains(slot))
-                                                _timeSlot(
-                                                  slot,
-                                                  available: false,
-                                                  selected: false,
-                                                  onTap: null,
-                                                )
-                                              else
+                                              if (availableSlots.contains(slot))
                                                 FutureBuilder<bool>(
                                                   future: _firestoreService.isSlotTaken(
                                                     'Pet Treasure',

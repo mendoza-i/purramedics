@@ -25,8 +25,50 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
     firestoreService.markAppointmentsAsRead();
   }
 
-  void _updateStatus(String docId, String newStatus) {
-    FirebaseFirestore.instance.collection('appointments').doc(docId).update({'status': newStatus});
+  void _updateStatus(String docId, String newStatus, [String? declineReason]) {
+    final updates = <String, dynamic>{'status': newStatus};
+    if (declineReason != null) {
+      updates['declineReason'] = declineReason;
+    }
+    FirebaseFirestore.instance.collection('appointments').doc(docId).update(updates);
+  }
+
+  void _showDeclineDialog(String docId) {
+    final TextEditingController reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.rMd),
+        title: Text('Decline Appointment', style: AppTypography.headlineSmall),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Please provide a reason for declining this appointment.', style: AppTypography.bodyMedium),
+            AppSpacing.vLg,
+            AppTextField(
+              controller: reasonController,
+              label: 'Reason for declination',
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            onPressed: () {
+              Navigator.pop(context);
+              _updateStatus(docId, 'Declined', reasonController.text.trim());
+            },
+            child: const Text('Decline', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 
   Color _statusColor(String status, bool isPast) {
@@ -75,6 +117,15 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
                 apt['additionalInfo'] ?? 'No notes were added by the pet owner.',
                 style: AppTypography.bodyMedium,
               ),
+              if (apt['status'] == 'Declined' && apt['declineReason'] != null && apt['declineReason'].toString().isNotEmpty) ...[
+                AppSpacing.vMd,
+                Text('Decline Reason', style: AppTypography.titleSmall.copyWith(color: AppColors.danger)),
+                AppSpacing.vXs,
+                Text(
+                  apt['declineReason'],
+                  style: AppTypography.bodyMedium.copyWith(color: AppColors.danger),
+                ),
+              ],
             ],
           ),
         ),
@@ -452,7 +503,7 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           TextButton(
-            onPressed: () => _updateStatus(id, 'Declined'),
+            onPressed: () => _showDeclineDialog(id),
             child: Text('Decline', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
           ),
           PrimaryButton(

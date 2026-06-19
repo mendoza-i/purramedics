@@ -828,6 +828,7 @@ class _AppointmentsPageState extends State<AppointmentsPage>
     final time = apt['time'] as String? ?? '--:--';
     final consultMethod = apt['consultationMethod'] as String? ?? 'In-Person Appointment';
     final info = apt['additionalInfo'] as String? ?? 'No additional notes.';
+    final declineReason = apt['declineReason'] as String?;
     final statusTone = isPast
         ? BadgeTone.neutral
         : isConfirmed
@@ -895,6 +896,21 @@ class _AppointmentsPageState extends State<AppointmentsPage>
               ),
               child: Text(info, style: AppTypography.bodyMedium),
             ),
+            if (status == 'Declined' && declineReason != null && declineReason.isNotEmpty) ...[
+              AppSpacing.vXl,
+              Text('Reason for declination', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+              AppSpacing.vSm,
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                decoration: BoxDecoration(
+                  color: AppColors.dangerSurface,
+                  borderRadius: AppRadii.rMd,
+                  border: Border.all(color: AppColors.danger.withOpacity(0.3)),
+                ),
+                child: Text(declineReason, style: AppTypography.bodyMedium.copyWith(color: AppColors.danger)),
+              ),
+            ],
             AppSpacing.vXl,
             PrimaryButton(
               label: 'Close',

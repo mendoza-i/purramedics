@@ -118,9 +118,19 @@ class FirestoreService {
     final query = await _appointmentsCollection
         .where('userId', isEqualTo: userId)
         .get();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     return query.docs.where((doc) {
       final data = doc.data() as Map<String, dynamic>;
       final status = (data['status'] ?? '').toString();
+      final dateStr = (data['date'] ?? '').toString();
+      try {
+        final parts = dateStr.split('-');
+        if (parts.length == 3) {
+          final d = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+          if (d.isBefore(today)) return false; // Ignore past dates
+        }
+      } catch (_) {}
       return status == 'Pending' || status == 'Confirmed';
     }).length;
   }
@@ -402,6 +412,14 @@ class FirestoreService {
               final data = doc.data() as Map<String, dynamic>;
               return data['isRead'] == false;
             }).length);
+  }
+
+  // Get Cancelled Appointments Count Stream (For Vet notification)
+  Stream<int> getCancelledAppointmentsCountStream() {
+    return _appointmentsCollection
+        .where('status', isEqualTo: 'Cancelled')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
   }
   
   // Mark Pending Appointments as Read

@@ -27,6 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   int _lastConfirmedCount = -1;
+  int _lastDeclinedCount = -1;
   int _lastUnreadCount = -1;
   StreamSubscription<List<Map<String, dynamic>>>? _appointmentsSub;
   StreamSubscription<int>? _unreadSub;
@@ -58,6 +59,28 @@ class _HomePageState extends State<HomePage> {
           );
         }
         _lastConfirmedCount = confirmedCount;
+
+        final declinedCount = appointments.where((a) => a['status'] == 'Declined').length;
+        if (_lastDeclinedCount >= 0 && declinedCount > _lastDeclinedCount && mounted) {
+          AudioUtils.playNotificationSound();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  const Expanded(child: Text('❌ Your appointment has been declined.')),
+                ],
+              ),
+              backgroundColor: AppColors.danger,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.all(16),
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+        _lastDeclinedCount = declinedCount;
       });
 
       _unreadSub = FirestoreService().getUserUnreadCountStream(user.uid).listen((count) {

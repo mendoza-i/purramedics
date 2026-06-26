@@ -217,12 +217,26 @@ class AppointmentsPage extends StatefulWidget {
                                         if (selectedTimeSlot != null && !availableSlots.contains(selectedTimeSlot)) {
                                           selectedTimeSlot = null;
                                         }
+                                        final now = DateTime.now();
+                                        final isToday = selectedDate.year == now.year && selectedDate.month == now.month && selectedDate.day == now.day;
+
+                                        bool isSlotValid(String slot) {
+                                          if (!isToday) return true;
+                                          final parts = slot.split(' ');
+                                          final timeParts = parts[0].split(':');
+                                          var h = int.parse(timeParts[0]);
+                                          if (parts[1] == 'PM' && h != 12) h += 12;
+                                          if (parts[1] == 'AM' && h == 12) h = 0;
+                                          final slotTime = DateTime(now.year, now.month, now.day, h, int.parse(timeParts[1]));
+                                          return slotTime.isAfter(now.add(const Duration(hours: 1)));
+                                        }
+
                                         return Wrap(
                                           spacing: AppSpacing.sm,
                                           runSpacing: AppSpacing.sm,
                                           children: [
                                             for (final slot in allTimeSlots)
-                                              if (availableSlots.contains(slot))
+                                              if (availableSlots.contains(slot) && isSlotValid(slot))
                                                 FutureBuilder<bool>(
                                                   future: _firestoreService.isSlotTaken(
                                                     'Pet Treasure',
@@ -896,10 +910,40 @@ class _AppointmentsPageState extends State<AppointmentsPage>
               child: Text(info, style: AppTypography.bodyMedium),
             ),
             AppSpacing.vXl,
-            PrimaryButton(
-              label: 'Close',
-              onPressed: () => Navigator.pop(context),
-            ),
+            if (!isPast && (status == 'Pending' || status == 'Confirmed')) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () async {
+                        final id = apt['id'];
+                        if (id != null) {
+                          await FirebaseFirestore.instance.collection('appointments').doc(id).update({'status': 'Cancelled'});
+                          if (context.mounted) Navigator.pop(context);
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.danger,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text('Cancel Booking'),
+                    ),
+                  ),
+                  AppSpacing.hMd,
+                  Expanded(
+                    child: PrimaryButton(
+                      label: 'Close',
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),
+            ] else ...[
+              PrimaryButton(
+                label: 'Close',
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
             AppSpacing.vSm,
           ],
         ),

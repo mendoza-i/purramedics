@@ -32,6 +32,8 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
   int _lastUnreadCount = -1;
   StreamSubscription<int>? _pendingSub;
   StreamSubscription<int>? _unreadSub;
+  StreamSubscription<int>? _cancelledSub;
+  int _lastCancelledCount = -1;
 
   @override
   void initState() {
@@ -57,6 +59,29 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
         );
       }
       _lastPendingCount = count;
+    });
+
+    _cancelledSub = _firestoreService.getCancelledAppointmentsCountStream().listen((count) {
+      if (_lastCancelledCount >= 0 && count > _lastCancelledCount && mounted) {
+        AudioUtils.playNotificationSound();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.cancel_presentation_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                const Expanded(child: Text('❌ An appointment has been cancelled by the pet owner.')),
+              ],
+            ),
+            backgroundColor: AppColors.danger,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+      _lastCancelledCount = count;
     });
 
     _unreadSub = _firestoreService.getVetUnreadCountStream().listen((count) {
@@ -87,6 +112,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
   void dispose() {
     _pendingSub?.cancel();
     _unreadSub?.cancel();
+    _cancelledSub?.cancel();
     super.dispose();
   }
 

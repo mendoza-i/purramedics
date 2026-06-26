@@ -237,33 +237,42 @@ class AppointmentsPage extends StatefulWidget {
                                           runSpacing: AppSpacing.sm,
                                           children: [
                                             for (final slot in allTimeSlots)
-                                              if (availableSlots.contains(slot) && isSlotValid(slot))
-                                                FutureBuilder<bool>(
-                                                  future: _firestoreService.isSlotTaken(
-                                                    'Pet Treasure',
-                                                    "${selectedDate.toLocal()}".split(' ')[0],
+                                              if (availableSlots.contains(slot))
+                                                if (!isSlotValid(slot))
+                                                  _timeSlot(
                                                     slot,
-                                                    includePending: true,
-                                                  ),
-                                                  builder: (ctx, takenSnap) {
-                                                    final taken = takenSnap.data ?? false;
-                                                    if (taken) {
+                                                    available: false,
+                                                    selected: false,
+                                                    onTap: null,
+                                                    labelOverride: 'Passed',
+                                                  )
+                                                else
+                                                  FutureBuilder<bool>(
+                                                    future: _firestoreService.isSlotTaken(
+                                                      'Pet Treasure',
+                                                      "${selectedDate.toLocal()}".split(' ')[0],
+                                                      slot,
+                                                      includePending: true,
+                                                    ),
+                                                    builder: (ctx, takenSnap) {
+                                                      final taken = takenSnap.data ?? false;
+                                                      if (taken) {
+                                                        return _timeSlot(
+                                                          slot,
+                                                          available: false,
+                                                          selected: false,
+                                                          onTap: null,
+                                                          labelOverride: 'Booked',
+                                                        );
+                                                      }
                                                       return _timeSlot(
                                                         slot,
-                                                        available: false,
-                                                        selected: false,
-                                                        onTap: null,
-                                                        labelOverride: 'Booked',
+                                                        available: true,
+                                                        selected: selectedTimeSlot == slot,
+                                                        onTap: () => setDialogState(() => selectedTimeSlot = slot),
                                                       );
-                                                    }
-                                                    return _timeSlot(
-                                                      slot,
-                                                      available: true,
-                                                      selected: selectedTimeSlot == slot,
-                                                      onTap: () => setDialogState(() => selectedTimeSlot = slot),
-                                                    );
-                                                  },
-                                                ),
+                                                    },
+                                                  ),
                                           ],
                                         );
                                       },

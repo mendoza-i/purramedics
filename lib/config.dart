@@ -9,4 +9,3 @@ const String claudeProxyUrl = String.fromEnvironment(
   'CLAUDE_PROXY_URL',
   defaultValue: '/api/chat',
 );
-

@@ -54,9 +54,16 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceAlt,
-        hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textTertiary),
-        labelStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        hintStyle: AppTypography.bodyMedium.copyWith(
+          color: AppColors.textTertiary,
+        ),
+        labelStyle: AppTypography.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: AppRadii.rMd,
           borderSide: BorderSide.none,
@@ -86,7 +93,9 @@ class AppTheme {
           disabledForegroundColor: AppColors.textTertiary,
           elevation: 0,
           minimumSize: const Size(0, 52),
-          textStyle: AppTypography.labelLarge.copyWith(color: AppColors.textInverse),
+          textStyle: AppTypography.labelLarge.copyWith(
+            color: AppColors.textInverse,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: AppRadii.rMd),
         ),
@@ -124,14 +133,18 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.textPrimary,
-        contentTextStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textInverse),
+        contentTextStyle: AppTypography.bodyMedium.copyWith(
+          color: AppColors.textInverse,
+        ),
         shape: RoundedRectangleBorder(borderRadius: AppRadii.rMd),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.xl)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadii.xl),
+          ),
         ),
       ),
       dialogTheme: DialogThemeData(

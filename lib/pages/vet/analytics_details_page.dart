@@ -15,8 +15,18 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
   late DateTime _compareMonth;
 
   static const List<String> _monthNames = [
-    'January','February','March','April','May','June',
-    'July','August','September','October','November','December',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   static const List<Color> _breakdownColors = [
@@ -36,16 +46,25 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
     _compareMonth = DateTime(now.year, now.month - 1);
   }
 
-  Map<String, int> _visitTypeCounts(List<Map<String, dynamic>> apts, DateTime month) {
+  Map<String, int> _visitTypeCounts(
+    List<Map<String, dynamic>> apts,
+    DateTime month,
+  ) {
     final counts = <String, int>{};
     for (final appt in apts) {
       try {
         final parts = appt['date'].toString().split('-');
         if (parts.length != 3) continue;
-        final d = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+        final d = DateTime(
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+          int.parse(parts[2]),
+        );
         if (d.year != month.year || d.month != month.month) continue;
         final type = (appt['visitType'] ?? 'General').toString().trim();
-        final key = type.isEmpty ? 'General' : type[0].toUpperCase() + type.substring(1).toLowerCase();
+        final key = type.isEmpty
+            ? 'General'
+            : type[0].toUpperCase() + type.substring(1).toLowerCase();
         counts[key] = (counts[key] ?? 0) + 1;
       } catch (_) {}
     }
@@ -58,7 +77,11 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
       try {
         final parts = appt['date'].toString().split('-');
         if (parts.length != 3) continue;
-        final d = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+        final d = DateTime(
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+          int.parse(parts[2]),
+        );
         if (d.year == month.year && d.month == month.month) total++;
       } catch (_) {}
     }
@@ -79,26 +102,35 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
 
     String change;
     if (prevTotal == 0) {
-      change = '$thisMonthName had $thisTotal appointment${thisTotal != 1 ? 's' : ''} with no prior data to compare.';
+      change =
+          '$thisMonthName had $thisTotal appointment${thisTotal != 1 ? 's' : ''} with no prior data to compare.';
     } else if (thisTotal == prevTotal) {
-      change = '$thisMonthName and $prevMonthName had equal volume ($thisTotal each).';
+      change =
+          '$thisMonthName and $prevMonthName had equal volume ($thisTotal each).';
     } else {
-      final pct = (((thisTotal - prevTotal) / prevTotal) * 100).abs().toStringAsFixed(0);
+      final pct = (((thisTotal - prevTotal) / prevTotal) * 100)
+          .abs()
+          .toStringAsFixed(0);
       final dir = thisTotal > prevTotal ? 'increase' : 'decrease';
-      change = '$thisMonthName had $thisTotal appointment${thisTotal != 1 ? 's' : ''} — a $pct% $dir from $prevMonthName ($prevTotal).';
+      change =
+          '$thisMonthName had $thisTotal appointment${thisTotal != 1 ? 's' : ''} — a $pct% $dir from $prevMonthName ($prevTotal).';
     }
 
     String typeSentence = '';
     if (thisTypes.isNotEmpty) {
-      final top = thisTypes.entries.reduce((a, b) => a.value >= b.value ? a : b);
-      typeSentence = ' ${top.key} led with ${top.value} booking${top.value != 1 ? 's' : ''}.';
+      final top = thisTypes.entries.reduce(
+        (a, b) => a.value >= b.value ? a : b,
+      );
+      typeSentence =
+          ' ${top.key} led with ${top.value} booking${top.value != 1 ? 's' : ''}.';
     }
 
     String declineSentence = '';
     for (final entry in prevTypes.entries) {
       final curr = thisTypes[entry.key] ?? 0;
       if (curr < entry.value) {
-        declineSentence = ' ${entry.key} bookings fell by ${entry.value - curr} vs $prevMonthName.';
+        declineSentence =
+            ' ${entry.key} bookings fell by ${entry.value - curr} vs $prevMonthName.';
         break;
       }
     }
@@ -121,7 +153,9 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
         stream: FirestoreService().getAllAppointmentsStream(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
 
           final all = snapshot.data!;
@@ -136,11 +170,23 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
             try {
               final parts = appt['date'].toString().split('-');
               if (parts.length != 3) continue;
-              final d = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+              final d = DateTime(
+                int.parse(parts[0]),
+                int.parse(parts[1]),
+                int.parse(parts[2]),
+              );
               dayCount[d.weekday - 1]++;
             } catch (_) {}
           }
-          const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+          const dayNames = [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday',
+          ];
           int peakIdx = 0;
           for (int i = 1; i < 7; i++) {
             if (dayCount[i] > dayCount[peakIdx]) peakIdx = i;
@@ -190,7 +236,10 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
                         ],
                       ),
                       AppSpacing.vXxxl,
-                      Text('Compare Appointment Volumes', style: AppTypography.headlineSmall),
+                      Text(
+                        'Compare Appointment Volumes',
+                        style: AppTypography.headlineSmall,
+                      ),
                       AppSpacing.vMd,
                       AppCard(
                         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -204,26 +253,44 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
                                     label: 'Month A',
                                     date: _selectedMonth,
                                     color: AppColors.primary,
-                                    onPrev: () => setState(() =>
-                                        _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1)),
+                                    onPrev: () => setState(
+                                      () => _selectedMonth = DateTime(
+                                        _selectedMonth.year,
+                                        _selectedMonth.month - 1,
+                                      ),
+                                    ),
                                     onNext: () {
-                                      final next = DateTime(_selectedMonth.year, _selectedMonth.month + 1);
+                                      final next = DateTime(
+                                        _selectedMonth.year,
+                                        _selectedMonth.month + 1,
+                                      );
                                       if (!next.isAfter(DateTime.now())) {
                                         setState(() => _selectedMonth = next);
                                       }
                                     },
                                   ),
                                 ),
-                                Container(width: 1, height: 54, color: AppColors.divider),
+                                Container(
+                                  width: 1,
+                                  height: 54,
+                                  color: AppColors.divider,
+                                ),
                                 Expanded(
                                   child: _miniPicker(
                                     label: 'Month B',
                                     date: _compareMonth,
                                     color: AppColors.textSecondary,
-                                    onPrev: () => setState(() =>
-                                        _compareMonth = DateTime(_compareMonth.year, _compareMonth.month - 1)),
+                                    onPrev: () => setState(
+                                      () => _compareMonth = DateTime(
+                                        _compareMonth.year,
+                                        _compareMonth.month - 1,
+                                      ),
+                                    ),
                                     onNext: () {
-                                      final next = DateTime(_compareMonth.year, _compareMonth.month + 1);
+                                      final next = DateTime(
+                                        _compareMonth.year,
+                                        _compareMonth.month + 1,
+                                      );
                                       if (!next.isAfter(DateTime.now())) {
                                         setState(() => _compareMonth = next);
                                       }
@@ -236,16 +303,22 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
                             const Divider(height: 1, color: AppColors.divider),
                             AppSpacing.vXl,
                             _comparisonBar(
-                              label: '${_monthNames[_selectedMonth.month - 1]} ${_selectedMonth.year}',
+                              label:
+                                  '${_monthNames[_selectedMonth.month - 1]} ${_selectedMonth.year}',
                               count: thisTotal,
-                              max: thisTotal > prevTotal ? thisTotal : prevTotal,
+                              max: thisTotal > prevTotal
+                                  ? thisTotal
+                                  : prevTotal,
                               color: AppColors.primary,
                             ),
                             AppSpacing.vSm,
                             _comparisonBar(
-                              label: '${_monthNames[_compareMonth.month - 1]} ${_compareMonth.year}',
+                              label:
+                                  '${_monthNames[_compareMonth.month - 1]} ${_compareMonth.year}',
                               count: prevTotal,
-                              max: thisTotal > prevTotal ? thisTotal : prevTotal,
+                              max: thisTotal > prevTotal
+                                  ? thisTotal
+                                  : prevTotal,
                               color: AppColors.textTertiary,
                             ),
                           ],
@@ -258,7 +331,9 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
                         decoration: BoxDecoration(
                           color: AppColors.primarySurface,
                           borderRadius: AppRadii.rLg,
-                          border: Border.all(color: AppColors.primary.withOpacity(0.25)),
+                          border: Border.all(
+                            color: AppColors.primary.withOpacity(0.25),
+                          ),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +379,8 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
                         const EmptyState(
                           icon: Icons.insights_rounded,
                           title: 'No visits yet',
-                          message: 'Visit types will appear as appointments are confirmed',
+                          message:
+                              'Visit types will appear as appointments are confirmed',
                           compact: true,
                         )
                       else
@@ -316,15 +392,21 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
                           child: Column(
                             children: List.generate(sortedTypes.length, (i) {
                               final e = sortedTypes[i];
-                              final ratio = thisTotal == 0 ? 0.0 : e.value / thisTotal;
-                              final col = _breakdownColors[i % _breakdownColors.length];
+                              final ratio = thisTotal == 0
+                                  ? 0.0
+                                  : e.value / thisTotal;
+                              final col =
+                                  _breakdownColors[i % _breakdownColors.length];
                               return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.md,
+                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           '${i + 1}. ${e.key}',
@@ -332,7 +414,10 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
                                         ),
                                         Text(
                                           '${e.value} • ${(ratio * 100).toStringAsFixed(0)}%',
-                                          style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                                          style: AppTypography.bodySmall
+                                              .copyWith(
+                                                color: AppColors.textTertiary,
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -348,16 +433,19 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
                                           ),
                                         ),
                                         LayoutBuilder(
-                                          builder: (ctx, c) => AnimatedContainer(
-                                            duration: const Duration(milliseconds: 700),
-                                            curve: Curves.easeOutQuart,
-                                            height: 8,
-                                            width: c.maxWidth * ratio,
-                                            decoration: BoxDecoration(
-                                              color: col,
-                                              borderRadius: AppRadii.rXs,
-                                            ),
-                                          ),
+                                          builder: (ctx, c) =>
+                                              AnimatedContainer(
+                                                duration: const Duration(
+                                                  milliseconds: 700,
+                                                ),
+                                                curve: Curves.easeOutQuart,
+                                                height: 8,
+                                                width: c.maxWidth * ratio,
+                                                decoration: BoxDecoration(
+                                                  color: col,
+                                                  borderRadius: AppRadii.rXs,
+                                                ),
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -391,7 +479,10 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
           AppSpacing.vXs,
           Text(
             label,
-            style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary, fontWeight: FontWeight.w600),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -427,22 +518,35 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
           children: [
             GestureDetector(
               onTap: onPrev,
-              child: const Icon(Icons.chevron_left_rounded, size: 26, color: AppColors.textSecondary),
+              child: const Icon(
+                Icons.chevron_left_rounded,
+                size: 26,
+                color: AppColors.textSecondary,
+              ),
             ),
             AppSpacing.hSm,
             Column(
               children: [
-                Text(_monthNames[date.month - 1], style: AppTypography.titleSmall),
+                Text(
+                  _monthNames[date.month - 1],
+                  style: AppTypography.titleSmall,
+                ),
                 Text(
                   '${date.year}',
-                  style: AppTypography.labelSmall.copyWith(color: AppColors.textTertiary),
+                  style: AppTypography.labelSmall.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
                 ),
               ],
             ),
             AppSpacing.hSm,
             GestureDetector(
               onTap: onNext,
-              child: const Icon(Icons.chevron_right_rounded, size: 26, color: AppColors.textSecondary),
+              child: const Icon(
+                Icons.chevron_right_rounded,
+                size: 26,
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
         ),
@@ -462,7 +566,9 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
           width: 90,
           child: Text(
             label,
-            style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary),
+            style: AppTypography.labelSmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -476,19 +582,21 @@ class _AnalyticsDetailsPageState extends State<AnalyticsDetailsPage> {
                   borderRadius: AppRadii.rSm,
                 ),
               ),
-              LayoutBuilder(builder: (ctx, c) {
-                final w = max == 0 ? 0.0 : (count / max) * c.maxWidth;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 700),
-                  curve: Curves.easeOutQuart,
-                  height: 22,
-                  width: w.clamp(0, c.maxWidth),
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: AppRadii.rSm,
-                  ),
-                );
-              }),
+              LayoutBuilder(
+                builder: (ctx, c) {
+                  final w = max == 0 ? 0.0 : (count / max) * c.maxWidth;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 700),
+                    curve: Curves.easeOutQuart,
+                    height: 22,
+                    width: w.clamp(0, c.maxWidth),
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: AppRadii.rSm,
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),

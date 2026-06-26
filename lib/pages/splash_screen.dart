@@ -14,7 +14,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -24,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500), 
+      duration: const Duration(milliseconds: 2500),
     );
 
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
@@ -36,23 +37,35 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   void _checkAuthAndNavigate() {
     if (!mounted) return;
-    
+
     final auth = AuthService();
-    
+
     // Auto-login routing! If the user is already authenticated from a previous session,
     // they bypass the IntroPage entirely.
     if (auth.isLoggedIn) {
       if (auth.isVet) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const VetDashboardPage()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const VetDashboardPage()),
+        );
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomePage()),
+        );
       }
     } else {
       // On web, skip the grey IntroPage and go straight to the split login page
       if (kIsWeb) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginPage()),
+        );
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const IntroPage()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const IntroPage()),
+        );
       }
     }
   }
@@ -87,7 +100,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             AppSpacing.vXs,
             Text(
               'Caring for your pets',
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.textTertiary),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textTertiary,
+              ),
             ),
             const Spacer(),
             AnimatedBuilder(
@@ -106,7 +121,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     widthFactor: _animation.value,
                     child: Container(
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: AppColors.primaryGradient),
+                        gradient: const LinearGradient(
+                          colors: AppColors.primaryGradient,
+                        ),
                         borderRadius: AppRadii.rFull,
                       ),
                     ),

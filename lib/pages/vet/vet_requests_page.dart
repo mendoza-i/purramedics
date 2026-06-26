@@ -36,7 +36,9 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
             stream: _firestoreService.getPetRequestsStream(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                return const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                );
               }
 
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -48,22 +50,34 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
               }
 
               final requests = snapshot.data!;
-              final pending = requests.where((r) => r['status'] == 'Pending').toList();
-              final resolved = requests.where((r) => r['status'] != 'Pending').toList();
+              final pending = requests
+                  .where((r) => r['status'] == 'Pending')
+                  .toList();
+              final resolved = requests
+                  .where((r) => r['status'] != 'Pending')
+                  .toList();
 
               return SingleChildScrollView(
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: Responsive.contentMaxWidth(context)),
+                    constraints: BoxConstraints(
+                      maxWidth: Responsive.contentMaxWidth(context),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (pending.isNotEmpty) ...[
                           Row(
                             children: [
-                              Text('Needs Attention', style: AppTypography.headlineSmall),
+                              Text(
+                                'Needs Attention',
+                                style: AppTypography.headlineSmall,
+                              ),
                               AppSpacing.hSm,
-                              AppBadge(label: '${pending.length}', tone: BadgeTone.warning),
+                              AppBadge(
+                                label: '${pending.length}',
+                                tone: BadgeTone.warning,
+                              ),
                             ],
                           ),
                           AppSpacing.vLg,
@@ -73,7 +87,9 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
                         if (resolved.isNotEmpty) ...[
                           Text(
                             'Resolved',
-                            style: AppTypography.headlineSmall.copyWith(color: AppColors.textSecondary),
+                            style: AppTypography.headlineSmall.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                           AppSpacing.vLg,
                           _buildGrid(resolved, isPending: false),
@@ -91,21 +107,37 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
     );
   }
 
-  Widget _buildGrid(List<Map<String, dynamic>> items, {required bool isPending}) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final cols = Responsive.isWide(context) ? 3 : (Responsive.isTablet(context) ? 2 : 1);
-      final cardWidth = (constraints.maxWidth - (AppSpacing.lg * (cols - 1))) / cols - 0.1;
-      return Wrap(
-        spacing: AppSpacing.lg,
-        runSpacing: AppSpacing.lg,
-        children: items
-            .map((r) => SizedBox(width: cardWidth, child: _buildRequestCard(r, isPending: isPending)))
-            .toList(),
-      );
-    });
+  Widget _buildGrid(
+    List<Map<String, dynamic>> items, {
+    required bool isPending,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cols = Responsive.isWide(context)
+            ? 3
+            : (Responsive.isTablet(context) ? 2 : 1);
+        final cardWidth =
+            (constraints.maxWidth - (AppSpacing.lg * (cols - 1))) / cols - 0.1;
+        return Wrap(
+          spacing: AppSpacing.lg,
+          runSpacing: AppSpacing.lg,
+          children: items
+              .map(
+                (r) => SizedBox(
+                  width: cardWidth,
+                  child: _buildRequestCard(r, isPending: isPending),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
   }
 
-  Widget _buildRequestCard(Map<String, dynamic> request, {required bool isPending}) {
+  Widget _buildRequestCard(
+    Map<String, dynamic> request, {
+    required bool isPending,
+  }) {
     final bool isDelete = request['requestType'] == 'Delete Request';
     final BadgeTone typeTone = isDelete ? BadgeTone.danger : BadgeTone.info;
     final String status = request['status'] ?? '';
@@ -120,7 +152,11 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
         ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.xl),
-        child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 28),
+        child: const Icon(
+          Icons.delete_outline_rounded,
+          color: Colors.white,
+          size: 28,
+        ),
       ),
       confirmDismiss: (_) async {
         return await showDialog<bool>(
@@ -134,11 +170,21 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+                child: Text(
+                  'Cancel',
+                  style: AppTypography.labelLarge.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: Text('Delete', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+                child: Text(
+                  'Delete',
+                  style: AppTypography.labelLarge.copyWith(
+                    color: AppColors.danger,
+                  ),
+                ),
               ),
             ],
           ),
@@ -164,20 +210,30 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AppBadge(label: request['requestType'] ?? 'Request', tone: typeTone),
+                AppBadge(
+                  label: request['requestType'] ?? 'Request',
+                  tone: typeTone,
+                ),
                 if (!isPending)
                   AppBadge(
                     label: status,
-                    tone: status == 'Approved' ? BadgeTone.success : BadgeTone.neutral,
+                    tone: status == 'Approved'
+                        ? BadgeTone.success
+                        : BadgeTone.neutral,
                   ),
               ],
             ),
             AppSpacing.vMd,
-            Text(request['petName'] ?? 'Unknown pet', style: AppTypography.titleLarge),
+            Text(
+              request['petName'] ?? 'Unknown pet',
+              style: AppTypography.titleLarge,
+            ),
             AppSpacing.vXs,
             Text(
               'Owner: ${request['ownerEmail'] ?? '—'}',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
             AppSpacing.vMd,
             Container(
@@ -192,7 +248,10 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
                 children: [
                   Text(
                     'REASON',
-                    style: AppTypography.labelSmall.copyWith(color: AppColors.textTertiary, letterSpacing: 0.5),
+                    style: AppTypography.labelSmall.copyWith(
+                      color: AppColors.textTertiary,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                   AppSpacing.vXs,
                   Text(
@@ -209,7 +268,8 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
                   Expanded(
                     child: SecondaryButton(
                       label: 'Decline',
-                      onPressed: () => _showReplyDialog(request['id'], 'Declined'),
+                      onPressed: () =>
+                          _showReplyDialog(request['id'], 'Declined'),
                       isExpanded: true,
                       size: AppButtonSize.small,
                     ),
@@ -218,14 +278,18 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
                   Expanded(
                     child: PrimaryButton(
                       label: 'Approve',
-                      onPressed: () => _showReplyDialog(request['id'], 'Approved'),
+                      onPressed: () =>
+                          _showReplyDialog(request['id'], 'Approved'),
                       isExpanded: true,
                       size: AppButtonSize.small,
                     ),
                   ),
                 ],
               ),
-            ] else if ((request['vetReply'] ?? '').toString().trim().isNotEmpty) ...[
+            ] else if ((request['vetReply'] ?? '')
+                .toString()
+                .trim()
+                .isNotEmpty) ...[
               AppSpacing.vMd,
               Container(
                 width: double.infinity,
@@ -239,7 +303,10 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
                   children: [
                     Text(
                       'YOUR REPLY',
-                      style: AppTypography.labelSmall.copyWith(color: AppColors.info, letterSpacing: 0.5),
+                      style: AppTypography.labelSmall.copyWith(
+                        color: AppColors.info,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                     AppSpacing.vXs,
                     Text(request['vetReply'], style: AppTypography.bodyMedium),
@@ -275,7 +342,9 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
                 isApprove
                     ? 'Add an optional message for the pet owner:'
                     : 'Explain why so the owner understands:',
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
               AppSpacing.vMd,
               KeyboardListener(
@@ -289,10 +358,13 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
                 },
                 child: AppTextField(
                   controller: replyCtrl,
-                  hint: isApprove ? 'Message (optional)…' : 'Reason for declining…',
+                  hint: isApprove
+                      ? 'Message (optional)…'
+                      : 'Reason for declining…',
                   maxLines: 3,
                   textInputAction: TextInputAction.send,
-                  onSubmitted: (_) => _submitReply(requestId, newStatus, replyCtrl.text.trim()),
+                  onSubmitted: (_) =>
+                      _submitReply(requestId, newStatus, replyCtrl.text.trim()),
                 ),
               ),
             ],
@@ -301,11 +373,17 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+            child: Text(
+              'Cancel',
+              style: AppTypography.labelLarge.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
           ),
           PrimaryButton(
             label: 'Confirm $newStatus',
-            onPressed: () => _submitReply(requestId, newStatus, replyCtrl.text.trim()),
+            onPressed: () =>
+                _submitReply(requestId, newStatus, replyCtrl.text.trim()),
             backgroundColor: accent,
             size: AppButtonSize.small,
           ),
@@ -321,7 +399,9 @@ class _VetRequestsPageState extends State<VetRequestsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Request marked as $newStatus'),
-          backgroundColor: newStatus == 'Approved' ? AppColors.success : AppColors.textPrimary,
+          backgroundColor: newStatus == 'Approved'
+              ? AppColors.success
+              : AppColors.textPrimary,
         ),
       );
     }

@@ -70,7 +70,9 @@ class EventDetailsPage extends StatelessWidget {
                   color: eventColor.withOpacity(0.12),
                   borderRadius: AppRadii.rXl,
                 ),
-                child: Center(child: Icon(eventIcon, size: 80, color: eventColor)),
+                child: Center(
+                  child: Icon(eventIcon, size: 80, color: eventColor),
+                ),
               ),
               AppSpacing.vXxl,
               Text(event.title, style: AppTypography.displayMedium),
@@ -87,7 +89,11 @@ class EventDetailsPage extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.calendar_month_rounded, color: AppColors.textSecondary, size: 18),
+                    const Icon(
+                      Icons.calendar_month_rounded,
+                      color: AppColors.textSecondary,
+                      size: 18,
+                    ),
                     AppSpacing.hSm,
                     Text(event.date, style: AppTypography.titleSmall),
                   ],
@@ -120,7 +126,11 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow({required String title, required String content, required IconData icon}) {
+  Widget _buildDetailRow({
+    required String title,
+    required String content,
+    required IconData icon,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -134,9 +144,17 @@ class EventDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: AppTypography.labelMedium.copyWith(color: AppColors.textTertiary)),
+              Text(
+                title,
+                style: AppTypography.labelMedium.copyWith(
+                  color: AppColors.textTertiary,
+                ),
+              ),
               AppSpacing.vXs,
-              Text(content, style: AppTypography.bodyLarge.copyWith(height: 1.5)),
+              Text(
+                content,
+                style: AppTypography.bodyLarge.copyWith(height: 1.5),
+              ),
             ],
           ),
         ),

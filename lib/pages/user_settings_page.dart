@@ -54,7 +54,9 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     if (_nameController.text.trim().isEmpty) return;
     setState(() => _isSaving = true);
 
-    final error = await AuthService().updateUserName(_nameController.text.trim());
+    final error = await AuthService().updateUserName(
+      _nameController.text.trim(),
+    );
     if (error != null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -94,12 +96,19 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
         title: Text('Log out', style: AppTypography.headlineSmall),
         content: Text(
           'Are you sure you want to log out of Purramedics?',
-          style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+            child: Text(
+              'Cancel',
+              style: AppTypography.labelLarge.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -110,7 +119,10 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                 (_) => false,
               );
             },
-            child: Text('Log out', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+            child: Text(
+              'Log out',
+              style: AppTypography.labelLarge.copyWith(color: AppColors.danger),
+            ),
           ),
         ],
       ),
@@ -155,10 +167,14 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Text('Personal Information', style: AppTypography.titleLarge),
+                            child: Text(
+                              'Personal Information',
+                              style: AppTypography.titleLarge,
+                            ),
                           ),
                           GestureDetector(
-                            onTap: () => setState(() => _isEditing = !_isEditing),
+                            onTap: () =>
+                                setState(() => _isEditing = !_isEditing),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 180),
                               padding: const EdgeInsets.symmetric(
@@ -166,13 +182,17 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                                 vertical: AppSpacing.sm,
                               ),
                               decoration: BoxDecoration(
-                                color: _isEditing ? AppColors.surfaceAlt : AppColors.primarySurface,
+                                color: _isEditing
+                                    ? AppColors.surfaceAlt
+                                    : AppColors.primarySurface,
                                 borderRadius: AppRadii.rFull,
                               ),
                               child: Text(
                                 _isEditing ? 'Cancel' : 'Edit info',
                                 style: AppTypography.labelMedium.copyWith(
-                                  color: _isEditing ? AppColors.textSecondary : AppColors.primaryDark,
+                                  color: _isEditing
+                                      ? AppColors.textSecondary
+                                      : AppColors.primaryDark,
                                 ),
                               ),
                             ),
@@ -182,7 +202,10 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                       AppSpacing.vSm,
                       Text(
                         'This information is used by veterinarians to contact you regarding your pets.',
-                        style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary, height: 1.5),
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textTertiary,
+                          height: 1.5,
+                        ),
                       ),
                       AppSpacing.vXxl,
 
@@ -208,7 +231,9 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                         controller: _phoneController,
                         readOnly: !_isEditing,
                         keyboardType: TextInputType.phone,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         textInputAction: TextInputAction.next,
                       ),
                       AppSpacing.vLg,
@@ -255,10 +280,16 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                           AppSpacing.hLg,
                           Text(
                             'Sign out securely',
-                            style: AppTypography.titleMedium.copyWith(color: AppColors.danger),
+                            style: AppTypography.titleMedium.copyWith(
+                              color: AppColors.danger,
+                            ),
                           ),
                           const Spacer(),
-                          const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.danger),
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 14,
+                            color: AppColors.danger,
+                          ),
                         ],
                       ),
                     ),

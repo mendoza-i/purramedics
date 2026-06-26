@@ -50,7 +50,12 @@ class AppTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
-          Text(label!, style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+          Text(
+            label!,
+            style: AppTypography.labelLarge.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
           AppSpacing.vSm,
         ],
         TextFormField(

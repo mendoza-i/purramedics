@@ -27,7 +27,9 @@ class RevenueStatsWidget extends StatelessWidget {
         if (!snapshot.hasData) {
           return const SizedBox(
             height: 140,
-            child: Center(child: CircularProgressIndicator(color: AppColors.success)),
+            child: Center(
+              child: CircularProgressIndicator(color: AppColors.success),
+            ),
           );
         }
 
@@ -39,13 +41,18 @@ class RevenueStatsWidget extends StatelessWidget {
         int thisConfirmedCount = 0;
 
         for (final appt in all) {
-          if ((appt['status'] ?? '').toString().toLowerCase() != 'confirmed') continue;
+          if ((appt['status'] ?? '').toString().toLowerCase() != 'confirmed')
+            continue;
 
           DateTime? date;
           try {
             final parts = appt['date'].toString().split('-');
             if (parts.length == 3) {
-              date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+              date = DateTime(
+                int.parse(parts[0]),
+                int.parse(parts[1]),
+                int.parse(parts[2]),
+              );
             }
           } catch (_) {}
 
@@ -82,7 +89,20 @@ class RevenueStatsWidget extends StatelessWidget {
           topService = topService[0].toUpperCase() + topService.substring(1);
         }
 
-        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const monthNames = [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ];
         final thisMonthLabel = monthNames[now.month - 1];
         final lastMonthLabel = monthNames[lastMonth.month - 1];
 
@@ -92,7 +112,12 @@ class RevenueStatsWidget extends StatelessWidget {
           child: InkWell(
             borderRadius: AppRadii.rXl,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const RevenueDetailsPage()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RevenueDetailsPage(),
+                ),
+              );
             },
             child: Ink(
               decoration: BoxDecoration(
@@ -120,7 +145,11 @@ class RevenueStatsWidget extends StatelessWidget {
                                 color: Colors.white.withOpacity(0.18),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.payments_rounded, color: Colors.white, size: 18),
+                              child: const Icon(
+                                Icons.payments_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
                             ),
                             AppSpacing.hSm,
                             Text(
@@ -155,13 +184,17 @@ class RevenueStatsWidget extends StatelessWidget {
                     AppSpacing.vLg,
                     Text(
                       '₱${_formatAmount(thisRevenue)}',
-                      style: AppTypography.displayLarge.copyWith(color: Colors.white),
+                      style: AppTypography.displayLarge.copyWith(
+                        color: Colors.white,
+                      ),
                     ),
                     AppSpacing.vXs,
                     Row(
                       children: [
                         Icon(
-                          isGrowing ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                          isGrowing
+                              ? Icons.trending_up_rounded
+                              : Icons.trending_down_rounded,
                           color: Colors.white,
                           size: 16,
                         ),
@@ -182,8 +215,16 @@ class RevenueStatsWidget extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _statChip(Icons.star_rounded, 'Top service', topService),
-                        _statChip(Icons.check_circle_rounded, 'Confirmed', '$thisConfirmedCount apts'),
+                        _statChip(
+                          Icons.star_rounded,
+                          'Top service',
+                          topService,
+                        ),
+                        _statChip(
+                          Icons.check_circle_rounded,
+                          'Confirmed',
+                          '$thisConfirmedCount apts',
+                        ),
                       ],
                     ),
                   ],

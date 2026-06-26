@@ -37,74 +37,110 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      _appointmentsSub = FirestoreService().getUserAppointmentsStream(user.uid).listen((appointments) {
-        final confirmedCount = appointments.where((a) => a['status'] == 'Confirmed').length;
-        if (_lastConfirmedCount >= 0 && confirmedCount > _lastConfirmedCount && mounted) {
-          AudioUtils.playNotificationSound();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 20),
-                  const SizedBox(width: 12),
-                  const Expanded(child: Text('✅ Your appointment has been confirmed!')),
-                ],
-              ),
-              backgroundColor: AppColors.success,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              margin: const EdgeInsets.all(16),
-              duration: const Duration(seconds: 5),
-            ),
-          );
-        }
-        _lastConfirmedCount = confirmedCount;
+      _appointmentsSub = FirestoreService()
+          .getUserAppointmentsStream(user.uid)
+          .listen((appointments) {
+            final confirmedCount = appointments
+                .where((a) => a['status'] == 'Confirmed')
+                .length;
+            if (_lastConfirmedCount >= 0 &&
+                confirmedCount > _lastConfirmedCount &&
+                mounted) {
+              AudioUtils.playNotificationSound();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle_outline_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text('✅ Your appointment has been confirmed!'),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: AppColors.success,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.all(16),
+                  duration: const Duration(seconds: 5),
+                ),
+              );
+            }
+            _lastConfirmedCount = confirmedCount;
 
-        final declinedCount = appointments.where((a) => a['status'] == 'Declined').length;
-        if (_lastDeclinedCount >= 0 && declinedCount > _lastDeclinedCount && mounted) {
-          AudioUtils.playNotificationSound();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
-                  const SizedBox(width: 12),
-                  const Expanded(child: Text('❌ Your appointment has been declined.')),
-                ],
-              ),
-              backgroundColor: AppColors.danger,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              margin: const EdgeInsets.all(16),
-              duration: const Duration(seconds: 5),
-            ),
-          );
-        }
-        _lastDeclinedCount = declinedCount;
-      });
+            final declinedCount = appointments
+                .where((a) => a['status'] == 'Declined')
+                .length;
+            if (_lastDeclinedCount >= 0 &&
+                declinedCount > _lastDeclinedCount &&
+                mounted) {
+              AudioUtils.playNotificationSound();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text('❌ Your appointment has been declined.'),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: AppColors.danger,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.all(16),
+                  duration: const Duration(seconds: 5),
+                ),
+              );
+            }
+            _lastDeclinedCount = declinedCount;
+          });
 
-      _unreadSub = FirestoreService().getUserUnreadCountStream(user.uid).listen((count) {
-        if (_lastUnreadCount >= 0 && count > _lastUnreadCount && mounted) {
-          AudioUtils.playNotificationSound();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.mark_chat_unread_rounded, color: Colors.white, size: 20),
-                  const SizedBox(width: 12),
-                  const Expanded(child: Text('💬 You have a new message from the clinic!')),
-                ],
+      _unreadSub = FirestoreService().getUserUnreadCountStream(user.uid).listen(
+        (count) {
+          if (_lastUnreadCount >= 0 && count > _lastUnreadCount && mounted) {
+            AudioUtils.playNotificationSound();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(
+                      Icons.mark_chat_unread_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Text('💬 You have a new message from the clinic!'),
+                    ),
+                  ],
+                ),
+                backgroundColor: AppColors.info,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: const EdgeInsets.all(16),
+                duration: const Duration(seconds: 5),
               ),
-              backgroundColor: AppColors.info,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              margin: const EdgeInsets.all(16),
-              duration: const Duration(seconds: 5),
-            ),
-          );
-        }
-        _lastUnreadCount = count;
-      });
+            );
+          }
+          _lastUnreadCount = count;
+        },
+      );
     }
   }
 
@@ -139,7 +175,9 @@ class _HomePageState extends State<HomePage> {
         ),
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: Responsive.contentMaxWidth(context)),
+            constraints: BoxConstraints(
+              maxWidth: Responsive.contentMaxWidth(context),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -172,7 +210,9 @@ class _HomePageState extends State<HomePage> {
                 _buildEventsList(isUpcoming: true),
                 AppSpacing.vXxxl,
 
-                Center(child: Text('Daily Tip', style: AppTypography.headlineMedium)),
+                Center(
+                  child: Text('Daily Tip', style: AppTypography.headlineMedium),
+                ),
                 AppSpacing.vLg,
                 Center(child: _buildDailyTip()),
                 AppSpacing.vXxxl,
@@ -191,75 +231,117 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildVetChatCta() {
     return GestureDetector(
-      onTap: () {
-        final user = FirebaseAuth.instance.currentUser;
-        if (user == null) return;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChatRoomPage(
-              chatId: user.uid,
-              chatUserName: user.displayName ?? user.email?.split('@')[0] ?? 'User',
-              isVet: false,
+          onTap: () {
+            final user = FirebaseAuth.instance.currentUser;
+            if (user == null) return;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChatRoomPage(
+                  chatId: user.uid,
+                  chatUserName:
+                      user.displayName ?? user.email?.split('@')[0] ?? 'User',
+                  isVet: false,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: AppColors.primaryGradient,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: AppRadii.rLg,
+              boxShadow: AppShadows.colored(AppColors.primary, opacity: 0.3),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.chat_bubble_outline_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                AppSpacing.hLg,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Chat with Vet',
+                        style: AppTypography.titleLarge.copyWith(
+                          color: AppColors.textInverse,
+                        ),
+                      ),
+                      AppSpacing.vXs,
+                      Text(
+                        'Ask a professional directly',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: Colors.white.withOpacity(0.85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.white,
+                  size: 14,
+                ),
+              ],
             ),
           ),
-        );
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: AppColors.primaryGradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: AppRadii.rLg,
-          boxShadow: AppShadows.colored(AppColors.primary, opacity: 0.3),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 24),
-            ),
-            AppSpacing.hLg,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Chat with Vet',
-                    style: AppTypography.titleLarge.copyWith(color: AppColors.textInverse),
-                  ),
-                  AppSpacing.vXs,
-                  Text(
-                    'Ask a professional directly',
-                    style: AppTypography.bodySmall.copyWith(color: Colors.white.withOpacity(0.85)),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
-          ],
-        ),
-      ),
-    )
+        )
         .animate(onPlay: (c) => c.repeat())
-        .shimmer(delay: 4000.ms, duration: 1500.ms, color: Colors.white.withOpacity(0.2));
+        .shimmer(
+          delay: 4000.ms,
+          duration: 1500.ms,
+          color: Colors.white.withOpacity(0.2),
+        );
   }
 
   Widget _buildServices() {
     final services = [
-      (title: "General\nCheckup", icon: Icons.health_and_safety_outlined, color: AppColors.primary, type: 'General Checkup'),
-      (title: 'Vaccination', icon: Icons.vaccines_outlined, color: AppColors.info, type: 'Vaccination'),
-      (title: "Surgery\n& Procedure", icon: Icons.medical_services_outlined, color: AppColors.secondary, type: 'Surgery'),
-      (title: "Deworming\n& Parasite", icon: Icons.bug_report_outlined, color: AppColors.success, type: 'Deworming'),
-      (title: "Grooming\nSession", icon: Icons.shower_outlined, color: AppColors.warning, type: 'Grooming'),
+      (
+        title: "General\nCheckup",
+        icon: Icons.health_and_safety_outlined,
+        color: AppColors.primary,
+        type: 'General Checkup',
+      ),
+      (
+        title: 'Vaccination',
+        icon: Icons.vaccines_outlined,
+        color: AppColors.info,
+        type: 'Vaccination',
+      ),
+      (
+        title: "Surgery\n& Procedure",
+        icon: Icons.medical_services_outlined,
+        color: AppColors.secondary,
+        type: 'Surgery',
+      ),
+      (
+        title: "Deworming\n& Parasite",
+        icon: Icons.bug_report_outlined,
+        color: AppColors.success,
+        type: 'Deworming',
+      ),
+      (
+        title: "Grooming\nSession",
+        icon: Icons.shower_outlined,
+        color: AppColors.warning,
+        type: 'Grooming',
+      ),
     ];
 
     return SizedBox(
@@ -274,7 +356,10 @@ class _HomePageState extends State<HomePage> {
               color: s.color,
               onTap: () {
                 navigateBottomBar(1);
-                AppointmentsPage.showBookDialog(context, initialVisitType: s.title);
+                AppointmentsPage.showBookDialog(
+                  context,
+                  initialVisitType: s.title,
+                );
               },
             ),
         ],
@@ -283,56 +368,69 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildDailyTip() {
-    final dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year, 1, 1)).inDays;
+    final dayOfYear = DateTime.now()
+        .difference(DateTime(DateTime.now().year, 1, 1))
+        .inDays;
     final currentWeek = dayOfYear ~/ 7;
 
     final tips = <Map<String, dynamic>>[
       {
         'hook': 'Why does your cat suddenly hate their water bowl? 💧',
-        'detail': "Cats are notoriously bad drinkers, but it might just be the bowl! Their whiskers are super sensitive. Learn why a wider bowl or a running fountain can prevent kidney issues.",
+        'detail':
+            "Cats are notoriously bad drinkers, but it might just be the bowl! Their whiskers are super sensitive. Learn why a wider bowl or a running fountain can prevent kidney issues.",
         'url': 'https://cats.com/whisker-fatigue',
         'icon': Icons.water_drop_outlined,
         'color': AppColors.info,
       },
       {
         'hook': 'The silent danger lurking in your kitchen! 🍫',
-        'detail': "We all know chocolate is bad, but did you know Xylitol (sugar substitute) in peanut butter is legally lethal to dogs? Always check the ingredients before sharing a snack.",
-        'url': 'https://vcahospitals.com/know-your-pet/xylitol-toxicity-in-dogs',
+        'detail':
+            "We all know chocolate is bad, but did you know Xylitol (sugar substitute) in peanut butter is legally lethal to dogs? Always check the ingredients before sharing a snack.",
+        'url':
+            'https://vcahospitals.com/know-your-pet/xylitol-toxicity-in-dogs',
         'icon': Icons.warning_amber_rounded,
         'color': AppColors.danger,
       },
       {
         'hook': "Is your pet 'too old' to play? Think again! 🎾",
-        'detail': 'Cognitive decline affects pets too. Mental stimulation through puzzle toys and short training sessions can keep their brain young and active for years longer.',
-        'url': 'https://vcahospitals.com/know-your-pet/senior-dog-care-special-considerations-for-dogs',
+        'detail':
+            'Cognitive decline affects pets too. Mental stimulation through puzzle toys and short training sessions can keep their brain young and active for years longer.',
+        'url':
+            'https://vcahospitals.com/know-your-pet/senior-dog-care-special-considerations-for-dogs',
         'icon': Icons.psychology_outlined,
         'color': AppColors.warning,
       },
       {
         'hook': 'The hidden cost of skipping the annual vet visit. 🩺',
-        'detail': 'Pets age 7 times faster than we do. Catching dental disease or early renal failure during a routine checkup can literally save thousands of dollars and extend their life.',
-        'url': 'https://www.avma.org/resources-tools/pet-owners/petcare/regular-veterinary-visits',
+        'detail':
+            'Pets age 7 times faster than we do. Catching dental disease or early renal failure during a routine checkup can literally save thousands of dollars and extend their life.',
+        'url':
+            'https://www.avma.org/resources-tools/pet-owners/petcare/regular-veterinary-visits',
         'icon': Icons.medical_services_outlined,
         'color': AppColors.primary,
       },
       {
         'hook': 'Why is your dog eating grass? 🌱',
-        'detail': "It's a common myth that they only do it when sick! Often, they just like the texture or need more fiber. However, if they vomit frequently after, it's time for a vet visit.",
+        'detail':
+            "It's a common myth that they only do it when sick! Often, they just like the texture or need more fiber. However, if they vomit frequently after, it's time for a vet visit.",
         'url': 'https://vcahospitals.com/know-your-pet/why-do-dogs-eat-grass',
         'icon': Icons.grass_outlined,
         'color': AppColors.success,
       },
       {
         'hook': "Purring doesn't always mean your cat is happy! 🙀",
-        'detail': 'Cats also purr to self-soothe when they are in pain, stressed, or frightened. Pay attention to their body language to decode what their purr actually means.',
+        'detail':
+            'Cats also purr to self-soothe when they are in pain, stressed, or frightened. Pay attention to their body language to decode what their purr actually means.',
         'url': 'https://www.scientificamerican.com/article/why-do-cats-purr/',
         'icon': Icons.hearing_outlined,
         'color': AppColors.secondary,
       },
       {
         'hook': "Are you trimming your pet's nails wrong? ✂️",
-        'detail': "Long nails aren't just loud on hardwood; they actually change how your dog walks, leading to severe joint pain and arthritis over time. Learn the 'quick' way to trim!",
-        'url': 'https://www.akc.org/expert-advice/health/how-to-trim-dogs-nails-safely/',
+        'detail':
+            "Long nails aren't just loud on hardwood; they actually change how your dog walks, leading to severe joint pain and arthritis over time. Learn the 'quick' way to trim!",
+        'url':
+            'https://www.akc.org/expert-advice/health/how-to-trim-dogs-nails-safely/',
         'icon': Icons.content_cut_outlined,
         'color': AppColors.primaryDark,
       },
@@ -357,10 +455,18 @@ class _HomePageState extends State<HomePage> {
         children: [
           Row(
             children: [
-              IconAvatar(icon: tip['icon'] as IconData, color: color, circle: true, size: 48),
+              IconAvatar(
+                icon: tip['icon'] as IconData,
+                color: color,
+                circle: true,
+                size: 48,
+              ),
               AppSpacing.hLg,
               Expanded(
-                child: Text(tip['hook'] as String, style: AppTypography.titleLarge),
+                child: Text(
+                  tip['hook'] as String,
+                  style: AppTypography.titleLarge,
+                ),
               ),
             ],
           ),
@@ -398,12 +504,22 @@ class _HomePageState extends State<HomePage> {
             if (timeParts[1].toUpperCase() == 'PM' && hour < 12) hour += 12;
             if (timeParts[1].toUpperCase() == 'AM' && hour == 12) hour = 0;
           }
-          return DateTime(int.parse(dateParts[2]), int.parse(dateParts[0]), int.parse(dateParts[1]), hour, minute);
+          return DateTime(
+            int.parse(dateParts[2]),
+            int.parse(dateParts[0]),
+            int.parse(dateParts[1]),
+            hour,
+            minute,
+          );
         }
       } else if (dateStr.contains('/')) {
         final dateParts = dateStr.split('/');
         if (dateParts.length == 3) {
-          return DateTime(int.parse(dateParts[2]), int.parse(dateParts[0]), int.parse(dateParts[1]));
+          return DateTime(
+            int.parse(dateParts[2]),
+            int.parse(dateParts[0]),
+            int.parse(dateParts[1]),
+          );
         }
       }
       return DateTime.parse(dateStr);
@@ -423,14 +539,21 @@ class _HomePageState extends State<HomePage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}', style: AppTypography.bodyMedium));
+            return Center(
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: AppTypography.bodyMedium,
+              ),
+            );
           }
 
           final allEvents = snapshot.data ?? [];
           if (allEvents.isEmpty) {
             return EmptyState(
               compact: true,
-              icon: isUpcoming ? Icons.event_busy_outlined : Icons.history_toggle_off_outlined,
+              icon: isUpcoming
+                  ? Icons.event_busy_outlined
+                  : Icons.history_toggle_off_outlined,
               title: isUpcoming ? 'No upcoming events' : 'No past events',
             );
           }
@@ -442,25 +565,33 @@ class _HomePageState extends State<HomePage> {
           for (final e in allEvents) {
             try {
               var startStr = e.date;
-              if (e.date.contains(' to ')) startStr = e.date.split(' to ')[0].trim();
+              if (e.date.contains(' to '))
+                startStr = e.date.split(' to ')[0].trim();
               final dt = _parseCustomDate(startStr);
               if (dt == null) continue;
               parsed.add({'event': e, 'startDate': dt});
             } catch (_) {}
           }
 
-          final filtered = parsed.where((m) {
-            final d = m['startDate'] as DateTime;
-            return isUpcoming
-                ? (d.isAfter(startOfToday) || d.isAtSameMomentAs(startOfToday))
-                : d.isBefore(startOfToday);
-          }).toList()
-            ..sort((a, b) => (a['startDate'] as DateTime).compareTo(b['startDate'] as DateTime));
+          final filtered =
+              parsed.where((m) {
+                final d = m['startDate'] as DateTime;
+                return isUpcoming
+                    ? (d.isAfter(startOfToday) ||
+                          d.isAtSameMomentAs(startOfToday))
+                    : d.isBefore(startOfToday);
+              }).toList()..sort(
+                (a, b) => (a['startDate'] as DateTime).compareTo(
+                  b['startDate'] as DateTime,
+                ),
+              );
 
           if (filtered.isEmpty) {
             return EmptyState(
               compact: true,
-              icon: isUpcoming ? Icons.event_busy_outlined : Icons.history_toggle_off_outlined,
+              icon: isUpcoming
+                  ? Icons.event_busy_outlined
+                  : Icons.history_toggle_off_outlined,
               title: isUpcoming ? 'No upcoming events' : 'No past events',
             );
           }
@@ -480,7 +611,9 @@ class _HomePageState extends State<HomePage> {
                 try {
                   final endStr = event.date.split(' to ')[1];
                   final endDate = _parseCustomDate(endStr);
-                  final s = DateFormat("MMMM d, yyyy 'at' h:mm a").format(startDate);
+                  final s = DateFormat(
+                    "MMMM d, yyyy 'at' h:mm a",
+                  ).format(startDate);
                   final e = endDate != null
                       ? DateFormat("MMMM d, yyyy 'at' h:mm a").format(endDate)
                       : 'Unknown End Time';
@@ -489,7 +622,8 @@ class _HomePageState extends State<HomePage> {
                   popupDate = DateFormat('MMMM d, yyyy').format(startDate);
                 }
               } else {
-                popupDate = (event.date.contains('at') || event.date.contains(':'))
+                popupDate =
+                    (event.date.contains('at') || event.date.contains(':'))
                     ? DateFormat("MMMM d, yyyy 'at' h:mm a").format(startDate)
                     : DateFormat('MMMM d, yyyy').format(startDate);
               }
@@ -521,7 +655,14 @@ class _HomePageState extends State<HomePage> {
   }) {
     final activeColor = isPast ? AppColors.textTertiary : color;
     return GestureDetector(
-      onTap: () => _showEventSheet(title, popupDate, location, description, color, isPast),
+      onTap: () => _showEventSheet(
+        title,
+        popupDate,
+        location,
+        description,
+        color,
+        isPast,
+      ),
       child: Container(
         width: 240,
         margin: const EdgeInsets.only(right: AppSpacing.md),
@@ -540,7 +681,10 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm + 2, vertical: AppSpacing.xs + 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm + 2,
+                    vertical: AppSpacing.xs + 2,
+                  ),
                   decoration: BoxDecoration(
                     color: activeColor.withOpacity(0.12),
                     borderRadius: AppRadii.rSm,
@@ -548,11 +692,18 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     badgeDate,
                     textAlign: TextAlign.center,
-                    style: AppTypography.labelMedium.copyWith(color: activeColor, height: 1.2),
+                    style: AppTypography.labelMedium.copyWith(
+                      color: activeColor,
+                      height: 1.2,
+                    ),
                   ),
                 ),
                 const Spacer(),
-                Icon(Icons.touch_app_outlined, color: AppColors.textTertiary, size: 16),
+                Icon(
+                  Icons.touch_app_outlined,
+                  color: AppColors.textTertiary,
+                  size: 16,
+                ),
               ],
             ),
             Column(
@@ -563,14 +714,20 @@ class _HomePageState extends State<HomePage> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTypography.titleLarge.copyWith(
-                    color: isPast ? AppColors.textSecondary : AppColors.textPrimary,
+                    color: isPast
+                        ? AppColors.textSecondary
+                        : AppColors.textPrimary,
                     decoration: isPast ? TextDecoration.lineThrough : null,
                   ),
                 ),
                 AppSpacing.vXs,
                 Row(
                   children: [
-                    const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textTertiary),
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 14,
+                      color: AppColors.textTertiary,
+                    ),
                     AppSpacing.hXs,
                     Expanded(
                       child: Text(
@@ -589,7 +746,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showEventSheet(String title, String popupDate, String location, String description, Color color, bool isPast) {
+  void _showEventSheet(
+    String title,
+    String popupDate,
+    String location,
+    String description,
+    Color color,
+    bool isPast,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -599,7 +763,9 @@ class _HomePageState extends State<HomePage> {
           height: MediaQuery.of(context).size.height * 0.75,
           decoration: const BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.xl)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppRadii.xl),
+            ),
           ),
           padding: const EdgeInsets.all(AppSpacing.xxl),
           child: SingleChildScrollView(
@@ -625,7 +791,9 @@ class _HomePageState extends State<HomePage> {
                       size: 48,
                     ),
                     AppSpacing.hLg,
-                    Expanded(child: Text(title, style: AppTypography.displaySmall)),
+                    Expanded(
+                      child: Text(title, style: AppTypography.displaySmall),
+                    ),
                   ],
                 ),
                 AppSpacing.vXl,
@@ -656,7 +824,10 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('DATE & TIME', style: AppTypography.labelSmall),
+                            Text(
+                              'DATE & TIME',
+                              style: AppTypography.labelSmall,
+                            ),
                             AppSpacing.vXs,
                             Text(popupDate, style: AppTypography.bodyLarge),
                           ],
@@ -697,18 +868,26 @@ class _HomePageState extends State<HomePage> {
                 Text('About this Event', style: AppTypography.headlineSmall),
                 AppSpacing.vSm,
                 Text(
-                  description.isEmpty ? 'No description provided.' : description,
-                  style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary),
+                  description.isEmpty
+                      ? 'No description provided.'
+                      : description,
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 AppSpacing.vXxl,
                 PrimaryButton(
                   label: isPast ? 'Got it' : 'Remind me',
-                  icon: isPast ? Icons.check_rounded : Icons.notifications_active_outlined,
+                  icon: isPast
+                      ? Icons.check_rounded
+                      : Icons.notifications_active_outlined,
                   onPressed: () {
                     Navigator.pop(context);
                     if (!isPast) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Event saved to your calendar')),
+                        const SnackBar(
+                          content: Text('Event saved to your calendar'),
+                        ),
                       );
                     }
                   },

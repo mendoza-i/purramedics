@@ -26,7 +26,9 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
   }
 
   void _updateStatus(String docId, String newStatus) {
-    FirebaseFirestore.instance.collection('appointments').doc(docId).update({'status': newStatus});
+    FirebaseFirestore.instance.collection('appointments').doc(docId).update({
+      'status': newStatus,
+    });
   }
 
   Color _statusColor(String status, bool isPast) {
@@ -60,7 +62,10 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(apt['visitType'] ?? 'Appointment', style: AppTypography.titleMedium),
+              Text(
+                apt['visitType'] ?? 'Appointment',
+                style: AppTypography.titleMedium,
+              ),
               AppSpacing.vMd,
               _kv('Date', apt['date'] ?? 'N/A'),
               _kv('Owner', apt['userName'] ?? 'N/A'),
@@ -72,7 +77,8 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
               Text('Notes', style: AppTypography.titleSmall),
               AppSpacing.vXs,
               Text(
-                apt['additionalInfo'] ?? 'No notes were added by the pet owner.',
+                apt['additionalInfo'] ??
+                    'No notes were added by the pet owner.',
                 style: AppTypography.bodyMedium,
               ),
             ],
@@ -81,7 +87,12 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Close', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+            child: Text(
+              'Close',
+              style: AppTypography.labelLarge.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
           ),
         ],
       ),
@@ -89,18 +100,23 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
   }
 
   Widget _kv(String k, String v) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 80,
-              child: Text(k, style: AppTypography.labelMedium.copyWith(color: AppColors.textTertiary)),
+    padding: const EdgeInsets.symmetric(vertical: 2),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 80,
+          child: Text(
+            k,
+            style: AppTypography.labelMedium.copyWith(
+              color: AppColors.textTertiary,
             ),
-            Expanded(child: Text(v, style: AppTypography.bodyMedium)),
-          ],
+          ),
         ),
-      );
+        Expanded(child: Text(v, style: AppTypography.bodyMedium)),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +133,9 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
         stream: firestoreService.getAllAppointmentsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
           if (!snapshot.hasData) {
             return const EmptyState(
@@ -165,13 +183,16 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
 
           return RefreshIndicator(
             color: AppColors.primary,
-            onRefresh: () async => await Future.delayed(const Duration(milliseconds: 600)),
+            onRefresh: () async =>
+                await Future.delayed(const Duration(milliseconds: 600)),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(AppSpacing.xxl),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: Responsive.contentMaxWidth(context)),
+                  constraints: BoxConstraints(
+                    maxWidth: Responsive.contentMaxWidth(context),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -179,7 +200,8 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
                       AppSpacing.vXxl,
                       ...displayMonths.map((m) {
                         final list = grouped[m] ?? [];
-                        final isCurrent = _selectedYear == now.year && m == now.month;
+                        final isCurrent =
+                            _selectedYear == now.year && m == now.month;
                         return _buildMonthSection(m, list, isCurrent, now);
                       }),
                     ],
@@ -195,7 +217,10 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
 
   Widget _buildYearToggle() {
     return AppCard(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -215,7 +240,12 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
     );
   }
 
-  Widget _buildMonthSection(int monthInt, List<Map<String, dynamic>> list, bool isCurrent, DateTime now) {
+  Widget _buildMonthSection(
+    int monthInt,
+    List<Map<String, dynamic>> list,
+    bool isCurrent,
+    DateTime now,
+  ) {
     final monthDate = DateTime(_selectedYear, monthInt, 1);
     final monthLabel = DateFormat('MMMM yyyy').format(monthDate).toUpperCase();
     final isExpanded = _expandedMonths[monthLabel] ?? isCurrent;
@@ -224,15 +254,20 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
       padding: const EdgeInsets.only(bottom: AppSpacing.xxxl),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final cols = Responsive.isWide(context) ? 3 : (Responsive.isTablet(context) ? 2 : 1);
-          final cardWidth = (constraints.maxWidth - (AppSpacing.lg * (cols - 1))) / cols - 0.1;
+          final cols = Responsive.isWide(context)
+              ? 3
+              : (Responsive.isTablet(context) ? 2 : 1);
+          final cardWidth =
+              (constraints.maxWidth - (AppSpacing.lg * (cols - 1))) / cols -
+              0.1;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
                 borderRadius: AppRadii.rMd,
-                onTap: () => setState(() => _expandedMonths[monthLabel] = !isExpanded),
+                onTap: () =>
+                    setState(() => _expandedMonths[monthLabel] = !isExpanded),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.lg,
@@ -242,25 +277,42 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
                       ? BoxDecoration(
                           color: AppColors.primarySurface,
                           borderRadius: AppRadii.rMd,
-                          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                          border: Border.all(
+                            color: AppColors.primary.withOpacity(0.3),
+                          ),
                         )
                       : null,
                   child: Row(
                     children: [
                       Text(
                         monthLabel.split(' ')[0],
-                        style: (isCurrent ? AppTypography.headlineMedium : AppTypography.headlineSmall)
-                            .copyWith(color: isCurrent ? AppColors.primaryDark : AppColors.textPrimary),
+                        style:
+                            (isCurrent
+                                    ? AppTypography.headlineMedium
+                                    : AppTypography.headlineSmall)
+                                .copyWith(
+                                  color: isCurrent
+                                      ? AppColors.primaryDark
+                                      : AppColors.textPrimary,
+                                ),
                       ),
                       if (isCurrent) ...[
                         AppSpacing.hSm,
-                        const AppBadge(label: 'CURRENT', tone: BadgeTone.primary),
+                        const AppBadge(
+                          label: 'CURRENT',
+                          tone: BadgeTone.primary,
+                        ),
                       ],
                       AppSpacing.hMd,
-                      AppBadge(label: '${list.length} appointments', tone: BadgeTone.neutral),
+                      AppBadge(
+                        label: '${list.length} appointments',
+                        tone: BadgeTone.neutral,
+                      ),
                       const Spacer(),
                       Icon(
-                        isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                        isExpanded
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
                         color: AppColors.textTertiary,
                       ),
                     ],
@@ -271,7 +323,9 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
                 AppSpacing.vMd,
                 if (list.isEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
                     child: Text(
                       'No appointments scheduled for this month.',
                       style: AppTypography.bodyMedium.copyWith(
@@ -284,7 +338,14 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
                   Wrap(
                     spacing: AppSpacing.lg,
                     runSpacing: AppSpacing.lg,
-                    children: list.map((apt) => SizedBox(width: cardWidth, child: _buildAppointmentCard(apt, now))).toList(),
+                    children: list
+                        .map(
+                          (apt) => SizedBox(
+                            width: cardWidth,
+                            child: _buildAppointmentCard(apt, now),
+                          ),
+                        )
+                        .toList(),
                   ),
               ],
             ],
@@ -304,7 +365,11 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
     try {
       final parts = apt['date'].toString().split('-');
       if (parts.length == 3) {
-        final d = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+        final d = DateTime(
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+          int.parse(parts[2]),
+        );
         isPast = d.isBefore(DateTime(now.year, now.month, now.day));
         explicitDate = DateFormat('MMMM dd, yyyy').format(d);
       }
@@ -322,14 +387,20 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
         ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.xl),
-        child: const Icon(Icons.delete_outline_rounded, color: AppColors.textInverse),
+        child: const Icon(
+          Icons.delete_outline_rounded,
+          color: AppColors.textInverse,
+        ),
       ),
       confirmDismiss: (_) async {
         final confirm = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: AppRadii.rLg),
-            title: Text('Delete appointment?', style: AppTypography.headlineSmall),
+            title: Text(
+              'Delete appointment?',
+              style: AppTypography.headlineSmall,
+            ),
             content: Text(
               "Are you sure you want to completely delete $userName's appointment?",
               style: AppTypography.bodyMedium,
@@ -337,14 +408,24 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+                child: Text(
+                  'Cancel',
+                  style: AppTypography.labelLarge.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
               TextButton(
                 onPressed: () {
                   firestoreService.deleteAppointment(id);
                   Navigator.pop(context, true);
                 },
-                child: Text('Delete', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+                child: Text(
+                  'Delete',
+                  style: AppTypography.labelLarge.copyWith(
+                    color: AppColors.danger,
+                  ),
+                ),
               ),
             ],
           ),
@@ -358,7 +439,8 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
           borderRadius: AppRadii.rLg,
           child: Container(
             decoration: BoxDecoration(
-              border: Border(left: BorderSide(color: accent, width: 6)),
+              color: isPast ? AppColors.surfaceAlt : accent.withOpacity(0.04),
+              border: Border.all(color: accent.withOpacity(0.3), width: 1),
             ),
             padding: const EdgeInsets.all(AppSpacing.xl),
             child: Column(
@@ -367,71 +449,96 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: accent.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.pets_rounded, color: accent, size: 24),
+                    ),
+                    AppSpacing.hMd,
                     Expanded(
-                      child: Text(
-                        apt['visitType'] ?? 'Appointment',
-                        style: AppTypography.titleMedium.copyWith(
-                          color: isPast ? AppColors.textTertiary : AppColors.textPrimary,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            apt['visitType'] ?? 'Appointment',
+                            style: AppTypography.titleMedium.copyWith(
+                              color: isPast
+                                  ? AppColors.textTertiary
+                                  : AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          AppSpacing.vXs,
+                          Text(
+                            '${apt['petName']} • $userName',
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ),
                     AppBadge(label: status, tone: _statusTone(status, isPast)),
                   ],
                 ),
-                AppSpacing.vMd,
-                Row(
-                  children: [
-                    const Icon(Icons.schedule_rounded, size: 14, color: AppColors.textTertiary),
-                    AppSpacing.hXs,
-                    Text(explicitDate, style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)),
-                    AppSpacing.hSm,
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.warningSurface,
-                        borderRadius: AppRadii.rXs,
+                AppSpacing.vLg,
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.divider),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_month_rounded,
+                        size: 16,
+                        color: AppColors.textTertiary,
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.access_time_rounded, size: 12, color: AppColors.warning),
-                          AppSpacing.hXs,
-                          Text(
-                            apt['time'] ?? 'No time',
-                            style: AppTypography.labelSmall.copyWith(color: AppColors.warning),
-                          ),
-                        ],
+                      AppSpacing.hSm,
+                      Text(
+                        explicitDate,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                AppSpacing.vSm,
-                Row(
-                  children: [
-                    const Icon(Icons.person_outline_rounded, size: 14, color: AppColors.textTertiary),
-                    AppSpacing.hXs,
-                    Expanded(
-                      child: Text(
-                        'Owner: $userName',
-                        style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
-                        overflow: TextOverflow.ellipsis,
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.warningSurface,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.access_time_rounded,
+                              size: 14,
+                              color: AppColors.warning,
+                            ),
+                            AppSpacing.hXs,
+                            Text(
+                              apt['time'] ?? 'No time',
+                              style: AppTypography.labelSmall.copyWith(
+                                color: AppColors.warning,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                AppSpacing.vXs,
-                Row(
-                  children: [
-                    const Icon(Icons.pets_rounded, size: 14, color: AppColors.textTertiary),
-                    AppSpacing.hXs,
-                    Expanded(
-                      child: Text(
-                        'Pet: ${apt['petName']}',
-                        style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 AppSpacing.vLg,
                 const Divider(color: AppColors.divider, height: 1),
@@ -453,7 +560,10 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
         children: [
           TextButton(
             onPressed: () => _updateStatus(id, 'Declined'),
-            child: Text('Decline', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+            child: Text(
+              'Decline',
+              style: AppTypography.labelLarge.copyWith(color: AppColors.danger),
+            ),
           ),
           PrimaryButton(
             label: 'Confirm',
@@ -478,12 +588,18 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.notes_rounded, size: 18, color: AppColors.info),
+                const Icon(
+                  Icons.notes_rounded,
+                  size: 18,
+                  color: AppColors.info,
+                ),
                 AppSpacing.hSm,
                 Expanded(
                   child: Text(
                     apt['additionalInfo'] ?? 'No additional notes',
-                    style: AppTypography.bodySmall.copyWith(color: AppColors.info),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.info,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -497,10 +613,14 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => AddPetPage(prefilledOwnerEmail: apt['userEmail']),
+                builder: (_) =>
+                    AddPetPage(prefilledOwnerEmail: apt['userEmail']),
               ),
             ),
-            icon: const Icon(Icons.note_add_rounded, color: AppColors.textTertiary),
+            icon: const Icon(
+              Icons.note_add_rounded,
+              color: AppColors.textTertiary,
+            ),
             tooltip: 'Add details to pet',
           ),
       ],

@@ -66,7 +66,9 @@ class _VetLoginPageState extends State<VetLoginPage> {
                   AppSpacing.vXs,
                   Text(
                     'Sign in to manage your practice',
-                    style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   AppSpacing.vXxl,
                   AppTextField(
@@ -87,11 +89,14 @@ class _VetLoginPageState extends State<VetLoginPage> {
                     onSubmitted: (_) => _login(),
                     suffix: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
                         color: AppColors.textTertiary,
                         size: 20,
                       ),
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                     ),
                   ),
                   AppSpacing.vXxl,

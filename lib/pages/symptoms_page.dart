@@ -24,8 +24,14 @@ class _SymptomsPageState extends State<SymptomsPage> {
   static bool _hasShownDisclaimer = false;
 
   final List<String> symptoms = const [
-    'Loss of appetite', 'Vomiting', 'Diarrhea', 'Lethargy',
-    'Coughing', 'Limping', 'Scratching', 'Difficulty breathing',
+    'Loss of appetite',
+    'Vomiting',
+    'Diarrhea',
+    'Lethargy',
+    'Coughing',
+    'Limping',
+    'Scratching',
+    'Difficulty breathing',
   ];
 
   @override
@@ -89,12 +95,20 @@ class _SymptomsPageState extends State<SymptomsPage> {
           'Purramedics uses an AI system trained on veterinary data to triage symptoms. '
           'It cross-references thousands of cases to give a preliminary assessment more accurate than generic web searches.\n\n'
           'Always consult a real vet for critical emergencies.',
-          style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary, height: 1.5),
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+            height: 1.5,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Understood', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+            child: Text(
+              'Understood',
+              style: AppTypography.labelLarge.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
           ),
         ],
       ),
@@ -132,7 +146,10 @@ class _SymptomsPageState extends State<SymptomsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.danger),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: AppColors.danger,
+          ),
         );
       }
     } finally {
@@ -156,7 +173,10 @@ class _SymptomsPageState extends State<SymptomsPage> {
           child: SingleChildScrollView(
             controller: _mainScrollController,
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl, vertical: AppSpacing.xxl),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xxl,
+              vertical: AppSpacing.xxl,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -183,16 +203,19 @@ class _SymptomsPageState extends State<SymptomsPage> {
             horizontal: AppSpacing.xxl,
             vertical: AppSpacing.lg,
           ),
-          child: PrimaryButton(
-            label: 'Generate Report',
-            icon: Icons.auto_awesome_rounded,
-            onPressed: _onGenerateReport,
-            isLoading: _isGenerating,
-          ).animate(onPlay: (c) => c.repeat(period: 3500.ms)).shimmer(
-                duration: 1200.ms,
-                color: Colors.white.withOpacity(0.25),
-                angle: 0.8,
-              ),
+          child:
+              PrimaryButton(
+                    label: 'Generate Report',
+                    icon: Icons.auto_awesome_rounded,
+                    onPressed: _onGenerateReport,
+                    isLoading: _isGenerating,
+                  )
+                  .animate(onPlay: (c) => c.repeat(period: 3500.ms))
+                  .shimmer(
+                    duration: 1200.ms,
+                    color: Colors.white.withOpacity(0.25),
+                    angle: 0.8,
+                  ),
         ),
       ),
     );
@@ -207,17 +230,28 @@ class _SymptomsPageState extends State<SymptomsPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(child: Text('AI-Powered Pet Triage', style: AppTypography.displayMedium)),
+            Expanded(
+              child: Text(
+                'AI-Powered Pet Triage',
+                style: AppTypography.displayMedium,
+              ),
+            ),
             IconButton(
               onPressed: _showTrustInfo,
-              icon: const Icon(Icons.info_outline_rounded, color: AppColors.textTertiary),
+              icon: const Icon(
+                Icons.info_outline_rounded,
+                color: AppColors.textTertiary,
+              ),
               tooltip: 'About this tool',
             ),
           ],
         ),
         Text(
           'Select signs below to generate a health report.',
-          style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary, height: 1.5),
+          style: AppTypography.bodyLarge.copyWith(
+            color: AppColors.textSecondary,
+            height: 1.5,
+          ),
         ),
       ],
     );
@@ -245,13 +279,19 @@ class _SymptomsPageState extends State<SymptomsPage> {
                 decoration: BoxDecoration(
                   color: selected ? AppColors.primary : AppColors.surface,
                   borderRadius: AppRadii.rFull,
-                  border: Border.all(color: selected ? AppColors.primary : AppColors.divider),
-                  boxShadow: selected ? AppShadows.colored(AppColors.primary, opacity: 0.2) : null,
+                  border: Border.all(
+                    color: selected ? AppColors.primary : AppColors.divider,
+                  ),
+                  boxShadow: selected
+                      ? AppShadows.colored(AppColors.primary, opacity: 0.2)
+                      : null,
                 ),
                 child: Text(
                   s,
                   style: AppTypography.labelMedium.copyWith(
-                    color: selected ? AppColors.textInverse : AppColors.textPrimary,
+                    color: selected
+                        ? AppColors.textInverse
+                        : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -296,7 +336,11 @@ class _SymptomsPageState extends State<SymptomsPage> {
       children: [
         Row(
           children: [
-            const Icon(Icons.monitor_heart_outlined, color: AppColors.textPrimary, size: 22),
+            const Icon(
+              Icons.monitor_heart_outlined,
+              color: AppColors.textPrimary,
+              size: 22,
+            ),
             AppSpacing.hSm,
             Text(
               chat.lastReport != null ? 'Analysis Result' : 'Analysis Status',
@@ -326,9 +370,17 @@ class _SymptomsPageState extends State<SymptomsPage> {
           children: [
             Container(width: 150, height: 20, color: AppColors.surface),
             AppSpacing.vMd,
-            Container(width: double.infinity, height: 14, color: AppColors.surface),
+            Container(
+              width: double.infinity,
+              height: 14,
+              color: AppColors.surface,
+            ),
             AppSpacing.vSm,
-            Container(width: double.infinity, height: 14, color: AppColors.surface),
+            Container(
+              width: double.infinity,
+              height: 14,
+              color: AppColors.surface,
+            ),
             AppSpacing.vSm,
             Container(width: 200, height: 14, color: AppColors.surface),
           ],
@@ -344,7 +396,13 @@ class _SymptomsPageState extends State<SymptomsPage> {
           _reportSection('🚨 Triage assessment', r.triage),
           if (r.summary.isNotEmpty) ...[
             AppSpacing.vSm,
-            Text(r.summary, style: AppTypography.bodyMedium.copyWith(height: 1.6, color: AppColors.textSecondary)),
+            Text(
+              r.summary,
+              style: AppTypography.bodyMedium.copyWith(
+                height: 1.6,
+                color: AppColors.textSecondary,
+              ),
+            ),
           ],
           const Divider(height: 32, color: AppColors.divider),
           _reportSection('🏥 Veterinary action plan', r.actionPlan),
@@ -376,7 +434,10 @@ class _SymptomsPageState extends State<SymptomsPage> {
           Text(
             'Select symptoms above and tap\nGenerate Report to start.',
             textAlign: TextAlign.center,
-            style: AppTypography.bodyMedium.copyWith(color: AppColors.textTertiary, height: 1.5),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textTertiary,
+              height: 1.5,
+            ),
           ),
         ],
       ),
@@ -400,7 +461,10 @@ class _SymptomsPageState extends State<SymptomsPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('• ', style: AppTypography.bodyLarge.copyWith(color: AppColors.primary)),
+          Text(
+            '• ',
+            style: AppTypography.bodyLarge.copyWith(color: AppColors.primary),
+          ),
           Expanded(child: Text(text, style: AppTypography.bodyMedium)),
         ],
       ),
@@ -417,7 +481,10 @@ class _SymptomsPageState extends State<SymptomsPage> {
         ),
         AppSpacing.vMd,
         StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance.collection('settings').doc('clinic_profile').snapshots(),
+          stream: FirebaseFirestore.instance
+              .collection('settings')
+              .doc('clinic_profile')
+              .snapshots(),
           builder: (context, snapshot) {
             final data = snapshot.data?.data() as Map<String, dynamic>?;
             final phone = data?['phone'] ?? '—';
@@ -450,7 +517,11 @@ class _SymptomsPageState extends State<SymptomsPage> {
                   bg: AppColors.warningSurface,
                   label: 'Visit Us',
                   value: address,
-                  onTap: () => launchUrl(Uri.parse('https://maps.google.com/?q=${Uri.encodeComponent(address)}')),
+                  onTap: () => launchUrl(
+                    Uri.parse(
+                      'https://maps.google.com/?q=${Uri.encodeComponent(address)}',
+                    ),
+                  ),
                 ),
               ],
             );
@@ -470,7 +541,10 @@ class _SymptomsPageState extends State<SymptomsPage> {
   }) {
     return AppCard(
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       child: Row(
         children: [
           IconAvatar(icon: icon, color: color, background: bg, circle: true),
@@ -479,13 +553,22 @@ class _SymptomsPageState extends State<SymptomsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: AppTypography.labelMedium.copyWith(color: AppColors.textTertiary)),
+                Text(
+                  label,
+                  style: AppTypography.labelMedium.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
+                ),
                 AppSpacing.vXs,
                 Text(value, style: AppTypography.titleSmall),
               ],
             ),
           ),
-          const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textTertiary),
+          const Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 14,
+            color: AppColors.textTertiary,
+          ),
         ],
       ),
     );
@@ -493,12 +576,60 @@ class _SymptomsPageState extends State<SymptomsPage> {
 
   Widget _buildFirstAidGrid() {
     final tiles = [
-      _GuideTile('CPR Guide', Icons.favorite_outline, AppColors.danger, AppColors.dangerSurface, _cprContent(), 'American Red Cross', 'https://www.redcross.org/take-a-class/cpr/performing-cpr/pet-cpr'),
-      _GuideTile('Choking', Icons.air, AppColors.info, AppColors.infoSurface, _chokingContent(), 'American Red Cross', 'https://www.redcross.org/take-a-class/resources/learn-pet-first-aid/dog/choking'),
-      _GuideTile('Bleeding', Icons.bloodtype_outlined, AppColors.warning, AppColors.warningSurface, _bleedingContent(), 'Veterinary Partner', 'https://veterinarypartner.vin.com/default.aspx?pid=19239&id=4951317'),
-      _GuideTile('Poisoning', Icons.science_outlined, AppColors.secondaryDark, AppColors.secondarySurface, _poisoningContent(), 'Animal Poisons Helpline', 'https://www.animalpoisons.com.au/emergency-instructions/'),
-      _GuideTile('Heatstroke', Icons.wb_sunny_outlined, AppColors.secondary, AppColors.secondarySurface, _heatstrokeContent(), 'American Red Cross', 'https://www.redcross.org/take-a-class/resources/learn-pet-first-aid/dog/heatstroke'),
-      _GuideTile('Seizures', Icons.bolt_outlined, AppColors.primary, AppColors.primarySurface, _seizuresContent(), 'Veterinary Partner', 'https://veterinarypartner.vin.com/default.aspx?pid=19239&id=4951440'),
+      _GuideTile(
+        'CPR Guide',
+        Icons.favorite_outline,
+        AppColors.danger,
+        AppColors.dangerSurface,
+        _cprContent(),
+        'American Red Cross',
+        'https://www.redcross.org/take-a-class/cpr/performing-cpr/pet-cpr',
+      ),
+      _GuideTile(
+        'Choking',
+        Icons.air,
+        AppColors.info,
+        AppColors.infoSurface,
+        _chokingContent(),
+        'American Red Cross',
+        'https://www.redcross.org/take-a-class/resources/learn-pet-first-aid/dog/choking',
+      ),
+      _GuideTile(
+        'Bleeding',
+        Icons.bloodtype_outlined,
+        AppColors.warning,
+        AppColors.warningSurface,
+        _bleedingContent(),
+        'Veterinary Partner',
+        'https://veterinarypartner.vin.com/default.aspx?pid=19239&id=4951317',
+      ),
+      _GuideTile(
+        'Poisoning',
+        Icons.science_outlined,
+        AppColors.secondaryDark,
+        AppColors.secondarySurface,
+        _poisoningContent(),
+        'Animal Poisons Helpline',
+        'https://www.animalpoisons.com.au/emergency-instructions/',
+      ),
+      _GuideTile(
+        'Heatstroke',
+        Icons.wb_sunny_outlined,
+        AppColors.secondary,
+        AppColors.secondarySurface,
+        _heatstrokeContent(),
+        'American Red Cross',
+        'https://www.redcross.org/take-a-class/resources/learn-pet-first-aid/dog/heatstroke',
+      ),
+      _GuideTile(
+        'Seizures',
+        Icons.bolt_outlined,
+        AppColors.primary,
+        AppColors.primarySurface,
+        _seizuresContent(),
+        'Veterinary Partner',
+        'https://veterinarypartner.vin.com/default.aspx?pid=19239&id=4951440',
+      ),
     ];
 
     return Column(
@@ -529,10 +660,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
       onTap: () => _showGuideSheet(t),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: t.bg,
-          borderRadius: AppRadii.rLg,
-        ),
+        decoration: BoxDecoration(color: t.bg, borderRadius: AppRadii.rLg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -579,9 +707,16 @@ class _SymptomsPageState extends State<SymptomsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
                 child: Row(
                   children: [
-                    IconAvatar(icon: t.icon, color: t.accent, background: t.bg, size: 52),
+                    IconAvatar(
+                      icon: t.icon,
+                      color: t.accent,
+                      background: t.bg,
+                      size: 52,
+                    ),
                     AppSpacing.hMd,
-                    Expanded(child: Text(t.title, style: AppTypography.displaySmall)),
+                    Expanded(
+                      child: Text(t.title, style: AppTypography.displaySmall),
+                    ),
                   ],
                 ),
               ),
@@ -589,13 +724,20 @@ class _SymptomsPageState extends State<SymptomsPage> {
               Expanded(
                 child: SingleChildScrollView(
                   controller: controller,
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, 0, AppSpacing.xxl, AppSpacing.lg),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.xxl,
+                    0,
+                    AppSpacing.xxl,
+                    AppSpacing.lg,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'STEP-BY-STEP GUIDE',
-                        style: AppTypography.labelSmall.copyWith(color: AppColors.textTertiary),
+                        style: AppTypography.labelSmall.copyWith(
+                          color: AppColors.textTertiary,
+                        ),
                       ),
                       AppSpacing.vMd,
                       t.content,
@@ -604,21 +746,35 @@ class _SymptomsPageState extends State<SymptomsPage> {
                       AppSpacing.vSm,
                       Row(
                         children: [
-                          const Icon(Icons.link_rounded, size: 14, color: AppColors.textTertiary),
+                          const Icon(
+                            Icons.link_rounded,
+                            size: 14,
+                            color: AppColors.textTertiary,
+                          ),
                           AppSpacing.hXs,
-                          Text('Source: ${t.source}', style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary)),
+                          Text(
+                            'Source: ${t.source}',
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textTertiary,
+                            ),
+                          ),
                         ],
                       ),
                       AppSpacing.vXs,
                       GestureDetector(
                         onTap: () async {
-                          if (!await launchUrl(Uri.parse(t.url), mode: LaunchMode.externalApplication)) {
+                          if (!await launchUrl(
+                            Uri.parse(t.url),
+                            mode: LaunchMode.externalApplication,
+                          )) {
                             debugPrint('Could not launch ${t.url}');
                           }
                         },
                         child: Text(
                           'Read full guide →',
-                          style: AppTypography.labelLarge.copyWith(color: t.accent),
+                          style: AppTypography.labelLarge.copyWith(
+                            color: t.accent,
+                          ),
                         ),
                       ),
                       AppSpacing.vXxxl,
@@ -634,57 +790,131 @@ class _SymptomsPageState extends State<SymptomsPage> {
   }
 
   Widget _step(String text) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs + 2),
-        child: Text(text, style: AppTypography.bodyLarge.copyWith(height: 1.6)),
-      );
+    padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs + 2),
+    child: Text(text, style: AppTypography.bodyLarge.copyWith(height: 1.6)),
+  );
 
-  Widget _cprContent() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _step('1. CHECK FOR RESPONSIVENESS: Call your pet\'s name, tap their shoulder. If no response, begin CPR immediately.'),
-        _step('2. POSITION: Lay pet on their right side on a firm surface. Ensure airway is clear.'),
-        _step('3. CHEST COMPRESSIONS: For dogs, push down 1/3 of chest width at 100–120 per minute. For cats, use thumb and fingers around the chest.'),
-        _step('4. RESCUE BREATHS: After 30 compressions, hold mouth shut, breathe into nose once every 5 seconds.'),
-        _step('5. CONTINUE: Keep the 30:2 ratio until breathing resumes or you reach a vet.'),
-      ]);
+  Widget _cprContent() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _step(
+        '1. CHECK FOR RESPONSIVENESS: Call your pet\'s name, tap their shoulder. If no response, begin CPR immediately.',
+      ),
+      _step(
+        '2. POSITION: Lay pet on their right side on a firm surface. Ensure airway is clear.',
+      ),
+      _step(
+        '3. CHEST COMPRESSIONS: For dogs, push down 1/3 of chest width at 100–120 per minute. For cats, use thumb and fingers around the chest.',
+      ),
+      _step(
+        '4. RESCUE BREATHS: After 30 compressions, hold mouth shut, breathe into nose once every 5 seconds.',
+      ),
+      _step(
+        '5. CONTINUE: Keep the 30:2 ratio until breathing resumes or you reach a vet.',
+      ),
+    ],
+  );
 
-  Widget _chokingContent() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _step('1. STAY CALM: Your pet is panicking. Keeping calm reduces their stress.'),
-        _step('2. LOOK INSIDE: Open the mouth gently and look for visible obstruction. Only remove if clearly reachable — don\'t push deeper.'),
-        _step('3. HEIMLICH FOR DOGS: Stand behind them, make a fist below the ribcage, thrust upward 3–5 times firmly.'),
-        _step('4. FOR CATS: Hold face-down, supporting head. Apply 5 firm back blows between shoulder blades.'),
-        _step('5. VET IMMEDIATELY: Even if the object dislodges, go to a vet to rule out internal damage.'),
-      ]);
+  Widget _chokingContent() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _step(
+        '1. STAY CALM: Your pet is panicking. Keeping calm reduces their stress.',
+      ),
+      _step(
+        '2. LOOK INSIDE: Open the mouth gently and look for visible obstruction. Only remove if clearly reachable — don\'t push deeper.',
+      ),
+      _step(
+        '3. HEIMLICH FOR DOGS: Stand behind them, make a fist below the ribcage, thrust upward 3–5 times firmly.',
+      ),
+      _step(
+        '4. FOR CATS: Hold face-down, supporting head. Apply 5 firm back blows between shoulder blades.',
+      ),
+      _step(
+        '5. VET IMMEDIATELY: Even if the object dislodges, go to a vet to rule out internal damage.',
+      ),
+    ],
+  );
 
-  Widget _bleedingContent() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _step('1. APPLY PRESSURE: Press a clean cloth or gauze firmly against the wound. Hold for at least 3 minutes without lifting.'),
-        _step('2. DO NOT REMOVE CLOTH: If blood soaks through, add another layer on top. Removing the cloth disrupts clot formation.'),
-        _step('3. ELEVATE: If possible, raise the injured limb above heart level to reduce blood flow.'),
-        _step('4. TOURNIQUET (LIMBS ONLY): As a last resort for severe limb bleeding, apply a tight band above the wound. Note the time applied.'),
-        _step('5. RUSH TO VET: All significant bleeding requires immediate veterinary attention.'),
-      ]);
+  Widget _bleedingContent() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _step(
+        '1. APPLY PRESSURE: Press a clean cloth or gauze firmly against the wound. Hold for at least 3 minutes without lifting.',
+      ),
+      _step(
+        '2. DO NOT REMOVE CLOTH: If blood soaks through, add another layer on top. Removing the cloth disrupts clot formation.',
+      ),
+      _step(
+        '3. ELEVATE: If possible, raise the injured limb above heart level to reduce blood flow.',
+      ),
+      _step(
+        '4. TOURNIQUET (LIMBS ONLY): As a last resort for severe limb bleeding, apply a tight band above the wound. Note the time applied.',
+      ),
+      _step(
+        '5. RUSH TO VET: All significant bleeding requires immediate veterinary attention.',
+      ),
+    ],
+  );
 
-  Widget _poisoningContent() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _step('1. DO NOT INDUCE VOMITING: Unless specifically instructed by a poison control hotline — some toxins cause more damage coming back up.'),
-        _step('2. IDENTIFY THE SUBSTANCE: If safe, keep the packaging or photograph what was ingested.'),
-        _step('3. CALL POISON CONTROL: Contact Animal Poison Control immediately.'),
-        _step('4. WATCH FOR SYMPTOMS: Drooling, vomiting, seizures, pale gums, or difficulty breathing signal a critical emergency.'),
-        _step('5. RUSH TO VET: Bring the substance/packaging. Time is critical with toxin exposure.'),
-      ]);
+  Widget _poisoningContent() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _step(
+        '1. DO NOT INDUCE VOMITING: Unless specifically instructed by a poison control hotline — some toxins cause more damage coming back up.',
+      ),
+      _step(
+        '2. IDENTIFY THE SUBSTANCE: If safe, keep the packaging or photograph what was ingested.',
+      ),
+      _step(
+        '3. CALL POISON CONTROL: Contact Animal Poison Control immediately.',
+      ),
+      _step(
+        '4. WATCH FOR SYMPTOMS: Drooling, vomiting, seizures, pale gums, or difficulty breathing signal a critical emergency.',
+      ),
+      _step(
+        '5. RUSH TO VET: Bring the substance/packaging. Time is critical with toxin exposure.',
+      ),
+    ],
+  );
 
-  Widget _heatstrokeContent() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _step('1. MOVE TO SHADE: Get your pet out of the heat immediately.'),
-        _step('2. COOL WATER (NOT ICE): Wet the coat with room-temp water — especially neck, armpits, and groin. Ice water can cause shock.'),
-        _step('3. FAN THEM: Use a fan or manual fanning to accelerate cooling while wetting.'),
-        _step('4. OFFER WATER: If conscious, let them drink small amounts of cool water. Never force it.'),
-        _step('5. VET IMMEDIATELY: Heatstroke causes organ damage within minutes.'),
-      ]);
+  Widget _heatstrokeContent() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _step('1. MOVE TO SHADE: Get your pet out of the heat immediately.'),
+      _step(
+        '2. COOL WATER (NOT ICE): Wet the coat with room-temp water — especially neck, armpits, and groin. Ice water can cause shock.',
+      ),
+      _step(
+        '3. FAN THEM: Use a fan or manual fanning to accelerate cooling while wetting.',
+      ),
+      _step(
+        '4. OFFER WATER: If conscious, let them drink small amounts of cool water. Never force it.',
+      ),
+      _step(
+        '5. VET IMMEDIATELY: Heatstroke causes organ damage within minutes.',
+      ),
+    ],
+  );
 
-  Widget _seizuresContent() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _step('1. DO NOT RESTRAIN: Never hold your pet down or grab their tongue. Pets do not swallow their tongues.'),
-        _step('2. CLEAR THE AREA: Move furniture, stairs, or sharp objects away.'),
-        _step('3. TIME IT: If a seizure lasts more than 3–5 minutes, it is life-threatening (status epilepticus).'),
-        _step('4. KEEP QUIET & DARK: Turn off loud TVs and dim the lights.'),
-        _step('5. AFTERCARE: They will be disoriented and blind (post-ictal). Comfort them gently.'),
-      ]);
+  Widget _seizuresContent() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _step(
+        '1. DO NOT RESTRAIN: Never hold your pet down or grab their tongue. Pets do not swallow their tongues.',
+      ),
+      _step(
+        '2. CLEAR THE AREA: Move furniture, stairs, or sharp objects away.',
+      ),
+      _step(
+        '3. TIME IT: If a seizure lasts more than 3–5 minutes, it is life-threatening (status epilepticus).',
+      ),
+      _step('4. KEEP QUIET & DARK: Turn off loud TVs and dim the lights.'),
+      _step(
+        '5. AFTERCARE: They will be disoriented and blind (post-ictal). Comfort them gently.',
+      ),
+    ],
+  );
 }
 
 class _GuideTile {
@@ -695,5 +925,13 @@ class _GuideTile {
   final Widget content;
   final String source;
   final String url;
-  const _GuideTile(this.title, this.icon, this.accent, this.bg, this.content, this.source, this.url);
+  const _GuideTile(
+    this.title,
+    this.icon,
+    this.accent,
+    this.bg,
+    this.content,
+    this.source,
+    this.url,
+  );
 }

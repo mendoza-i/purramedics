@@ -107,11 +107,17 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
     );
     if (date == null) return;
 
-    final time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
     if (time == null) return;
 
-    if (date.year == now.year && date.month == now.month && date.day == now.day) {
-      if (time.hour < now.hour || (time.hour == now.hour && time.minute < now.minute)) {
+    if (date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day) {
+      if (time.hour < now.hour ||
+          (time.hour == now.hour && time.minute < now.minute)) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -124,7 +130,8 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
       }
     }
 
-    final formattedDate = "${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}";
+    final formattedDate =
+        "${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}";
     final formattedTime = time.format(context);
     final combined = '$formattedDate at $formattedTime';
 
@@ -150,7 +157,9 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
         _endDateController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Please fill title, location, and start/end dates'),
+          content: const Text(
+            'Please fill title, location, and start/end dates',
+          ),
           backgroundColor: AppColors.danger,
         ),
       );
@@ -160,7 +169,8 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
     setState(() => _isSaving = true);
 
     final firestoreService = FirestoreService();
-    final fullDateString = '${_startDateController.text.trim()} to ${_endDateController.text.trim()}';
+    final fullDateString =
+        '${_startDateController.text.trim()} to ${_endDateController.text.trim()}';
 
     if (widget.eventId != null) {
       await firestoreService.updateEvent(
@@ -187,7 +197,9 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(widget.eventId != null ? 'Event updated' : 'Event published'),
+          content: Text(
+            widget.eventId != null ? 'Event updated' : 'Event published',
+          ),
           backgroundColor: AppColors.success,
         ),
       );
@@ -202,7 +214,10 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Event' : 'Create Event', style: AppTypography.headlineLarge),
+        title: Text(
+          isEditing ? 'Edit Event' : 'Create Event',
+          style: AppTypography.headlineLarge,
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
@@ -222,7 +237,10 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _label('Event title', 'Shown publicly on the community calendar'),
+                        _label(
+                          'Event title',
+                          'Shown publicly on the community calendar',
+                        ),
                         AppSpacing.vSm,
                         AppTextField(
                           controller: _titleController,
@@ -253,7 +271,11 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                                 children: [
                                   _label('Start', 'When it begins'),
                                   AppSpacing.vSm,
-                                  _datePickerField(_startDateController, 'Select start', true),
+                                  _datePickerField(
+                                    _startDateController,
+                                    'Select start',
+                                    true,
+                                  ),
                                 ],
                               ),
                             ),
@@ -264,7 +286,11 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                                 children: [
                                   _label('End', 'When it concludes'),
                                   AppSpacing.vSm,
-                                  _datePickerField(_endDateController, 'Select end', false),
+                                  _datePickerField(
+                                    _endDateController,
+                                    'Select end',
+                                    false,
+                                  ),
                                 ],
                               ),
                             ),
@@ -280,21 +306,29 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                             itemCount: _availableIcons.length,
                             separatorBuilder: (_, __) => AppSpacing.hSm,
                             itemBuilder: (context, i) {
-                              final entry = _availableIcons.entries.elementAt(i);
+                              final entry = _availableIcons.entries.elementAt(
+                                i,
+                              );
                               final selected = _selectedIconName == entry.key;
                               return GestureDetector(
-                                onTap: () => setState(() => _selectedIconName = entry.key),
+                                onTap: () => setState(
+                                  () => _selectedIconName = entry.key,
+                                ),
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 180),
                                   width: 68,
                                   decoration: BoxDecoration(
-                                    color: selected ? AppColors.primary : AppColors.surfaceAlt,
+                                    color: selected
+                                        ? AppColors.primary
+                                        : AppColors.surfaceAlt,
                                     borderRadius: AppRadii.rLg,
                                   ),
                                   child: Icon(
                                     entry.value,
                                     size: 30,
-                                    color: selected ? AppColors.textInverse : AppColors.textSecondary,
+                                    color: selected
+                                        ? AppColors.textInverse
+                                        : AppColors.textSecondary,
                                   ),
                                 ),
                               );
@@ -309,7 +343,9 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                           children: _availableColors.map((color) {
                             final selected = _selectedColorValue == color.value;
                             return GestureDetector(
-                              onTap: () => setState(() => _selectedColorValue = color.value),
+                              onTap: () => setState(
+                                () => _selectedColorValue = color.value,
+                              ),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 180),
                                 width: 44,
@@ -318,19 +354,28 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                                   color: color,
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: selected ? AppColors.textPrimary : Colors.transparent,
+                                    color: selected
+                                        ? AppColors.textPrimary
+                                        : Colors.transparent,
                                     width: 3,
                                   ),
                                 ),
                                 child: selected
-                                    ? const Icon(Icons.check_rounded, color: Colors.white, size: 20)
+                                    ? const Icon(
+                                        Icons.check_rounded,
+                                        color: Colors.white,
+                                        size: 20,
+                                      )
                                     : null,
                               ),
                             );
                           }).toList(),
                         ),
                         AppSpacing.vLg,
-                        _label('About this event', 'Short description; URLs auto-link'),
+                        _label(
+                          'About this event',
+                          'Short description; URLs auto-link',
+                        ),
                         AppSpacing.vSm,
                         KeyboardListener(
                           focusNode: FocusNode(),
@@ -360,13 +405,17 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                         onPressed: () => Navigator.pop(context),
                         child: Text(
                           'Cancel',
-                          style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary),
+                          style: AppTypography.labelLarge.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
                       AppSpacing.hMd,
                       PrimaryButton(
                         label: isEditing ? 'Save' : 'Publish',
-                        icon: isEditing ? Icons.check_rounded : Icons.cloud_upload_outlined,
+                        icon: isEditing
+                            ? Icons.check_rounded
+                            : Icons.cloud_upload_outlined,
                         onPressed: _saveEvent,
                         isLoading: _isSaving,
                       ),
@@ -389,7 +438,9 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
         AppSpacing.vXs,
         Text(
           subtext,
-          style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textTertiary,
+          ),
         ),
       ],
     );
@@ -406,19 +457,28 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
         child: DropdownButton<String>(
           value: _selectedLocationPreset,
           isExpanded: true,
-          icon: const Icon(Icons.expand_more_rounded, color: AppColors.textSecondary),
+          icon: const Icon(
+            Icons.expand_more_rounded,
+            color: AppColors.textSecondary,
+          ),
           style: AppTypography.bodyMedium,
           items: _locationPresets
-              .map((loc) => DropdownMenuItem(
-                    value: loc,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.location_on_outlined, size: 18, color: AppColors.textSecondary),
-                        AppSpacing.hSm,
-                        Text(loc, style: AppTypography.bodyMedium),
-                      ],
-                    ),
-                  ))
+              .map(
+                (loc) => DropdownMenuItem(
+                  value: loc,
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 18,
+                        color: AppColors.textSecondary,
+                      ),
+                      AppSpacing.hSm,
+                      Text(loc, style: AppTypography.bodyMedium),
+                    ],
+                  ),
+                ),
+              )
               .toList(),
           onChanged: (val) {
             if (val == null) return;
@@ -432,7 +492,11 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
     );
   }
 
-  Widget _datePickerField(TextEditingController controller, String hint, bool isStart) {
+  Widget _datePickerField(
+    TextEditingController controller,
+    String hint,
+    bool isStart,
+  ) {
     return GestureDetector(
       onTap: () => _pickDateTime(isStart),
       child: AbsorbPointer(

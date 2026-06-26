@@ -15,20 +15,38 @@ class _VetAvailabilityPageState extends State<VetAvailabilityPage> {
   final FirestoreService _firestoreService = FirestoreService();
 
   final List<String> _allTimeSlots = const [
-    "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM",
-    "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM",
-    "04:00 PM", "05:00 PM", "06:00 PM", "07:00 PM",
-    "08:00 PM", "09:00 PM",
+    "08:00 AM",
+    "09:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "01:00 PM",
+    "02:00 PM",
+    "03:00 PM",
+    "04:00 PM",
+    "05:00 PM",
+    "06:00 PM",
+    "07:00 PM",
+    "08:00 PM",
+    "09:00 PM",
   ];
 
   void _toggleSlot(String dateString, String timeSlot, bool isAvailable) async {
-    await _firestoreService.toggleAvailability(dateString, timeSlot, !isAvailable);
+    await _firestoreService.toggleAvailability(
+      dateString,
+      timeSlot,
+      !isAvailable,
+    );
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Slot $timeSlot marked ${!isAvailable ? 'open' : 'closed'}'),
+          content: Text(
+            'Slot $timeSlot marked ${!isAvailable ? 'open' : 'closed'}',
+          ),
           duration: const Duration(milliseconds: 900),
-          backgroundColor: !isAvailable ? AppColors.success : AppColors.textPrimary,
+          backgroundColor: !isAvailable
+              ? AppColors.success
+              : AppColors.textPrimary,
         ),
       );
     }
@@ -64,7 +82,9 @@ class _VetAvailabilityPageState extends State<VetAvailabilityPage> {
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: Responsive.contentMaxWidth(context)),
+            constraints: BoxConstraints(
+              maxWidth: Responsive.contentMaxWidth(context),
+            ),
             child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: Responsive.pagePadding(context),
@@ -83,11 +103,33 @@ class _VetAvailabilityPageState extends State<VetAvailabilityPage> {
                       separatorBuilder: (_, __) => AppSpacing.hSm,
                       itemBuilder: (context, index) {
                         final date = DateTime.now().add(Duration(days: index));
-                        final isSelected = _selectedDate.year == date.year &&
+                        final isSelected =
+                            _selectedDate.year == date.year &&
                             _selectedDate.month == date.month &&
                             _selectedDate.day == date.day;
-                        final dayName = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][date.weekday - 1];
-                        final monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.month - 1];
+                        final dayName = [
+                          'Mon',
+                          'Tue',
+                          'Wed',
+                          'Thu',
+                          'Fri',
+                          'Sat',
+                          'Sun',
+                        ][date.weekday - 1];
+                        final monthName = [
+                          'Jan',
+                          'Feb',
+                          'Mar',
+                          'Apr',
+                          'May',
+                          'Jun',
+                          'Jul',
+                          'Aug',
+                          'Sep',
+                          'Oct',
+                          'Nov',
+                          'Dec',
+                        ][date.month - 1];
 
                         return GestureDetector(
                           onTap: () => setState(() => _selectedDate = date),
@@ -95,12 +137,18 @@ class _VetAvailabilityPageState extends State<VetAvailabilityPage> {
                             duration: const Duration(milliseconds: 180),
                             width: 72,
                             decoration: BoxDecoration(
-                              color: isSelected ? AppColors.primary : AppColors.surface,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.surface,
                               borderRadius: AppRadii.rLg,
                               border: Border.all(
-                                color: isSelected ? AppColors.primary : AppColors.border,
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.border,
                               ),
-                              boxShadow: isSelected ? AppShadows.colored(AppColors.primary) : null,
+                              boxShadow: isSelected
+                                  ? AppShadows.colored(AppColors.primary)
+                                  : null,
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -108,7 +156,9 @@ class _VetAvailabilityPageState extends State<VetAvailabilityPage> {
                                 Text(
                                   '$dayName, $monthName',
                                   style: AppTypography.labelSmall.copyWith(
-                                    color: isSelected ? Colors.white.withOpacity(0.85) : AppColors.textTertiary,
+                                    color: isSelected
+                                        ? Colors.white.withOpacity(0.85)
+                                        : AppColors.textTertiary,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -116,7 +166,9 @@ class _VetAvailabilityPageState extends State<VetAvailabilityPage> {
                                 Text(
                                   '${date.day}',
                                   style: AppTypography.headlineSmall.copyWith(
-                                    color: isSelected ? AppColors.textInverse : AppColors.textPrimary,
+                                    color: isSelected
+                                        ? AppColors.textInverse
+                                        : AppColors.textPrimary,
                                   ),
                                 ),
                               ],
@@ -137,7 +189,9 @@ class _VetAvailabilityPageState extends State<VetAvailabilityPage> {
                           AppSpacing.vXs,
                           Text(
                             'Tap to toggle availability',
-                            style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textTertiary,
+                            ),
                           ),
                         ],
                       ),
@@ -145,15 +199,22 @@ class _VetAvailabilityPageState extends State<VetAvailabilityPage> {
                         children: [
                           TextButton.icon(
                             onPressed: () => _bulkSet(formattedDate, true),
-                            icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+                            icon: const Icon(
+                              Icons.check_circle_outline_rounded,
+                              size: 18,
+                            ),
                             label: const Text('Open all'),
-                            style: TextButton.styleFrom(foregroundColor: AppColors.success),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.success,
+                            ),
                           ),
                           TextButton.icon(
                             onPressed: () => _bulkSet(formattedDate, false),
                             icon: const Icon(Icons.block_rounded, size: 18),
                             label: const Text('Close all'),
-                            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.danger,
+                            ),
                           ),
                         ],
                       ),
@@ -162,52 +223,75 @@ class _VetAvailabilityPageState extends State<VetAvailabilityPage> {
                   AppSpacing.vMd,
                   Expanded(
                     child: StreamBuilder<List<String>>(
-                      stream: _firestoreService.getAvailableTimesStream(formattedDate),
+                      stream: _firestoreService.getAvailableTimesStream(
+                        formattedDate,
+                      ),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          );
                         }
                         if (snapshot.hasError) {
                           return Center(
                             child: Text(
                               'Error loading slots.',
-                              style: AppTypography.bodyMedium.copyWith(color: AppColors.danger),
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.danger,
+                              ),
                             ),
                           );
                         }
                         final availableSlots = snapshot.data ?? [];
 
                         return GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: Responsive.gridColumns(context, mobileCount: 3, desktopCount: 6),
-                            childAspectRatio: 2.2,
-                            crossAxisSpacing: AppSpacing.sm,
-                            mainAxisSpacing: AppSpacing.sm,
-                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: Responsive.gridColumns(
+                                  context,
+                                  mobileCount: 3,
+                                  desktopCount: 6,
+                                ),
+                                childAspectRatio: 2.2,
+                                crossAxisSpacing: AppSpacing.sm,
+                                mainAxisSpacing: AppSpacing.sm,
+                              ),
                           itemCount: _allTimeSlots.length,
                           itemBuilder: (context, index) {
                             final slot = _allTimeSlots[index];
                             final isAvailable = availableSlots.contains(slot);
 
                             return InkWell(
-                              onTap: () => _toggleSlot(formattedDate, slot, isAvailable),
+                              onTap: () =>
+                                  _toggleSlot(formattedDate, slot, isAvailable),
                               borderRadius: AppRadii.rMd,
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 180),
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: isAvailable ? AppColors.successSurface : AppColors.surface,
+                                  color: isAvailable
+                                      ? AppColors.successSurface
+                                      : AppColors.surface,
                                   borderRadius: AppRadii.rMd,
                                   border: Border.all(
-                                    color: isAvailable ? AppColors.success : AppColors.border,
+                                    color: isAvailable
+                                        ? AppColors.success
+                                        : AppColors.border,
                                     width: isAvailable ? 1.5 : 1,
                                   ),
                                 ),
                                 child: Text(
                                   slot,
                                   style: AppTypography.labelMedium.copyWith(
-                                    color: isAvailable ? AppColors.success : AppColors.textTertiary,
-                                    fontWeight: isAvailable ? FontWeight.w700 : FontWeight.w500,
+                                    color: isAvailable
+                                        ? AppColors.success
+                                        : AppColors.textTertiary,
+                                    fontWeight: isAvailable
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
                                   ),
                                 ),
                               ),

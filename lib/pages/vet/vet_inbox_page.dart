@@ -13,7 +13,9 @@ class VetInboxPage extends StatelessWidget {
     if (timestamp == null) return '';
     final now = DateTime.now();
     final time = timestamp.toDate();
-    if (now.day == time.day && now.month == time.month && now.year == time.year) {
+    if (now.day == time.day &&
+        now.month == time.month &&
+        now.year == time.year) {
       return DateFormat('h:mm a').format(time);
     }
     return DateFormat('MMM d').format(time);
@@ -40,7 +42,9 @@ class VetInboxPage extends StatelessWidget {
               stream: firestoreService.getVetInboxStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
                 }
 
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -62,8 +66,10 @@ class VetInboxPage extends StatelessWidget {
                     final chat = chats[index];
                     final unreadCount = (chat['unreadByVet'] ?? 0) as int;
                     final hasUnread = unreadCount > 0;
-                    final lastMessageTime = chat['lastMessageTime'] as Timestamp?;
-                    final name = (chat['userName'] as String?) ?? 'Unknown user';
+                    final lastMessageTime =
+                        chat['lastMessageTime'] as Timestamp?;
+                    final name =
+                        (chat['userName'] as String?) ?? 'Unknown user';
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -89,7 +95,9 @@ class VetInboxPage extends StatelessWidget {
                               backgroundColor: AppColors.primarySurface,
                               child: Text(
                                 name.isNotEmpty ? name[0].toUpperCase() : '?',
-                                style: AppTypography.titleMedium.copyWith(color: AppColors.primary),
+                                style: AppTypography.titleMedium.copyWith(
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                             AppSpacing.hMd,
@@ -101,7 +109,9 @@ class VetInboxPage extends StatelessWidget {
                                     name,
                                     style: hasUnread
                                         ? AppTypography.titleSmall
-                                        : AppTypography.titleSmall.copyWith(fontWeight: FontWeight.w500),
+                                        : AppTypography.titleSmall.copyWith(
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                   ),
                                   AppSpacing.vXs,
                                   Text(
@@ -109,8 +119,12 @@ class VetInboxPage extends StatelessWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: AppTypography.bodyMedium.copyWith(
-                                      color: hasUnread ? AppColors.textPrimary : AppColors.textTertiary,
-                                      fontWeight: hasUnread ? FontWeight.w600 : FontWeight.w400,
+                                      color: hasUnread
+                                          ? AppColors.textPrimary
+                                          : AppColors.textTertiary,
+                                      fontWeight: hasUnread
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
                                     ),
                                   ),
                                 ],
@@ -124,20 +138,27 @@ class VetInboxPage extends StatelessWidget {
                                 Text(
                                   _formatTime(lastMessageTime),
                                   style: AppTypography.labelSmall.copyWith(
-                                    color: hasUnread ? AppColors.primary : AppColors.textTertiary,
+                                    color: hasUnread
+                                        ? AppColors.primary
+                                        : AppColors.textTertiary,
                                   ),
                                 ),
                                 if (hasUnread) ...[
                                   AppSpacing.vXs,
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: AppColors.primary,
                                       borderRadius: AppRadii.rFull,
                                     ),
                                     child: Text(
                                       '$unreadCount',
-                                      style: AppTypography.labelSmall.copyWith(color: AppColors.textInverse),
+                                      style: AppTypography.labelSmall.copyWith(
+                                        color: AppColors.textInverse,
+                                      ),
                                     ),
                                   ),
                                 ],

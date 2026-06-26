@@ -35,10 +35,7 @@ class AppCard extends StatelessWidget {
         border: borderColor != null ? Border.all(color: borderColor!) : null,
         boxShadow: shadow ?? AppShadows.sm,
       ),
-      child: Padding(
-        padding: padding ?? AppSpacing.cardPadding,
-        child: child,
-      ),
+      child: Padding(padding: padding ?? AppSpacing.cardPadding, child: child),
     );
 
     if (onTap == null) return container;

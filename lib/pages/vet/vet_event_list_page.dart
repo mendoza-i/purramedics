@@ -22,11 +22,19 @@ class _VetEventListPageState extends State<VetEventListPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('Delete event?', style: AppTypography.titleLarge),
-        content: Text("Permanently delete '$title'?", style: AppTypography.bodyMedium),
+        content: Text(
+          "Permanently delete '$title'?",
+          style: AppTypography.bodyMedium,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+            child: Text(
+              'Cancel',
+              style: AppTypography.labelLarge.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -34,11 +42,17 @@ class _VetEventListPageState extends State<VetEventListPage> {
               await _firestoreService.deleteEvent(id);
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: const Text('Event deleted'), backgroundColor: AppColors.textPrimary),
+                  SnackBar(
+                    content: const Text('Event deleted'),
+                    backgroundColor: AppColors.textPrimary,
+                  ),
                 );
               }
             },
-            child: Text('Delete', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+            child: Text(
+              'Delete',
+              style: AppTypography.labelLarge.copyWith(color: AppColors.danger),
+            ),
           ),
         ],
       ),
@@ -49,10 +63,8 @@ class _VetEventListPageState extends State<VetEventListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => VetEventCreationPage(
-          eventMap: eventData,
-          eventId: eventData['id'],
-        ),
+        builder: (_) =>
+            VetEventCreationPage(eventMap: eventData, eventId: eventData['id']),
       ),
     );
   }
@@ -73,7 +85,9 @@ class _VetEventListPageState extends State<VetEventListPage> {
     return icons[name] ?? Icons.event_rounded;
   }
 
-  (List<Map<String, dynamic>>, List<Map<String, dynamic>>) _splitEvents(List<Map<String, dynamic>> events) {
+  (List<Map<String, dynamic>>, List<Map<String, dynamic>>) _splitEvents(
+    List<Map<String, dynamic>> events,
+  ) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final upcoming = <Map<String, dynamic>>[];
@@ -84,7 +98,8 @@ class _VetEventListPageState extends State<VetEventListPage> {
       try {
         final dateStr = event['date'].toString();
         String compareStr = dateStr;
-        if (dateStr.contains(' to ')) compareStr = dateStr.split(' to ')[1].trim();
+        if (dateStr.contains(' to '))
+          compareStr = dateStr.split(' to ')[1].trim();
         final parts = compareStr.split(' at ');
         if (parts.length == 2) {
           final dateParts = parts[0].split('/');
@@ -97,13 +112,23 @@ class _VetEventListPageState extends State<VetEventListPage> {
               if (timeParts[1] == 'PM' && hour < 12) hour += 12;
               if (timeParts[1] == 'AM' && hour == 12) hour = 0;
             }
-            final d = DateTime(int.parse(dateParts[2]), int.parse(dateParts[0]), int.parse(dateParts[1]), hour, minute);
+            final d = DateTime(
+              int.parse(dateParts[2]),
+              int.parse(dateParts[0]),
+              int.parse(dateParts[1]),
+              hour,
+              minute,
+            );
             if (d.isBefore(now)) isPast = true;
           }
         } else {
           final dateParts = compareStr.split('/');
           if (dateParts.length == 3) {
-            final d = DateTime(int.parse(dateParts[2]), int.parse(dateParts[0]), int.parse(dateParts[1]));
+            final d = DateTime(
+              int.parse(dateParts[2]),
+              int.parse(dateParts[0]),
+              int.parse(dateParts[1]),
+            );
             if (d.isBefore(today)) isPast = true;
           }
         }
@@ -125,7 +150,9 @@ class _VetEventListPageState extends State<VetEventListPage> {
         final endParts = parts[1].split(' at ');
         final startD = DateFormat('MM/dd/yyyy').parse(startParts[0]);
         final endD = DateFormat('MM/dd/yyyy').parse(endParts[0]);
-        if (startD.year == endD.year && startD.month == endD.month && startD.day == endD.day) {
+        if (startD.year == endD.year &&
+            startD.month == endD.month &&
+            startD.day == endD.day) {
           return "${DateFormat('MMMM d, yyyy').format(startD)} • ${startParts[1]} to ${endParts.length > 1 ? endParts[1] : ''}";
         }
         return "${DateFormat('MMM d').format(startD)}, ${startParts[1]} to ${DateFormat('MMM d').format(endD)}, ${endParts.length > 1 ? endParts[1] : ''}";
@@ -172,7 +199,9 @@ class _VetEventListPageState extends State<VetEventListPage> {
           stream: _firestoreService.getEventsStreamMap(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
             }
             final events = snapshot.data ?? [];
             final (upcoming, past) = _splitEvents(events);
@@ -180,7 +209,8 @@ class _VetEventListPageState extends State<VetEventListPage> {
 
             return RefreshIndicator(
               color: AppColors.primary,
-              onRefresh: () async => Future.delayed(const Duration(milliseconds: 600)),
+              onRefresh: () async =>
+                  Future.delayed(const Duration(milliseconds: 600)),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.symmetric(
@@ -189,7 +219,9 @@ class _VetEventListPageState extends State<VetEventListPage> {
                 ),
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: Responsive.contentMaxWidth(context)),
+                    constraints: BoxConstraints(
+                      maxWidth: Responsive.contentMaxWidth(context),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -202,21 +234,33 @@ class _VetEventListPageState extends State<VetEventListPage> {
                                   key: ValueKey('empty_$_currentTab'),
                                   width: double.infinity,
                                   child: EmptyState(
-                                    icon: _currentTab == 0 ? Icons.event_available_rounded : Icons.history_rounded,
-                                    title: _currentTab == 0 ? 'No upcoming events' : 'No past events',
+                                    icon: _currentTab == 0
+                                        ? Icons.event_available_rounded
+                                        : Icons.history_rounded,
+                                    title: _currentTab == 0
+                                        ? 'No upcoming events'
+                                        : 'No past events',
                                     message: _currentTab == 0
                                         ? 'Create your first event to get started'
                                         : 'Completed events will show up here',
-                                    actionLabel: _currentTab == 0 ? 'Create event' : null,
+                                    actionLabel: _currentTab == 0
+                                        ? 'Create event'
+                                        : null,
                                     onAction: _currentTab == 0
                                         ? () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(builder: (_) => const VetEventCreationPage()),
-                                            )
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  const VetEventCreationPage(),
+                                            ),
+                                          )
                                         : null,
                                   ),
                                 )
-                              : _buildGrid(active, key: ValueKey('grid_$_currentTab')),
+                              : _buildGrid(
+                                  active,
+                                  key: ValueKey('grid_$_currentTab'),
+                                ),
                         ),
                       ],
                     ),
@@ -250,13 +294,18 @@ class _VetEventListPageState extends State<VetEventListPage> {
                 Text(
                   label,
                   style: AppTypography.labelLarge.copyWith(
-                    color: active ? AppColors.textInverse : AppColors.textSecondary,
+                    color: active
+                        ? AppColors.textInverse
+                        : AppColors.textSecondary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 AppSpacing.hXs,
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: active
                         ? Colors.white.withOpacity(0.25)
@@ -266,7 +315,9 @@ class _VetEventListPageState extends State<VetEventListPage> {
                   child: Text(
                     '$count',
                     style: AppTypography.labelSmall.copyWith(
-                      color: active ? AppColors.textInverse : AppColors.textSecondary,
+                      color: active
+                          ? AppColors.textInverse
+                          : AppColors.textSecondary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -285,10 +336,7 @@ class _VetEventListPageState extends State<VetEventListPage> {
         borderRadius: AppRadii.rLg,
       ),
       child: Row(
-        children: [
-          tab(0, 'Upcoming', upCount),
-          tab(1, 'Past', pastCount),
-        ],
+        children: [tab(0, 'Upcoming', upCount), tab(1, 'Past', pastCount)],
       ),
     );
   }
@@ -298,12 +346,18 @@ class _VetEventListPageState extends State<VetEventListPage> {
       key: key,
       builder: (context, constraints) {
         final cols = Responsive.isWide(context) ? 2 : 1;
-        final width = (constraints.maxWidth - (AppSpacing.lg * (cols - 1))) / cols - 0.1;
+        final width =
+            (constraints.maxWidth - (AppSpacing.lg * (cols - 1))) / cols - 0.1;
         return Wrap(
           spacing: AppSpacing.lg,
           runSpacing: AppSpacing.lg,
           children: events
-              .map((e) => SizedBox(width: width, child: _buildEventCard(e, _currentTab == 1)))
+              .map(
+                (e) => SizedBox(
+                  width: width,
+                  child: _buildEventCard(e, _currentTab == 1),
+                ),
+              )
               .toList(),
         );
       },
@@ -329,7 +383,11 @@ class _VetEventListPageState extends State<VetEventListPage> {
         ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.xl),
-        child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 28),
+        child: const Icon(
+          Icons.delete_outline_rounded,
+          color: Colors.white,
+          size: 28,
+        ),
       ),
       confirmDismiss: (_) async {
         _deleteEvent(id, title);
@@ -384,7 +442,9 @@ class _VetEventListPageState extends State<VetEventListPage> {
         Expanded(
           child: Text(
             text,
-            style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

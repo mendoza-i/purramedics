@@ -10,7 +10,8 @@ import '../models/event.dart';
 /// 2. Get Events: Streams events in real-time to all users.
 /// ============================================================================
 class FirestoreService {
-  final CollectionReference _eventsCollection = FirebaseFirestore.instance.collection('events');
+  final CollectionReference _eventsCollection = FirebaseFirestore.instance
+      .collection('events');
 
   // Add Event (For Vets)
   Future<void> addEvent(Event event) async {
@@ -31,18 +32,18 @@ class FirestoreService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return Event(
-          title: data['title'] ?? '',
-          location: data['location'] ?? '',
-          date: data['date'] ?? '',
-          colorValue: data['colorValue'] ?? 0xFF000000,
-          description: data['description'] ?? '',
-          iconName: data['iconName'] ?? 'default',
-        );
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return Event(
+              title: data['title'] ?? '',
+              location: data['location'] ?? '',
+              date: data['date'] ?? '',
+              colorValue: data['colorValue'] ?? 0xFF000000,
+              description: data['description'] ?? '',
+              iconName: data['iconName'] ?? 'default',
+            );
+          }).toList();
+        });
   }
 
   // Get Events Dictionary Stream (For Vet - Includes ID for Edit/Delete)
@@ -51,16 +52,24 @@ class FirestoreService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+        });
   }
 
   // Update Event
-  Future<void> updateEvent(String id, String title, String loc, String date, int color, String desc, String icon) async {
+  Future<void> updateEvent(
+    String id,
+    String title,
+    String loc,
+    String date,
+    int color,
+    String desc,
+    String icon,
+  ) async {
     await _eventsCollection.doc(id).update({
       'title': title,
       'location': loc,
@@ -79,21 +88,22 @@ class FirestoreService {
   // ==========================================
   // APPOINTMENTS
   // ==========================================
-  final CollectionReference _appointmentsCollection = FirebaseFirestore.instance.collection('appointments');
+  final CollectionReference _appointmentsCollection = FirebaseFirestore.instance
+      .collection('appointments');
 
   // Add Appointment (For Users)
   Future<void> addAppointment(
-    String clinic, 
-    String doctor, 
-    String date, 
-    String time, 
-    String pet, 
-    String type, 
-    String userId, 
+    String clinic,
+    String doctor,
+    String date,
+    String time,
+    String pet,
+    String type,
+    String userId,
     String userName,
-    String userEmail, 
-    String additionalInfo, 
-    String consultationMethod, 
+    String userEmail,
+    String additionalInfo,
+    String consultationMethod,
   ) async {
     await _appointmentsCollection.add({
       'clinicName': clinic,
@@ -104,7 +114,7 @@ class FirestoreService {
       'visitType': type,
       'userId': userId,
       'userName': userName,
-      'userEmail': userEmail, 
+      'userEmail': userEmail,
       'additionalInfo': additionalInfo,
       'consultationMethod': consultationMethod,
       'status': 'Pending',
@@ -127,7 +137,11 @@ class FirestoreService {
       try {
         final parts = dateStr.split('-');
         if (parts.length == 3) {
-          final d = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+          final d = DateTime(
+            int.parse(parts[0]),
+            int.parse(parts[1]),
+            int.parse(parts[2]),
+          );
           if (d.isBefore(today)) return false; // Ignore past dates
         }
       } catch (_) {}
@@ -142,12 +156,12 @@ class FirestoreService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-         final data = doc.data() as Map<String, dynamic>;
-         data['id'] = doc.id; // Include ID
-         return data;
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            data['id'] = doc.id; // Include ID
+            return data;
+          }).toList();
+        });
   }
 
   // Get All Appointments Stream (For Vet Dashboard)
@@ -156,17 +170,21 @@ class FirestoreService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+        });
   }
 
   // Get slot status for a clinic slot (date + time)
   // Returns: 'confirmed', 'pending', or 'available'
-  Future<String> getSlotStatus(String clinicName, String date, String time) async {
+  Future<String> getSlotStatus(
+    String clinicName,
+    String date,
+    String time,
+  ) async {
     final query = await _appointmentsCollection
         .where('clinicName', isEqualTo: clinicName)
         .where('date', isEqualTo: date)
@@ -184,7 +202,12 @@ class FirestoreService {
   }
 
   // Convenience: check if slot is taken. If includePending=true, treat pending as taken too.
-  Future<bool> isSlotTaken(String clinicName, String date, String time, {bool includePending = false}) async {
+  Future<bool> isSlotTaken(
+    String clinicName,
+    String date,
+    String time, {
+    bool includePending = false,
+  }) async {
     final status = await getSlotStatus(clinicName, date, time);
     if (status == 'confirmed') return true;
     if (includePending && status == 'pending') return true;
@@ -196,11 +219,11 @@ class FirestoreService {
     await _appointmentsCollection.doc(id).delete();
   }
 
-
   // ==========================================
   // PETS (Vet Managed)
   // ==========================================
-  final CollectionReference _petsCollection = FirebaseFirestore.instance.collection('pets');
+  final CollectionReference _petsCollection = FirebaseFirestore.instance
+      .collection('pets');
 
   // Add Pet (Vet Only)
   Future<void> addPet({
@@ -268,12 +291,12 @@ class FirestoreService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-         final data = doc.data() as Map<String, dynamic>;
-         data['id'] = doc.id;
-         return data;
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+        });
   }
 
   // Get All Pets (For Vet Dashboard)
@@ -282,30 +305,45 @@ class FirestoreService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+        });
   }
+
   // ==========================================
   // USERS (For Vet Selector)
   // ==========================================
-  final CollectionReference _usersCollection = FirebaseFirestore.instance.collection('users');
+  final CollectionReference _usersCollection = FirebaseFirestore.instance
+      .collection('users');
 
   // Save User Profile (Call this on SignUp)
-  Future<void> saveUser(String uid, String email, String name, String role) async {
-    await _usersCollection.doc(uid).set({
-      'email': email.toLowerCase(),
-      'name': name,
-      'role': role,
-      'createdAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true)); // Ensure we don't accidentally wipe phone/address if syncing
+  Future<void> saveUser(
+    String uid,
+    String email,
+    String name,
+    String role,
+  ) async {
+    await _usersCollection.doc(uid).set(
+      {
+        'email': email.toLowerCase(),
+        'name': name,
+        'role': role,
+        'createdAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    ); // Ensure we don't accidentally wipe phone/address if syncing
   }
 
   // Update User Contact Details
-  Future<void> updateUserContactDetails(String uid, String name, String phone, String address) async {
+  Future<void> updateUserContactDetails(
+    String uid,
+    String name,
+    String phone,
+    String address,
+  ) async {
     await _usersCollection.doc(uid).set({
       'name': name,
       'phone': phone,
@@ -323,10 +361,7 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getOwnersStream() {
     // FIX: Removing the strict 'role == owner' filter because previously created
     // accounts might not have this exact role string, causing the list to be empty.
-    return _usersCollection
-        .orderBy('name')
-        .snapshots()
-        .map((snapshot) {
+    return _usersCollection.orderBy('name').snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
@@ -338,7 +373,8 @@ class FirestoreService {
   // ==========================================
   // PET REQUESTS (Changes/Deletions)
   // ==========================================
-  final CollectionReference _petRequestsCollection = FirebaseFirestore.instance.collection('pet_requests');
+  final CollectionReference _petRequestsCollection = FirebaseFirestore.instance
+      .collection('pet_requests');
 
   Future<void> addPetRequest({
     required String petId,
@@ -366,16 +402,20 @@ class FirestoreService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+        });
   }
 
   // Update Pet Request Status
-  Future<void> updatePetRequestStatus(String requestId, String status, String vetReply) async {
+  Future<void> updatePetRequestStatus(
+    String requestId,
+    String status,
+    String vetReply,
+  ) async {
     await _petRequestsCollection.doc(requestId).update({
       'status': status,
       'vetReply': vetReply,
@@ -384,14 +424,19 @@ class FirestoreService {
   }
 
   // Get Pet Requests for a specific Owner
-  Stream<List<Map<String, dynamic>>> getPetRequestsForOwnerStream(String ownerId) {
+  Stream<List<Map<String, dynamic>>> getPetRequestsForOwnerStream(
+    String ownerId,
+  ) {
     return _petRequestsCollection
         .where('ownerId', isEqualTo: ownerId)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => {
-              'id': doc.id,
-              ...doc.data() as Map<String, dynamic>
-            }).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map(
+                (doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>},
+              )
+              .toList(),
+        );
   }
 
   // Delete Pet Request (For Vet)
@@ -402,16 +447,18 @@ class FirestoreService {
   // ==========================================
   // DASHBOARD QUICK STATS (NEW)
   // ==========================================
-  
+
   // Get count of Pending Appointments
   Stream<int> getPendingAppointmentsCountStream() {
     return _appointmentsCollection
         .where('status', isEqualTo: 'Pending')
         .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              return data['isRead'] == false;
-            }).length);
+        .map(
+          (snapshot) => snapshot.docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return data['isRead'] == false;
+          }).length,
+        );
   }
 
   // Get Cancelled Appointments Count Stream (For Vet notification)
@@ -421,13 +468,13 @@ class FirestoreService {
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
   }
-  
+
   // Mark Pending Appointments as Read
   Future<void> markAppointmentsAsRead() async {
     final query = await _appointmentsCollection
         .where('status', isEqualTo: 'Pending')
         .get();
-    
+
     final batch = FirebaseFirestore.instance.batch();
     for (var doc in query.docs) {
       final data = doc.data() as Map<String, dynamic>;
@@ -437,7 +484,7 @@ class FirestoreService {
     }
     await batch.commit();
   }
-  
+
   // Get count of Pending Requests
   Stream<int> getPendingRequestsCountStream() {
     return _petRequestsCollection
@@ -449,7 +496,8 @@ class FirestoreService {
   // Get count of Today's Appointments
   Stream<int> getTodayAppointmentsCountStream() {
     final now = DateTime.now();
-    final todayString = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    final todayString =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
     return _appointmentsCollection
         .where('date', isEqualTo: todayString)
         .snapshots()
@@ -471,7 +519,8 @@ class FirestoreService {
   // ==========================================
   // CLINIC SETTINGS
   // ==========================================
-  final CollectionReference _settingsCollection = FirebaseFirestore.instance.collection('settings');
+  final CollectionReference _settingsCollection = FirebaseFirestore.instance
+      .collection('settings');
 
   Future<void> updateClinicSettings({
     required String phone,
@@ -498,7 +547,13 @@ class FirestoreService {
     final doc = await _settingsCollection.doc('service_prices').get();
     if (!doc.exists || doc.data() == null) {
       // Seed with defaults
-      const defaults = {'checkup': '500', 'vaccination': '800', 'grooming': '400', 'surgery': '3000', 'others': '500'};
+      const defaults = {
+        'checkup': '500',
+        'vaccination': '800',
+        'grooming': '400',
+        'surgery': '3000',
+        'others': '500',
+      };
       await _settingsCollection.doc('service_prices').set(defaults);
       return defaults;
     }
@@ -507,9 +562,17 @@ class FirestoreService {
   }
 
   Stream<Map<String, String>> getServicePricesStream() {
-    return _settingsCollection.doc('service_prices').snapshots().map((snapshot) {
+    return _settingsCollection.doc('service_prices').snapshots().map((
+      snapshot,
+    ) {
       if (!snapshot.exists || snapshot.data() == null) {
-        return {'checkup': '500', 'vaccination': '800', 'grooming': '400', 'surgery': '3000', 'others': '500'};
+        return {
+          'checkup': '500',
+          'vaccination': '800',
+          'grooming': '400',
+          'surgery': '3000',
+          'others': '500',
+        };
       }
       final data = snapshot.data() as Map<String, dynamic>;
       return data.map((k, v) => MapEntry(k, v.toString()));
@@ -523,7 +586,7 @@ class FirestoreService {
   // ==========================================
   // MEDICAL SESSION NOTES (Checkup History)
   // ==========================================
-  
+
   // Add a new session note to a specific pet
   Future<void> addSessionNote({
     required String petId,
@@ -534,28 +597,33 @@ class FirestoreService {
     await _petsCollection.doc(petId).collection('session_notes').add({
       'vetName': vetName,
       'note': note,
-      'createdAt': customDate != null ? Timestamp.fromDate(customDate) : FieldValue.serverTimestamp(),
+      'createdAt': customDate != null
+          ? Timestamp.fromDate(customDate)
+          : FieldValue.serverTimestamp(),
     });
   }
 
   // Get stream of session notes for a specific pet
   Stream<List<Map<String, dynamic>>> getSessionNotesStream(String petId) {
-    return _petsCollection.doc(petId).collection('session_notes')
+    return _petsCollection
+        .doc(petId)
+        .collection('session_notes')
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+        });
   }
 
   // ==========================================
   // CHAT SYSTEM
   // ==========================================
-  final CollectionReference _chatsCollection = FirebaseFirestore.instance.collection('chats');
+  final CollectionReference _chatsCollection = FirebaseFirestore.instance
+      .collection('chats');
 
   // Send a message
   Future<void> sendMessage({
@@ -567,7 +635,7 @@ class FirestoreService {
     required String chatUserName,
   }) async {
     final chatDoc = _chatsCollection.doc(chatId);
-    
+
     // 1. Add message to subcollection
     await chatDoc.collection('messages').add({
       'senderId': senderId,
@@ -596,12 +664,12 @@ class FirestoreService {
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+        });
   }
 
   // Get active chats for Vet Inbox
@@ -610,12 +678,12 @@ class FirestoreService {
         .orderBy('lastMessageTime', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+        });
   }
 
   // Get active chats for User (Optional, could just check unreadByUser)
@@ -642,26 +710,29 @@ class FirestoreService {
   // ==========================================
   // VET AVAILABILITY
   // ==========================================
-  final CollectionReference _availabilityCollection = FirebaseFirestore.instance.collection('vet_availability');
+  final CollectionReference _availabilityCollection = FirebaseFirestore.instance
+      .collection('vet_availability');
 
-  Future<void> toggleAvailability(String dateString, String timeSlot, bool makeAvailable) async {
+  Future<void> toggleAvailability(
+    String dateString,
+    String timeSlot,
+    bool makeAvailable,
+  ) async {
     final docRef = _availabilityCollection.doc(dateString);
     if (makeAvailable) {
       await docRef.set({
-        'slots': FieldValue.arrayUnion([timeSlot])
+        'slots': FieldValue.arrayUnion([timeSlot]),
       }, SetOptions(merge: true));
     } else {
       await docRef.set({
-        'slots': FieldValue.arrayRemove([timeSlot])
+        'slots': FieldValue.arrayRemove([timeSlot]),
       }, SetOptions(merge: true));
     }
   }
 
   Future<void> setAllAvailability(String dateString, List<String> slots) async {
     final docRef = _availabilityCollection.doc(dateString);
-    await docRef.set({
-      'slots': slots
-    }, SetOptions(merge: true));
+    await docRef.set({'slots': slots}, SetOptions(merge: true));
   }
 
   Stream<List<String>> getAvailableTimesStream(String dateString) {

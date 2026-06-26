@@ -12,7 +12,8 @@ class IntroPage extends StatefulWidget {
   State<IntroPage> createState() => _IntroPageState();
 }
 
-class _IntroPageState extends State<IntroPage> with SingleTickerProviderStateMixin {
+class _IntroPageState extends State<IntroPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
@@ -25,9 +26,10 @@ class _IntroPageState extends State<IntroPage> with SingleTickerProviderStateMix
       vsync: this,
     );
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-    _slideAnimation = Tween<double>(begin: 50, end: 0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _slideAnimation = Tween<double>(
+      begin: 50,
+      end: 0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _controller.forward();
   }
 
@@ -98,7 +100,9 @@ class _IntroPageState extends State<IntroPage> with SingleTickerProviderStateMix
                     AppSpacing.vSm,
                     Text(
                       'Your trusted companion for pet healthcare',
-                      style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary),
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: deviceHeight * 0.1),
@@ -123,7 +127,9 @@ class _IntroPageState extends State<IntroPage> with SingleTickerProviderStateMix
                         onPressed: _goToHome,
                         child: Text(
                           'Continue as guest',
-                          style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary),
+                          style: AppTypography.labelLarge.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
                     ),

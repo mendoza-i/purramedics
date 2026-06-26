@@ -32,7 +32,9 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
         stream: FirestoreService().getAllAppointmentsStream(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
           final all = snapshot.data!;
           final now = DateTime.now();
@@ -43,13 +45,18 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
           final countsByType = <String, int>{};
 
           for (final appt in all) {
-            if ((appt['status'] ?? '').toString().toLowerCase() != 'confirmed') continue;
+            if ((appt['status'] ?? '').toString().toLowerCase() != 'confirmed')
+              continue;
 
             DateTime? date;
             try {
               final parts = appt['date'].toString().split('-');
               if (parts.length == 3) {
-                date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+                date = DateTime(
+                  int.parse(parts[0]),
+                  int.parse(parts[1]),
+                  int.parse(parts[2]),
+                );
               }
             } catch (_) {}
 
@@ -67,8 +74,18 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
           }
 
           const monthNames = [
-            'January','February','March','April','May','June',
-            'July','August','September','October','November','December'
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December',
           ];
           final currentLabel = '${monthNames[now.month - 1]} ${now.year}';
 
@@ -106,34 +123,46 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
                             AppSpacing.vMd,
                             Text(
                               '₱${_formatAmount(thisRevenue)}',
-                              style: AppTypography.displayLarge.copyWith(color: Colors.white),
+                              style: AppTypography.displayLarge.copyWith(
+                                color: Colors.white,
+                              ),
                             ),
                             AppSpacing.vXs,
                             Text(
                               'Estimated total revenue',
-                              style: AppTypography.bodyMedium.copyWith(color: Colors.white.withOpacity(0.7)),
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: Colors.white.withOpacity(0.7),
+                              ),
                             ),
                           ],
                         ),
                       ),
                       AppSpacing.vHuge,
-                      Text('Service Breakdown', style: AppTypography.headlineSmall),
+                      Text(
+                        'Service Breakdown',
+                        style: AppTypography.headlineSmall,
+                      ),
                       AppSpacing.vLg,
                       if (thisMonthByType.isEmpty)
                         const EmptyState(
                           icon: Icons.receipt_long_outlined,
                           title: 'No revenue this month',
-                          message: 'Confirm appointments to see service revenue',
+                          message:
+                              'Confirm appointments to see service revenue',
                         )
                       else
                         ...thisMonthByType.entries.map((entry) {
                           final type = entry.key;
                           final revenue = entry.value;
                           final count = countsByType[type] ?? 0;
-                          final percent = thisRevenue > 0 ? (revenue / thisRevenue) * 100 : 0.0;
+                          final percent = thisRevenue > 0
+                              ? (revenue / thisRevenue) * 100
+                              : 0.0;
 
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                            padding: const EdgeInsets.only(
+                              bottom: AppSpacing.md,
+                            ),
                             child: AppCard(
                               padding: const EdgeInsets.all(AppSpacing.lg),
                               child: Row(
@@ -147,16 +176,21 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
                                   AppSpacing.hLg,
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          type[0].toUpperCase() + type.substring(1),
+                                          type[0].toUpperCase() +
+                                              type.substring(1),
                                           style: AppTypography.titleSmall,
                                         ),
                                         AppSpacing.vXs,
                                         Text(
                                           '$count confirmed ${count == 1 ? 'visit' : 'visits'}',
-                                          style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                                          style: AppTypography.bodySmall
+                                              .copyWith(
+                                                color: AppColors.textTertiary,
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -166,12 +200,16 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
                                     children: [
                                       Text(
                                         '₱${_formatAmount(revenue)}',
-                                        style: AppTypography.titleMedium.copyWith(color: AppColors.success),
+                                        style: AppTypography.titleMedium
+                                            .copyWith(color: AppColors.success),
                                       ),
                                       AppSpacing.vXs,
                                       Text(
                                         '${percent.toStringAsFixed(1)}%',
-                                        style: AppTypography.labelSmall.copyWith(color: AppColors.textTertiary),
+                                        style: AppTypography.labelSmall
+                                            .copyWith(
+                                              color: AppColors.textTertiary,
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -190,12 +228,19 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.info_outline_rounded, color: AppColors.info, size: 20),
+                            const Icon(
+                              Icons.info_outline_rounded,
+                              color: AppColors.info,
+                              size: 20,
+                            ),
                             AppSpacing.hMd,
                             Expanded(
                               child: Text(
                                 'Revenue shown is estimated from confirmed appointments and preset base fees per service type.',
-                                style: AppTypography.bodySmall.copyWith(color: AppColors.info, height: 1.5),
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.info,
+                                  height: 1.5,
+                                ),
                               ),
                             ),
                           ],

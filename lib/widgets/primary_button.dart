@@ -26,16 +26,16 @@ class PrimaryButton extends StatelessWidget {
   });
 
   double get _height => switch (size) {
-        AppButtonSize.small => 40,
-        AppButtonSize.medium => 48,
-        AppButtonSize.large => 56,
-      };
+    AppButtonSize.small => 40,
+    AppButtonSize.medium => 48,
+    AppButtonSize.large => 56,
+  };
 
   double get _fontSize => switch (size) {
-        AppButtonSize.small => 13,
-        AppButtonSize.medium => 14,
-        AppButtonSize.large => 15,
-      };
+    AppButtonSize.small => 13,
+    AppButtonSize.medium => 14,
+    AppButtonSize.large => 15,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,11 @@ class PrimaryButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (icon != null) ...[
-                    Icon(icon, size: _fontSize + 3, color: foregroundColor ?? AppColors.textInverse),
+                    Icon(
+                      icon,
+                      size: _fontSize + 3,
+                      color: foregroundColor ?? AppColors.textInverse,
+                    ),
                     AppSpacing.hSm,
                   ],
                   Text(
@@ -82,7 +86,9 @@ class PrimaryButton extends StatelessWidget {
       ),
     );
 
-    return isExpanded ? SizedBox(width: double.infinity, child: button) : button;
+    return isExpanded
+        ? SizedBox(width: double.infinity, child: button)
+        : button;
   }
 }
 
@@ -103,10 +109,10 @@ class SecondaryButton extends StatelessWidget {
   });
 
   double get _height => switch (size) {
-        AppButtonSize.small => 40,
-        AppButtonSize.medium => 48,
-        AppButtonSize.large => 56,
-      };
+    AppButtonSize.small => 40,
+    AppButtonSize.medium => 48,
+    AppButtonSize.large => 56,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +140,8 @@ class SecondaryButton extends StatelessWidget {
       ),
     );
 
-    return isExpanded ? SizedBox(width: double.infinity, child: button) : button;
+    return isExpanded
+        ? SizedBox(width: double.infinity, child: button)
+        : button;
   }
 }

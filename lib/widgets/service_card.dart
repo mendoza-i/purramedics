@@ -45,7 +45,9 @@ class ServiceCard extends StatelessWidget {
             const Spacer(),
             Text(
               title,
-              style: AppTypography.titleMedium.copyWith(color: AppColors.textPrimary),
+              style: AppTypography.titleMedium.copyWith(
+                color: AppColors.textPrimary,
+              ),
             ),
             AppSpacing.vXs,
             Row(

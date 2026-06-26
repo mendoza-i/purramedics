@@ -8,16 +8,23 @@ import '../widgets/widgets.dart';
 class AppointmentsPage extends StatefulWidget {
   const AppointmentsPage({super.key});
 
-  static Future<void> showBookDialog(BuildContext context, {String? initialVisitType}) async {
+  static Future<void> showBookDialog(
+    BuildContext context, {
+    String? initialVisitType,
+  }) async {
     final _firestoreService = FirestoreService();
     final _user = FirebaseAuth.instance.currentUser;
 
     if (_user != null) {
-      final activeCount = await _firestoreService.getActiveBookingCount(_user.uid);
+      final activeCount = await _firestoreService.getActiveBookingCount(
+        _user.uid,
+      );
       if (activeCount >= 2 && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('You can only have up to 2 active bookings at a time.'),
+            content: Text(
+              'You can only have up to 2 active bookings at a time.',
+            ),
             backgroundColor: AppColors.warning,
           ),
         );
@@ -30,8 +37,14 @@ class AppointmentsPage extends StatefulWidget {
     final otherVisitController = TextEditingController();
     final infoController = TextEditingController();
     DateTime selectedDate = DateTime.now();
-    final visitTypes = const ['Checkup', 'Vaccination', 'Grooming', 'Surgery', 'Others'];
-    
+    final visitTypes = const [
+      'Checkup',
+      'Vaccination',
+      'Grooming',
+      'Surgery',
+      'Others',
+    ];
+
     String selectedVisitType = visitTypes[0];
     if (initialVisitType != null) {
       final match = visitTypes.firstWhere(
@@ -47,13 +60,16 @@ class AppointmentsPage extends StatefulWidget {
     }
 
     bool isBooking = false;
-    final consultMethods = const ['In-Person Appointment', 'Online Consultation'];
+    final consultMethods = const [
+      'In-Person Appointment',
+      'Online Consultation',
+    ];
     String selectedMethod = consultMethods[0];
     String? selectedTimeSlot;
     final allTimeSlots = <String>[
       for (var h = 8; h <= 21; h++)
         '${(h == 0 || h == 12) ? 12 : h % 12}'.padLeft(2, '0') +
-            ':00 ${h < 12 ? 'AM' : 'PM'}'
+            ':00 ${h < 12 ? 'AM' : 'PM'}',
     ];
 
     if (!context.mounted) return;
@@ -72,11 +88,15 @@ class AppointmentsPage extends StatefulWidget {
               maxChildSize: 0.97,
               builder: (_, scrollController) {
                 return Padding(
-                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
                   child: Container(
                     decoration: const BoxDecoration(
                       color: AppColors.surface,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.xl)),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(AppRadii.xl),
+                      ),
                     ),
                     child: Column(
                       children: [
@@ -84,21 +104,37 @@ class AppointmentsPage extends StatefulWidget {
                         Container(
                           width: 44,
                           height: 5,
-                          decoration: BoxDecoration(color: AppColors.border, borderRadius: AppRadii.rFull),
+                          decoration: BoxDecoration(
+                            color: AppColors.border,
+                            borderRadius: AppRadii.rFull,
+                          ),
                         ),
                         AppSpacing.vLg,
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.xxl,
+                          ),
                           child: Row(
                             children: [
-                              const IconAvatar(icon: Icons.pets_rounded, color: AppColors.primary, size: 44),
+                              const IconAvatar(
+                                icon: Icons.pets_rounded,
+                                color: AppColors.primary,
+                                size: 44,
+                              ),
                               AppSpacing.hMd,
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Book appointment', style: AppTypography.headlineMedium),
-                                  Text('Pet Treasure Clinic',
-                                      style: AppTypography.bodySmall.copyWith(color: AppColors.primary)),
+                                  Text(
+                                    'Book appointment',
+                                    style: AppTypography.headlineMedium,
+                                  ),
+                                  Text(
+                                    'Pet Treasure Clinic',
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
@@ -109,7 +145,12 @@ class AppointmentsPage extends StatefulWidget {
                         Expanded(
                           child: ListView(
                             controller: scrollController,
-                            padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.sm, AppSpacing.xxl, AppSpacing.xxl),
+                            padding: const EdgeInsets.fromLTRB(
+                              AppSpacing.xxl,
+                              AppSpacing.sm,
+                              AppSpacing.xxl,
+                              AppSpacing.xxl,
+                            ),
                             children: [
                               Form(
                                 key: formKey,
@@ -123,26 +164,40 @@ class AppointmentsPage extends StatefulWidget {
                                       controller: petController,
                                       label: 'Pet name',
                                       prefixIcon: Icons.pets_rounded,
-                                      validator: (v) => v == null || v.trim().isEmpty ? 'Please enter a pet name' : null,
+                                      validator: (v) =>
+                                          v == null || v.trim().isEmpty
+                                          ? 'Please enter a pet name'
+                                          : null,
                                     ),
                                     AppSpacing.vMd,
                                     const SizedBox(height: AppSpacing.lg),
                                     StreamBuilder<Map<String, String>>(
-                                      stream: FirestoreService().getServicePricesStream(),
+                                      stream: FirestoreService()
+                                          .getServicePricesStream(),
                                       builder: (context, priceSnap) {
                                         final prices = priceSnap.data ?? {};
                                         return DropdownButtonFormField<String>(
                                           value: selectedVisitType,
                                           decoration: const InputDecoration(
                                             labelText: 'Visit type',
-                                            prefixIcon: Icon(Icons.medical_services_outlined),
+                                            prefixIcon: Icon(
+                                              Icons.medical_services_outlined,
+                                            ),
                                           ),
                                           items: visitTypes.map((t) {
-                                            final price = prices[t.toLowerCase()];
-                                            final label = price != null ? '$t — ₱$price' : t;
-                                            return DropdownMenuItem(value: t, child: Text(label));
+                                            final price =
+                                                prices[t.toLowerCase()];
+                                            final label = price != null
+                                                ? '$t — ₱$price'
+                                                : t;
+                                            return DropdownMenuItem(
+                                              value: t,
+                                              child: Text(label),
+                                            );
                                           }).toList(),
-                                          onChanged: (v) => setDialogState(() => selectedVisitType = v!),
+                                          onChanged: (v) => setDialogState(
+                                            () => selectedVisitType = v!,
+                                          ),
                                         );
                                       },
                                     ),
@@ -152,7 +207,10 @@ class AppointmentsPage extends StatefulWidget {
                                         controller: otherVisitController,
                                         label: 'Specify reason',
                                         prefixIcon: Icons.edit_outlined,
-                                        validator: (v) => v == null || v.trim().isEmpty ? 'Please specify' : null,
+                                        validator: (v) =>
+                                            v == null || v.trim().isEmpty
+                                            ? 'Please specify'
+                                            : null,
                                       ),
                                     ],
                                     AppSpacing.vXl,
@@ -162,18 +220,29 @@ class AppointmentsPage extends StatefulWidget {
                                       decoration: BoxDecoration(
                                         color: AppColors.surface,
                                         borderRadius: AppRadii.rMd,
-                                        border: Border.all(color: AppColors.divider),
+                                        border: Border.all(
+                                          color: AppColors.divider,
+                                        ),
                                       ),
                                       clipBehavior: Clip.hardEdge,
                                       child: Builder(
                                         builder: (context) {
                                           final now = DateTime.now();
-                                          final today = DateTime(now.year, now.month, now.day);
-                                          final safeInitialDate = selectedDate.isBefore(today) ? today : selectedDate;
+                                          final today = DateTime(
+                                            now.year,
+                                            now.month,
+                                            now.day,
+                                          );
+                                          final safeInitialDate =
+                                              selectedDate.isBefore(today)
+                                              ? today
+                                              : selectedDate;
                                           return CalendarDatePicker(
                                             initialDate: safeInitialDate,
                                             firstDate: today,
-                                            lastDate: today.add(const Duration(days: 365)),
+                                            lastDate: today.add(
+                                              const Duration(days: 365),
+                                            ),
                                             onDateChanged: (date) {
                                               setDialogState(() {
                                                 selectedDate = date;
@@ -189,20 +258,33 @@ class AppointmentsPage extends StatefulWidget {
                                     AppSpacing.vSm,
                                     StreamBuilder<List<String>>(
                                       stream: FirestoreService()
-                                          .getAvailableTimesStream("${selectedDate.toLocal()}".split(' ')[0]),
+                                          .getAvailableTimesStream(
+                                            "${selectedDate.toLocal()}".split(
+                                              ' ',
+                                            )[0],
+                                          ),
                                       builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
                                           return const Padding(
-                                            padding: EdgeInsets.all(AppSpacing.lg),
-                                            child: Center(child: CircularProgressIndicator()),
+                                            padding: EdgeInsets.all(
+                                              AppSpacing.lg,
+                                            ),
+                                            child: Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
                                           );
                                         }
-                                        final availableSlots = snapshot.data ?? [];
+                                        final availableSlots =
+                                            snapshot.data ?? [];
                                         if (availableSlots.isEmpty) {
                                           selectedTimeSlot = null;
                                           return Container(
                                             width: double.infinity,
-                                            padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: AppSpacing.lg,
+                                            ),
                                             decoration: BoxDecoration(
                                               color: AppColors.dangerSurface,
                                               borderRadius: AppRadii.rMd,
@@ -210,26 +292,45 @@ class AppointmentsPage extends StatefulWidget {
                                             child: Center(
                                               child: Text(
                                                 'No slots available for this date',
-                                                style: AppTypography.labelLarge.copyWith(color: AppColors.danger),
+                                                style: AppTypography.labelLarge
+                                                    .copyWith(
+                                                      color: AppColors.danger,
+                                                    ),
                                               ),
                                             ),
                                           );
                                         }
-                                        if (selectedTimeSlot != null && !availableSlots.contains(selectedTimeSlot)) {
+                                        if (selectedTimeSlot != null &&
+                                            !availableSlots.contains(
+                                              selectedTimeSlot,
+                                            )) {
                                           selectedTimeSlot = null;
                                         }
                                         final now = DateTime.now();
-                                        final isToday = selectedDate.year == now.year && selectedDate.month == now.month && selectedDate.day == now.day;
+                                        final isToday =
+                                            selectedDate.year == now.year &&
+                                            selectedDate.month == now.month &&
+                                            selectedDate.day == now.day;
 
                                         bool isSlotValid(String slot) {
                                           if (!isToday) return true;
                                           final parts = slot.split(' ');
                                           final timeParts = parts[0].split(':');
                                           var h = int.parse(timeParts[0]);
-                                          if (parts[1] == 'PM' && h != 12) h += 12;
-                                          if (parts[1] == 'AM' && h == 12) h = 0;
-                                          final slotTime = DateTime(now.year, now.month, now.day, h, int.parse(timeParts[1]));
-                                          return slotTime.isAfter(now.add(const Duration(hours: 1)));
+                                          if (parts[1] == 'PM' && h != 12)
+                                            h += 12;
+                                          if (parts[1] == 'AM' && h == 12)
+                                            h = 0;
+                                          final slotTime = DateTime(
+                                            now.year,
+                                            now.month,
+                                            now.day,
+                                            h,
+                                            int.parse(timeParts[1]),
+                                          );
+                                          return slotTime.isAfter(
+                                            now.add(const Duration(hours: 1)),
+                                          );
                                         }
 
                                         return Wrap(
@@ -248,28 +349,39 @@ class AppointmentsPage extends StatefulWidget {
                                                   )
                                                 else
                                                   FutureBuilder<bool>(
-                                                    future: _firestoreService.isSlotTaken(
-                                                      'Pet Treasure',
-                                                      "${selectedDate.toLocal()}".split(' ')[0],
-                                                      slot,
-                                                      includePending: true,
-                                                    ),
+                                                    future: _firestoreService
+                                                        .isSlotTaken(
+                                                          'Pet Treasure',
+                                                          "${selectedDate.toLocal()}"
+                                                              .split(' ')[0],
+                                                          slot,
+                                                          includePending: true,
+                                                        ),
                                                     builder: (ctx, takenSnap) {
-                                                      final taken = takenSnap.data ?? false;
+                                                      final taken =
+                                                          takenSnap.data ??
+                                                          false;
                                                       if (taken) {
                                                         return _timeSlot(
                                                           slot,
                                                           available: false,
                                                           selected: false,
                                                           onTap: null,
-                                                          labelOverride: 'Booked',
+                                                          labelOverride:
+                                                              'Booked',
                                                         );
                                                       }
                                                       return _timeSlot(
                                                         slot,
                                                         available: true,
-                                                        selected: selectedTimeSlot == slot,
-                                                        onTap: () => setDialogState(() => selectedTimeSlot = slot),
+                                                        selected:
+                                                            selectedTimeSlot ==
+                                                            slot,
+                                                        onTap: () => setDialogState(
+                                                          () =>
+                                                              selectedTimeSlot =
+                                                                  slot,
+                                                        ),
                                                       );
                                                     },
                                                   ),
@@ -282,7 +394,8 @@ class AppointmentsPage extends StatefulWidget {
                                     AppSpacing.vSm,
                                     AppTextField(
                                       controller: infoController,
-                                      hint: 'Describe symptoms or any relevant info (optional)',
+                                      hint:
+                                          'Describe symptoms or any relevant info (optional)',
                                       prefixIcon: Icons.note_alt_outlined,
                                       maxLines: 3,
                                     ),
@@ -292,38 +405,80 @@ class AppointmentsPage extends StatefulWidget {
                                       isLoading: isBooking,
                                       onPressed: () async {
                                         if (_user == null) return;
-                                        if (!formKey.currentState!.validate()) return;
+                                        if (!formKey.currentState!.validate())
+                                          return;
                                         if (selectedTimeSlot == null) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Please select an available time slot.')),
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Please select an available time slot.',
+                                              ),
+                                            ),
                                           );
                                           return;
                                         }
-                                        final finalVisitType = selectedVisitType == 'Others'
+                                        final finalVisitType =
+                                            selectedVisitType == 'Others'
                                             ? otherVisitController.text.trim()
                                             : selectedVisitType;
-                                        final dateString = "${selectedDate.toLocal()}".split(' ')[0];
+                                        final dateString =
+                                            "${selectedDate.toLocal()}".split(
+                                              ' ',
+                                            )[0];
 
                                         final confirmed = await showDialog<bool>(
                                           context: context,
                                           builder: (ctx) => AlertDialog(
-                                            shape: RoundedRectangleBorder(borderRadius: AppRadii.rLg),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: AppRadii.rLg,
+                                            ),
                                             title: Row(
                                               children: [
-                                                const Icon(Icons.event_available_rounded, color: AppColors.primary),
+                                                const Icon(
+                                                  Icons.event_available_rounded,
+                                                  color: AppColors.primary,
+                                                ),
                                                 AppSpacing.hSm,
-                                                Text('Confirm booking?', style: AppTypography.headlineSmall),
+                                                Text(
+                                                  'Confirm booking?',
+                                                  style: AppTypography
+                                                      .headlineSmall,
+                                                ),
                                               ],
                                             ),
                                             content: Column(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                _confirmRow(Icons.pets_rounded, 'Pet', petController.text.trim()),
-                                                _confirmRow(Icons.medical_services_outlined, 'Visit', finalVisitType),
-                                                _confirmRow(Icons.calendar_today_outlined, 'Date', dateString),
-                                                _confirmRow(Icons.access_time_outlined, 'Time', selectedTimeSlot!),
                                                 _confirmRow(
-                                                  selectedMethod.contains('Online') ? Icons.videocam_outlined : Icons.local_hospital_outlined,
+                                                  Icons.pets_rounded,
+                                                  'Pet',
+                                                  petController.text.trim(),
+                                                ),
+                                                _confirmRow(
+                                                  Icons
+                                                      .medical_services_outlined,
+                                                  'Visit',
+                                                  finalVisitType,
+                                                ),
+                                                _confirmRow(
+                                                  Icons.calendar_today_outlined,
+                                                  'Date',
+                                                  dateString,
+                                                ),
+                                                _confirmRow(
+                                                  Icons.access_time_outlined,
+                                                  'Time',
+                                                  selectedTimeSlot!,
+                                                ),
+                                                _confirmRow(
+                                                  selectedMethod.contains(
+                                                        'Online',
+                                                      )
+                                                      ? Icons.videocam_outlined
+                                                      : Icons
+                                                            .local_hospital_outlined,
                                                   'Method',
                                                   selectedMethod,
                                                 ),
@@ -331,12 +486,30 @@ class AppointmentsPage extends StatefulWidget {
                                             ),
                                             actions: [
                                               TextButton(
-                                                onPressed: () => Navigator.pop(ctx, false),
-                                                child: Text('Go back', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+                                                onPressed: () =>
+                                                    Navigator.pop(ctx, false),
+                                                child: Text(
+                                                  'Go back',
+                                                  style: AppTypography
+                                                      .labelLarge
+                                                      .copyWith(
+                                                        color: AppColors
+                                                            .textSecondary,
+                                                      ),
+                                                ),
                                               ),
                                               TextButton(
-                                                onPressed: () => Navigator.pop(ctx, true),
-                                                child: Text('Confirm booking', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+                                                onPressed: () =>
+                                                    Navigator.pop(ctx, true),
+                                                child: Text(
+                                                  'Confirm booking',
+                                                  style: AppTypography
+                                                      .labelLarge
+                                                      .copyWith(
+                                                        color:
+                                                            AppColors.primary,
+                                                      ),
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -346,30 +519,44 @@ class AppointmentsPage extends StatefulWidget {
 
                                         setDialogState(() => isBooking = true);
                                         try {
-                                          await _firestoreService.addAppointment(
-                                            'Pet Treasure',
-                                            '',
-                                            dateString,
-                                            selectedTimeSlot!,
-                                            petController.text.trim(),
-                                            finalVisitType,
-                                            _user.uid,
-                                            _user.displayName ?? 'Pet Owner',
-                                            _user.email ?? '',
-                                            infoController.text.trim(),
-                                            selectedMethod,
-                                          );
+                                          await _firestoreService
+                                              .addAppointment(
+                                                'Pet Treasure',
+                                                '',
+                                                dateString,
+                                                selectedTimeSlot!,
+                                                petController.text.trim(),
+                                                finalVisitType,
+                                                _user.uid,
+                                                _user.displayName ??
+                                                    'Pet Owner',
+                                                _user.email ?? '',
+                                                infoController.text.trim(),
+                                                selectedMethod,
+                                              );
                                           if (context.mounted) {
                                             Navigator.pop(context);
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Appointment request submitted 🐾')),
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Appointment request submitted 🐾',
+                                                ),
+                                              ),
                                             );
                                           }
                                         } catch (e) {
-                                          setDialogState(() => isBooking = false);
+                                          setDialogState(
+                                            () => isBooking = false,
+                                          );
                                           if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(content: Text('Error: $e')),
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text('Error: $e'),
+                                              ),
                                             );
                                           }
                                         }
@@ -393,7 +580,8 @@ class AppointmentsPage extends StatefulWidget {
     );
   }
 
-  static Widget _section(String label) => Text(label, style: AppTypography.labelLarge);
+  static Widget _section(String label) =>
+      Text(label, style: AppTypography.labelLarge);
 
   static Widget _confirmRow(IconData icon, String label, String value) {
     return Padding(
@@ -419,12 +607,16 @@ class AppointmentsPage extends StatefulWidget {
         decoration: BoxDecoration(
           color: selected ? AppColors.primary : AppColors.surfaceAlt,
           borderRadius: AppRadii.rMd,
-          border: Border.all(color: selected ? AppColors.primary : AppColors.divider),
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.divider,
+          ),
         ),
         child: Column(
           children: [
             Icon(
-              isOnline ? Icons.videocam_outlined : Icons.local_hospital_outlined,
+              isOnline
+                  ? Icons.videocam_outlined
+                  : Icons.local_hospital_outlined,
               color: selected ? AppColors.textInverse : AppColors.textSecondary,
               size: 20,
             ),
@@ -432,7 +624,9 @@ class AppointmentsPage extends StatefulWidget {
             Text(
               isOnline ? 'Online' : 'In-person',
               style: AppTypography.labelMedium.copyWith(
-                color: selected ? AppColors.textInverse : AppColors.textSecondary,
+                color: selected
+                    ? AppColors.textInverse
+                    : AppColors.textSecondary,
               ),
             ),
           ],
@@ -441,25 +635,34 @@ class AppointmentsPage extends StatefulWidget {
     );
   }
 
-  static Widget _timeSlot(String slot, {required bool available, required bool selected, VoidCallback? onTap, String? labelOverride}) {
+  static Widget _timeSlot(
+    String slot, {
+    required bool available,
+    required bool selected,
+    VoidCallback? onTap,
+    String? labelOverride,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm + 2,
+        ),
         decoration: BoxDecoration(
           color: !available
               ? AppColors.surfaceAlt
               : selected
-                  ? AppColors.primary
-                  : AppColors.primarySurface,
+              ? AppColors.primary
+              : AppColors.primarySurface,
           borderRadius: AppRadii.rSm,
           border: Border.all(
             color: !available
                 ? AppColors.divider
                 : selected
-                    ? AppColors.primary
-                    : AppColors.primary.withOpacity(0.35),
+                ? AppColors.primary
+                : AppColors.primary.withOpacity(0.35),
           ),
         ),
         child: Column(
@@ -471,9 +674,11 @@ class AppointmentsPage extends StatefulWidget {
                 color: !available
                     ? AppColors.textTertiary
                     : selected
-                        ? AppColors.textInverse
-                        : AppColors.primaryDark,
-                decoration: !available && labelOverride == null ? TextDecoration.lineThrough : null,
+                    ? AppColors.textInverse
+                    : AppColors.primaryDark,
+                decoration: !available && labelOverride == null
+                    ? TextDecoration.lineThrough
+                    : null,
               ),
             ),
             if (labelOverride != null)
@@ -516,7 +721,12 @@ class _AppointmentsPageState extends State<AppointmentsPage>
   @override
   Widget build(BuildContext context) {
     if (_user == null) {
-      return Center(child: Text('Please log in to view appointments.', style: AppTypography.bodyLarge));
+      return Center(
+        child: Text(
+          'Please log in to view appointments.',
+          style: AppTypography.bodyLarge,
+        ),
+      );
     }
 
     return Scaffold(
@@ -532,7 +742,12 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}', style: AppTypography.bodyMedium));
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: AppTypography.bodyMedium,
+                    ),
+                  );
                 }
                 final appointments = snapshot.data ?? [];
                 final now = DateTime.now();
@@ -543,7 +758,11 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                   try {
                     final parts = apt['date'].toString().split('-');
                     if (parts.length == 3) {
-                      final d = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+                      final d = DateTime(
+                        int.parse(parts[0]),
+                        int.parse(parts[1]),
+                        int.parse(parts[2]),
+                      );
                       if (d.isBefore(today)) {
                         past.add(apt);
                       } else {
@@ -578,7 +797,12 @@ class _AppointmentsPageState extends State<AppointmentsPage>
         foregroundColor: AppColors.textInverse,
         elevation: 2,
         icon: const Icon(Icons.add_rounded),
-        label: Text('Book new', style: AppTypography.labelLarge.copyWith(color: AppColors.textInverse)),
+        label: Text(
+          'Book new',
+          style: AppTypography.labelLarge.copyWith(
+            color: AppColors.textInverse,
+          ),
+        ),
       ),
     );
   }
@@ -586,33 +810,47 @@ class _AppointmentsPageState extends State<AppointmentsPage>
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.huge, AppSpacing.xxl, AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xxl,
+        AppSpacing.huge,
+        AppSpacing.xxl,
+        AppSpacing.lg,
+      ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: AppColors.primaryGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(AppRadii.xl)),
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(AppRadii.xl),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs + 2),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs + 2,
+            ),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               borderRadius: AppRadii.rFull,
             ),
             child: Text(
               'PET TREASURE CLINIC',
-              style: AppTypography.labelSmall.copyWith(color: AppColors.textInverse),
+              style: AppTypography.labelSmall.copyWith(
+                color: AppColors.textInverse,
+              ),
             ),
           ),
           AppSpacing.vSm,
           Text(
             'My visits',
-            style: AppTypography.displayMedium.copyWith(color: AppColors.textInverse),
+            style: AppTypography.displayMedium.copyWith(
+              color: AppColors.textInverse,
+            ),
           ),
           AppSpacing.vLg,
           Container(
@@ -629,11 +867,15 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                 borderRadius: AppRadii.rSm,
               ),
               indicatorSize: TabBarIndicatorSize.tab,
-              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              labelPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+              ),
               labelColor: AppColors.primaryDark,
               unselectedLabelColor: AppColors.textInverse,
               labelStyle: AppTypography.labelLarge,
-              unselectedLabelStyle: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w500),
+              unselectedLabelStyle: AppTypography.labelLarge.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
               tabs: const [
                 Tab(height: 36, text: 'Upcoming'),
                 Tab(height: 36, text: 'Past'),
@@ -651,7 +893,9 @@ class _AppointmentsPageState extends State<AppointmentsPage>
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xxl),
           child: EmptyState(
-            icon: isPast ? Icons.history_toggle_off_outlined : Icons.event_available_outlined,
+            icon: isPast
+                ? Icons.history_toggle_off_outlined
+                : Icons.event_available_outlined,
             title: isPast ? 'No past visits' : 'No upcoming visits',
             message: isPast
                 ? 'Your appointment history will appear here.'
@@ -662,13 +906,22 @@ class _AppointmentsPageState extends State<AppointmentsPage>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.xl, AppSpacing.xxl, 96),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xxl,
+        AppSpacing.xl,
+        AppSpacing.xxl,
+        96,
+      ),
       itemCount: items.length,
-      itemBuilder: (context, i) => _buildAppointmentCard(items[i], isPast: isPast),
+      itemBuilder: (context, i) =>
+          _buildAppointmentCard(items[i], isPast: isPast),
     );
   }
 
-  Widget _buildAppointmentCard(Map<String, dynamic> apt, {bool isPast = false}) {
+  Widget _buildAppointmentCard(
+    Map<String, dynamic> apt, {
+    bool isPast = false,
+  }) {
     final id = apt['id'] as String;
     final isConfirmed = apt['status'] == 'Confirmed';
     final date = apt['date'] as String? ?? 'N/A';
@@ -677,7 +930,8 @@ class _AppointmentsPageState extends State<AppointmentsPage>
     final status = apt['status'] as String? ?? 'Pending';
     final type = apt['visitType'] as String? ?? 'Visit';
     final time = apt['time'] as String? ?? '--:--';
-    final consultMethod = apt['consultationMethod'] as String? ?? 'In-Person Appointment';
+    final consultMethod =
+        apt['consultationMethod'] as String? ?? 'In-Person Appointment';
 
     String dayMonth = '';
     String year = '';
@@ -687,7 +941,20 @@ class _AppointmentsPageState extends State<AppointmentsPage>
         year = parts[0];
         final m = int.tryParse(parts[1]);
         if (m != null && m >= 1 && m <= 12) {
-          const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          const months = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+          ];
           dayMonth = '${parts[2]} ${months[m - 1]}';
         }
       }
@@ -696,8 +963,8 @@ class _AppointmentsPageState extends State<AppointmentsPage>
     final statusTone = isPast
         ? BadgeTone.neutral
         : isConfirmed
-            ? BadgeTone.success
-            : BadgeTone.warning;
+        ? BadgeTone.success
+        : BadgeTone.warning;
     final accent = isPast ? AppColors.textTertiary : AppColors.primary;
     final isOnline = consultMethod.toLowerCase().contains('online');
 
@@ -711,7 +978,9 @@ class _AppointmentsPageState extends State<AppointmentsPage>
             height: 4,
             decoration: BoxDecoration(
               color: accent,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadii.lg)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppRadii.lg),
+              ),
             ),
           ),
           Padding(
@@ -746,8 +1015,12 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                           Text(
                             pet,
                             style: AppTypography.titleLarge.copyWith(
-                              color: isPast ? AppColors.textSecondary : AppColors.textPrimary,
-                              decoration: isPast ? TextDecoration.lineThrough : null,
+                              color: isPast
+                                  ? AppColors.textSecondary
+                                  : AppColors.textPrimary,
+                              decoration: isPast
+                                  ? TextDecoration.lineThrough
+                                  : null,
                             ),
                           ),
                           AppSpacing.vXs,
@@ -765,8 +1038,12 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                   runSpacing: AppSpacing.xs,
                   children: [
                     _infoChip(Icons.access_time_outlined, time),
-                    _infoChip(isOnline ? Icons.videocam_outlined : Icons.local_hospital_outlined,
-                        isOnline ? 'Online' : 'In-person'),
+                    _infoChip(
+                      isOnline
+                          ? Icons.videocam_outlined
+                          : Icons.local_hospital_outlined,
+                      isOnline ? 'Online' : 'In-person',
+                    ),
                     _infoChip(Icons.business_outlined, clinic),
                   ],
                 ),
@@ -789,15 +1066,25 @@ class _AppointmentsPageState extends State<AppointmentsPage>
           builder: (context) => AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: AppRadii.rLg),
             title: const Text('Delete appointment?'),
-            content: Text('Are you sure you want to delete the appointment for $pet?'),
+            content: Text(
+              'Are you sure you want to delete the appointment for $pet?',
+            ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Keep')),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Keep'),
+              ),
               TextButton(
                 onPressed: () {
                   confirm = true;
                   Navigator.pop(context);
                 },
-                child: Text('Delete', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+                child: Text(
+                  'Delete',
+                  style: AppTypography.labelLarge.copyWith(
+                    color: AppColors.danger,
+                  ),
+                ),
               ),
             ],
           ),
@@ -817,16 +1104,22 @@ class _AppointmentsPageState extends State<AppointmentsPage>
   }
 
   Widget _dismissBg({required Alignment alignment}) => Container(
-        alignment: alignment,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-        margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-        decoration: BoxDecoration(color: AppColors.danger, borderRadius: AppRadii.rLg),
-        child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
-      );
+    alignment: alignment,
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+    margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+    decoration: BoxDecoration(
+      color: AppColors.danger,
+      borderRadius: AppRadii.rLg,
+    ),
+    child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+  );
 
   Widget _infoChip(IconData icon, String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs + 1),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs + 1,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surfaceAlt,
         borderRadius: AppRadii.rFull,
@@ -850,13 +1143,14 @@ class _AppointmentsPageState extends State<AppointmentsPage>
     final type = apt['visitType'] as String? ?? 'Visit';
     final date = apt['date'] as String? ?? 'N/A';
     final time = apt['time'] as String? ?? '--:--';
-    final consultMethod = apt['consultationMethod'] as String? ?? 'In-Person Appointment';
+    final consultMethod =
+        apt['consultationMethod'] as String? ?? 'In-Person Appointment';
     final info = apt['additionalInfo'] as String? ?? 'No additional notes.';
     final statusTone = isPast
         ? BadgeTone.neutral
         : isConfirmed
-            ? BadgeTone.success
-            : BadgeTone.warning;
+        ? BadgeTone.success
+        : BadgeTone.warning;
 
     showModalBottomSheet(
       context: context,
@@ -866,7 +1160,9 @@ class _AppointmentsPageState extends State<AppointmentsPage>
         padding: const EdgeInsets.all(AppSpacing.xxl),
         decoration: const BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.xl)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadii.xl),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -876,13 +1172,20 @@ class _AppointmentsPageState extends State<AppointmentsPage>
               child: Container(
                 width: 44,
                 height: 5,
-                decoration: BoxDecoration(color: AppColors.border, borderRadius: AppRadii.rFull),
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: AppRadii.rFull,
+                ),
               ),
             ),
             AppSpacing.vXl,
             Row(
               children: [
-                const IconAvatar(icon: Icons.pets_rounded, color: AppColors.primary, size: 48),
+                const IconAvatar(
+                  icon: Icons.pets_rounded,
+                  color: AppColors.primary,
+                  size: 48,
+                ),
                 AppSpacing.hMd,
                 Expanded(
                   child: Column(
@@ -928,7 +1231,10 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                       onPressed: () async {
                         final id = apt['id'];
                         if (id != null) {
-                          await FirebaseFirestore.instance.collection('appointments').doc(id).update({'status': 'Cancelled'});
+                          await FirebaseFirestore.instance
+                              .collection('appointments')
+                              .doc(id)
+                              .update({'status': 'Cancelled'});
                           if (context.mounted) Navigator.pop(context);
                         }
                       },
@@ -966,7 +1272,10 @@ class _AppointmentsPageState extends State<AppointmentsPage>
       children: [
         Container(
           padding: const EdgeInsets.all(AppSpacing.sm),
-          decoration: BoxDecoration(color: AppColors.surfaceAlt, borderRadius: AppRadii.rSm),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceAlt,
+            borderRadius: AppRadii.rSm,
+          ),
           child: Icon(icon, size: 16, color: AppColors.textSecondary),
         ),
         AppSpacing.hMd,
@@ -980,5 +1289,4 @@ class _AppointmentsPageState extends State<AppointmentsPage>
       ],
     );
   }
-
 }

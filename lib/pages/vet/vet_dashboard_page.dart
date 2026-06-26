@@ -27,7 +27,7 @@ class VetDashboardPage extends StatefulWidget {
 class _VetDashboardPageState extends State<VetDashboardPage> {
   final FirestoreService _firestoreService = FirestoreService();
   final User? currentUser = FirebaseAuth.instance.currentUser;
-  
+
   int _lastPendingCount = -1;
   int _lastUnreadCount = -1;
   StreamSubscription<int>? _pendingSub;
@@ -38,21 +38,31 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
   @override
   void initState() {
     super.initState();
-    _pendingSub = _firestoreService.getPendingAppointmentsCountStream().listen((count) {
+    _pendingSub = _firestoreService.getPendingAppointmentsCountStream().listen((
+      count,
+    ) {
       if (_lastPendingCount >= 0 && count > _lastPendingCount && mounted) {
         AudioUtils.playNotificationSound();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 20),
+                const Icon(
+                  Icons.notifications_active_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
                 const SizedBox(width: 12),
-                const Expanded(child: Text('🔔 New appointment has been booked!')),
+                const Expanded(
+                  child: Text('🔔 New appointment has been booked!'),
+                ),
               ],
             ),
             backgroundColor: AppColors.primary,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.all(16),
             duration: const Duration(seconds: 4),
           ),
@@ -61,28 +71,42 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
       _lastPendingCount = count;
     });
 
-    _cancelledSub = _firestoreService.getCancelledAppointmentsCountStream().listen((count) {
-      if (_lastCancelledCount >= 0 && count > _lastCancelledCount && mounted) {
-        AudioUtils.playNotificationSound();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.cancel_presentation_rounded, color: Colors.white, size: 20),
-                const SizedBox(width: 12),
-                const Expanded(child: Text('❌ An appointment has been cancelled by the pet owner.')),
-              ],
-            ),
-            backgroundColor: AppColors.danger,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: const EdgeInsets.all(16),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
-      _lastCancelledCount = count;
-    });
+    _cancelledSub = _firestoreService
+        .getCancelledAppointmentsCountStream()
+        .listen((count) {
+          if (_lastCancelledCount >= 0 &&
+              count > _lastCancelledCount &&
+              mounted) {
+            AudioUtils.playNotificationSound();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(
+                      Icons.cancel_presentation_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Text(
+                        '❌ An appointment has been cancelled by the pet owner.',
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: AppColors.danger,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: const EdgeInsets.all(16),
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
+          _lastCancelledCount = count;
+        });
 
     _unreadSub = _firestoreService.getVetUnreadCountStream().listen((count) {
       if (_lastUnreadCount >= 0 && count > _lastUnreadCount && mounted) {
@@ -91,14 +115,20 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.mark_chat_unread_rounded, color: Colors.white, size: 20),
+                const Icon(
+                  Icons.mark_chat_unread_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
                 const SizedBox(width: 12),
                 const Expanded(child: Text('💬 You have a new message!')),
               ],
             ),
             backgroundColor: AppColors.info,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.all(16),
             duration: const Duration(seconds: 4),
           ),
@@ -142,26 +172,57 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
   Widget _buildSidebar() {
     final items = [
       _SidebarItem('Dashboard', Icons.dashboard_rounded, null),
-      _SidebarItem('Appointments', Icons.calendar_today_rounded, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetAppointmentListPage()));
-      }, badgeStream: _firestoreService.getPendingAppointmentsCountStream()),
+      _SidebarItem(
+        'Appointments',
+        Icons.calendar_today_rounded,
+        () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const VetAppointmentListPage()),
+          );
+        },
+        badgeStream: _firestoreService.getPendingAppointmentsCountStream(),
+      ),
       _SidebarItem('My Patients', Icons.pets_rounded, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetPatientListPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const VetPatientListPage()),
+        );
       }),
       _SidebarItem('Availability', Icons.event_available_rounded, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetAvailabilityPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const VetAvailabilityPage()),
+        );
       }),
       _SidebarItem('Events', Icons.event_rounded, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetEventListPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const VetEventListPage()),
+        );
       }),
       _SidebarItem('Requests', Icons.medical_services_rounded, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetRequestsPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const VetRequestsPage()),
+        );
       }),
-      _SidebarItem('Inbox', Icons.inbox_rounded, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetInboxPage()));
-      }, badgeStream: _firestoreService.getVetUnreadCountStream()),
+      _SidebarItem(
+        'Inbox',
+        Icons.inbox_rounded,
+        () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const VetInboxPage()),
+          );
+        },
+        badgeStream: _firestoreService.getVetUnreadCountStream(),
+      ),
       _SidebarItem('Settings', Icons.settings_rounded, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetSettingsPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const VetSettingsPage()),
+        );
       }),
     ];
 
@@ -179,19 +240,26 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
             child: Row(
               children: [
                 Container(
-                  width: 36,
-                  height: 36,
-                  decoration: const BoxDecoration(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
                     color: AppColors.primarySurface,
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.local_hospital_rounded, color: AppColors.primary, size: 20),
+                  child: const Icon(
+                    Icons.pets_rounded,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
                 ),
                 AppSpacing.hMd,
                 Expanded(
                   child: Text(
                     'Purramedics',
-                    style: AppTypography.titleMedium.copyWith(color: AppColors.primary),
+                    style: AppTypography.titleMedium.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w800,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -204,62 +272,77 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               children: items.map((item) {
                 final isActive = item.onTap == null;
-                return Material(
-                  color: isActive ? AppColors.primarySurface : Colors.transparent,
-                  child: InkWell(
-                    onTap: item.onTap,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xl,
-                        vertical: AppSpacing.md + 2,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            item.icon,
-                            size: 20,
-                            color: isActive ? AppColors.primary : AppColors.textSecondary,
-                          ),
-                          AppSpacing.hMd,
-                          Expanded(
-                            child: Text(
-                              item.label,
-                              style: AppTypography.titleSmall.copyWith(
-                                color: isActive ? AppColors.primary : AppColors.textPrimary,
-                                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: 4,
+                  ),
+                  child: Material(
+                    color: isActive
+                        ? AppColors.primarySurface
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: item.onTap,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.md,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              item.icon,
+                              size: 20,
+                              color: isActive
+                                  ? AppColors.primaryDark
+                                  : AppColors.textSecondary,
+                            ),
+                            AppSpacing.hMd,
+                            Expanded(
+                              child: Text(
+                                item.label,
+                                style: AppTypography.titleSmall.copyWith(
+                                  color: isActive
+                                      ? AppColors.primaryDark
+                                      : AppColors.textPrimary,
+                                  fontWeight: isActive
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                          if (item.badgeStream != null)
-                            StreamBuilder<int>(
-                              stream: item.badgeStream,
-                              builder: (context, snapshot) {
-                                final count = snapshot.data ?? 0;
-                                if (count == 0) return const SizedBox.shrink();
-                                return Container(
-                                  margin: const EdgeInsets.only(right: 8),
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.danger,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    '$count',
-                                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                                  ),
-                                );
-                              },
-                            ),
-                          if (isActive)
-                            Container(
-                              width: 4,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(2),
+                            if (item.badgeStream != null)
+                              StreamBuilder<int>(
+                                stream: item.badgeStream,
+                                builder: (context, snapshot) {
+                                  final count = snapshot.data ?? 0;
+                                  if (count == 0)
+                                    return const SizedBox.shrink();
+                                  return Container(
+                                    margin: const EdgeInsets.only(left: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.danger,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      '$count',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -287,7 +370,9 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
         ),
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: Responsive.contentMaxWidth(context)),
+            constraints: BoxConstraints(
+              maxWidth: Responsive.contentMaxWidth(context),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -297,7 +382,10 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
                 AppSpacing.vMd,
                 _buildToolsGrid(),
                 AppSpacing.vXxl,
-                if (Responsive.isWide(context)) _buildWideLayout() else _buildMobileLayout(),
+                if (Responsive.isWide(context))
+                  _buildWideLayout()
+                else
+                  _buildMobileLayout(),
               ],
             ),
           ),
@@ -315,7 +403,9 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
           children: [
             Text(
               'Welcome back,',
-              style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
             Text(
               currentUser?.displayName ?? 'Dr. Vet',
@@ -334,7 +424,10 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
               context,
               MaterialPageRoute(builder: (_) => const VetSettingsPage()),
             ),
-            icon: const Icon(Icons.settings_rounded, color: AppColors.textPrimary),
+            icon: const Icon(
+              Icons.settings_rounded,
+              color: AppColors.textPrimary,
+            ),
             tooltip: 'Settings',
           ),
         ),
@@ -351,13 +444,19 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _sectionTitle('Revenue Overview', Icons.attach_money_rounded, AppColors.success),
+              _sectionTitle(
+                'Revenue Overview',
+                Icons.attach_money_rounded,
+                AppColors.success,
+              ),
               AppSpacing.vMd,
               const RevenueStatsWidget(),
               AppSpacing.vXxl,
               Row(
                 children: [
-                  Expanded(child: SizedBox(height: 226, child: _todayVisitsCard())),
+                  Expanded(
+                    child: SizedBox(height: 226, child: _todayVisitsCard()),
+                  ),
                   AppSpacing.hLg,
                   Expanded(child: SizedBox(height: 226, child: _inboxCard())),
                 ],
@@ -371,11 +470,19 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _sectionTitle('Patient Traffic', Icons.bar_chart_rounded, AppColors.success),
+              _sectionTitle(
+                'Patient Traffic',
+                Icons.bar_chart_rounded,
+                AppColors.success,
+              ),
               AppSpacing.vMd,
               const DescriptiveAnalyticsWidget(),
               AppSpacing.vXxxl,
-              _sectionTitle('Weather Forecast', Icons.show_chart_rounded, AppColors.info),
+              _sectionTitle(
+                'Weather Forecast',
+                Icons.show_chart_rounded,
+                AppColors.info,
+              ),
               AppSpacing.vMd,
               const SeasonalForecastWidget(),
             ],
@@ -397,15 +504,27 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
           ],
         ),
         AppSpacing.vXxxl,
-        _sectionTitle('Revenue Overview', Icons.attach_money_rounded, AppColors.success),
+        _sectionTitle(
+          'Revenue Overview',
+          Icons.attach_money_rounded,
+          AppColors.success,
+        ),
         AppSpacing.vMd,
         const RevenueStatsWidget(),
         AppSpacing.vXxl,
-        _sectionTitle('Patient Traffic', Icons.bar_chart_rounded, AppColors.success),
+        _sectionTitle(
+          'Patient Traffic',
+          Icons.bar_chart_rounded,
+          AppColors.success,
+        ),
         AppSpacing.vMd,
         const DescriptiveAnalyticsWidget(),
         AppSpacing.vXxxl,
-        _sectionTitle('Weather Forecast', Icons.show_chart_rounded, AppColors.info),
+        _sectionTitle(
+          'Weather Forecast',
+          Icons.show_chart_rounded,
+          AppColors.info,
+        ),
         AppSpacing.vMd,
         const SeasonalForecastWidget(),
       ],
@@ -413,26 +532,26 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
   }
 
   Widget _todayVisitsCard() => _statCard(
-        title: "Today's Visits",
-        icon: Icons.calendar_month_rounded,
-        color: AppColors.warning,
-        stream: _firestoreService.getTodayAppointmentsCountStream(),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const VetAppointmentListPage()),
-        ),
-      );
+    title: "Today's Visits",
+    icon: Icons.calendar_month_rounded,
+    color: AppColors.warning,
+    stream: _firestoreService.getTodayAppointmentsCountStream(),
+    onTap: () => Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const VetAppointmentListPage()),
+    ),
+  );
 
   Widget _inboxCard() => _statCard(
-        title: 'Inbox',
-        icon: Icons.mark_chat_unread_rounded,
-        color: AppColors.info,
-        stream: _firestoreService.getVetUnreadCountStream(),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const VetInboxPage()),
-        ),
-      );
+    title: 'Inbox',
+    icon: Icons.mark_chat_unread_rounded,
+    color: AppColors.info,
+    stream: _firestoreService.getVetUnreadCountStream(),
+    onTap: () => Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const VetInboxPage()),
+    ),
+  );
 
   Widget _statCard({
     required String title,
@@ -441,40 +560,81 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
     required Stream<int> stream,
     required VoidCallback onTap,
   }) {
-    return AppCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconAvatar(icon: icon, color: color, size: 40, circle: true),
-              StreamBuilder<int>(
-                stream: stream,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    );
-                  }
-                  final count = snapshot.data ?? 0;
-                  return Text(
-                    '$count',
-                    style: AppTypography.displaySmall.copyWith(
-                      color: count > 0 ? color : AppColors.textTertiary,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color.withOpacity(0.12), color.withOpacity(0.02)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: AppRadii.rLg,
+        border: Border.all(color: color.withOpacity(0.2), width: 1.5),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: AppRadii.rLg,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -20,
+                  bottom: -20,
+                  child: Icon(icon, size: 100, color: color.withOpacity(0.1)),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          title,
+                          style: AppTypography.titleMedium.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(icon, color: color, size: 24),
+                        ),
+                      ],
                     ),
-                  );
-                },
-              ),
-            ],
+                    StreamBuilder<int>(
+                      stream: stream,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const SizedBox(
+                            height: 32,
+                            width: 32,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          );
+                        }
+                        final count = snapshot.data ?? 0;
+                        return Text(
+                          '$count',
+                          style: AppTypography.displayMedium.copyWith(
+                            color: color,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          Text(title, style: AppTypography.titleSmall),
-        ],
+        ),
       ),
     );
   }
@@ -491,30 +651,89 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
 
   Widget _buildToolsGrid() {
     final tools = [
-      _Tool('Availability', 'Manage schedule', Icons.event_available_rounded, AppColors.secondary, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetAvailabilityPage()));
-      }),
-      _Tool('Appointments', 'View schedule', Icons.calendar_today_rounded, AppColors.warning, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetAppointmentListPage()));
-      }, badgeStream: _firestoreService.getPendingAppointmentsCountStream()),
-      _Tool('My Patients', 'Manage records', Icons.pets_rounded, AppColors.info, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetPatientListPage()));
-      }),
-      _Tool('Manage Events', 'Create drives', Icons.event_rounded, AppColors.secondaryDark, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetEventListPage()));
-      }),
-      _Tool('Requests', 'Review & approve', Icons.medical_services_rounded, AppColors.primary, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetRequestsPage()));
-      }),
-      _Tool('Inbox', 'Client messages', Icons.inbox_rounded, AppColors.info, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VetInboxPage()));
-      }),
+      _Tool(
+        'Availability',
+        'Manage schedule',
+        Icons.event_available_rounded,
+        AppColors.secondary,
+        () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const VetAvailabilityPage()),
+          );
+        },
+      ),
+      _Tool(
+        'Appointments',
+        'View schedule',
+        Icons.calendar_today_rounded,
+        AppColors.warning,
+        () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const VetAppointmentListPage()),
+          );
+        },
+        badgeStream: _firestoreService.getPendingAppointmentsCountStream(),
+      ),
+      _Tool(
+        'My Patients',
+        'Manage records',
+        Icons.pets_rounded,
+        AppColors.info,
+        () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const VetPatientListPage()),
+          );
+        },
+      ),
+      _Tool(
+        'Manage Events',
+        'Create drives',
+        Icons.event_rounded,
+        AppColors.secondaryDark,
+        () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const VetEventListPage()),
+          );
+        },
+      ),
+      _Tool(
+        'Requests',
+        'Review & approve',
+        Icons.medical_services_rounded,
+        AppColors.primary,
+        () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const VetRequestsPage()),
+          );
+        },
+      ),
+      _Tool(
+        'Inbox',
+        'Client messages',
+        Icons.inbox_rounded,
+        AppColors.info,
+        () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const VetInboxPage()),
+          );
+        },
+      ),
     ];
 
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: Responsive.gridColumns(context, mobileCount: 2, desktopCount: 3),
+      crossAxisCount: Responsive.gridColumns(
+        context,
+        mobileCount: 2,
+        desktopCount: 3,
+      ),
       crossAxisSpacing: AppSpacing.md,
       mainAxisSpacing: AppSpacing.md,
       childAspectRatio: 1.0,
@@ -531,14 +750,22 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
         children: [
           IconAvatar(icon: t.icon, color: t.color, size: 56),
           AppSpacing.vMd,
-          Text(t.title, textAlign: TextAlign.center, style: AppTypography.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(
+            t.title,
+            textAlign: TextAlign.center,
+            style: AppTypography.titleSmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           AppSpacing.vXs,
           Text(
             t.subtitle,
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiary,
+            ),
           ),
         ],
       ),
@@ -560,13 +787,22 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
                 top: -4,
                 right: -4,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.danger,
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: AppShadows.colored(AppColors.danger, opacity: 0.4),
+                    boxShadow: AppShadows.colored(
+                      AppColors.danger,
+                      opacity: 0.4,
+                    ),
                   ),
-                  constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                  constraints: const BoxConstraints(
+                    minWidth: 20,
+                    minHeight: 20,
+                  ),
                   child: Center(
                     child: Text(
                       '$count',
@@ -593,7 +829,14 @@ class _Tool {
   final Color color;
   final VoidCallback onTap;
   final Stream<int>? badgeStream;
-  _Tool(this.title, this.subtitle, this.icon, this.color, this.onTap, {this.badgeStream});
+  _Tool(
+    this.title,
+    this.subtitle,
+    this.icon,
+    this.color,
+    this.onTap, {
+    this.badgeStream,
+  });
 }
 
 class _SidebarItem {

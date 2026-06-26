@@ -57,6 +57,9 @@ class Responsive {
       value(context, mobile: double.infinity, tablet: 720.0, desktop: 1150.0);
 
   /// Number of grid columns for tool/card grids.
-  static int gridColumns(BuildContext context, {int mobileCount = 2, int desktopCount = 3}) =>
-      isWide(context) ? desktopCount : mobileCount;
+  static int gridColumns(
+    BuildContext context, {
+    int mobileCount = 2,
+    int desktopCount = 3,
+  }) => isWide(context) ? desktopCount : mobileCount;
 }

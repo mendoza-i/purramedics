@@ -19,7 +19,10 @@ class MyBottomNavBar extends StatelessWidget {
         color: AppColors.surface,
         border: Border(top: BorderSide(color: AppColors.divider)),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
       child: SafeArea(
         top: false,
         child: GNav(
@@ -30,9 +33,14 @@ class MyBottomNavBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           tabBorderRadius: AppRadii.full,
           gap: AppSpacing.sm,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
           iconSize: 22,
-          textStyle: AppTypography.labelLarge.copyWith(color: AppColors.primaryDark),
+          textStyle: AppTypography.labelLarge.copyWith(
+            color: AppColors.primaryDark,
+          ),
           onTabChange: (value) => onTabChange?.call(value),
           tabs: const [
             GButton(icon: Icons.home_rounded, text: 'Home'),

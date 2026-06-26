@@ -24,7 +24,10 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     final auth = AuthService();
-    final error = await auth.login(_emailController.text.trim(), _passwordController.text.trim());
+    final error = await auth.login(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
 
     setState(() => _isLoading = false);
     if (!mounted) return;
@@ -69,12 +72,20 @@ class _LoginPageState extends State<LoginPage> {
           Positioned(
             top: -60,
             right: -120,
-            child: Icon(Icons.circle_outlined, size: 420, color: Colors.white.withOpacity(0.05)),
+            child: Icon(
+              Icons.circle_outlined,
+              size: 420,
+              color: Colors.white.withOpacity(0.05),
+            ),
           ),
           Positioned(
             bottom: -160,
             left: -60,
-            child: Icon(Icons.circle_outlined, size: 620, color: Colors.white.withOpacity(0.05)),
+            child: Icon(
+              Icons.circle_outlined,
+              size: 620,
+              color: Colors.white.withOpacity(0.05),
+            ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +100,10 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: AppRadii.rMd,
                     ),
                     padding: const EdgeInsets.all(6),
-                    child: Image.asset('lib/images/logo1.png', fit: BoxFit.contain),
+                    child: Image.asset(
+                      'lib/images/logo1.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
                   AppSpacing.hMd,
                   Text(
@@ -132,7 +146,9 @@ class _LoginPageState extends State<LoginPage> {
               AppSpacing.vXxl,
               Text(
                 '© ${DateTime.now().year} Purramedics. All rights reserved.',
-                style: AppTypography.bodySmall.copyWith(color: Colors.white.withOpacity(0.5)),
+                style: AppTypography.bodySmall.copyWith(
+                  color: Colors.white.withOpacity(0.5),
+                ),
               ),
             ],
           ),
@@ -149,7 +165,9 @@ class _LoginPageState extends State<LoginPage> {
         AppSpacing.hXs,
         Text(
           label,
-          style: AppTypography.bodySmall.copyWith(color: Colors.white.withOpacity(0.7)),
+          style: AppTypography.bodySmall.copyWith(
+            color: Colors.white.withOpacity(0.7),
+          ),
         ),
       ],
     );
@@ -175,7 +193,10 @@ class _LoginPageState extends State<LoginPage> {
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Text("Don't have an account? ", style: AppTypography.bodyMedium),
+                  Text(
+                    "Don't have an account? ",
+                    style: AppTypography.bodyMedium,
+                  ),
                   GestureDetector(
                     onTap: () => Navigator.push(
                       context,
@@ -211,11 +232,14 @@ class _LoginPageState extends State<LoginPage> {
                 onSubmitted: (_) => _login(),
                 suffix: IconButton(
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    _obscurePassword
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
                     color: AppColors.textTertiary,
                     size: 20,
                   ),
-                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
               AppSpacing.vHuge,

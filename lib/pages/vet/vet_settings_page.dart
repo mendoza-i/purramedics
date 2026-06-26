@@ -22,11 +22,23 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
   bool _isLoading = false;
   bool _isSaving = false;
   bool _isEditing = false;
-  
+
   bool _isPriceSaving = false;
   final Map<String, TextEditingController> _priceControllers = {};
-  static const _serviceNames = ['checkup', 'vaccination', 'grooming', 'surgery', 'others'];
-  static const _serviceLabels = {'checkup': 'Checkup', 'vaccination': 'Vaccination', 'grooming': 'Grooming', 'surgery': 'Surgery', 'others': 'Others'};
+  static const _serviceNames = [
+    'checkup',
+    'vaccination',
+    'grooming',
+    'surgery',
+    'others',
+  ];
+  static const _serviceLabels = {
+    'checkup': 'Checkup',
+    'vaccination': 'Vaccination',
+    'grooming': 'Grooming',
+    'surgery': 'Surgery',
+    'others': 'Others',
+  };
 
   @override
   void initState() {
@@ -39,7 +51,9 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
     final prices = await _firestoreService.getServicePrices();
     setState(() {
       for (final key in _serviceNames) {
-        _priceControllers[key] = TextEditingController(text: '${prices[key] ?? 500}');
+        _priceControllers[key] = TextEditingController(
+          text: '${prices[key] ?? 500}',
+        );
       }
     });
   }
@@ -98,7 +112,10 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.danger),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: AppColors.danger,
+          ),
         );
       }
     } finally {
@@ -125,7 +142,10 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.danger),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: AppColors.danger,
+          ),
         );
       }
     } finally {
@@ -165,7 +185,9 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
           : Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
@@ -190,12 +212,18 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                                 AppSpacing.hMd,
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text('Service Pricing', style: AppTypography.titleLarge),
+                                      Text(
+                                        'Service Pricing',
+                                        style: AppTypography.titleLarge,
+                                      ),
                                       Text(
                                         'Set consultation fees (₱) shown to pet owners',
-                                        style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                                        style: AppTypography.bodySmall.copyWith(
+                                          color: AppColors.textTertiary,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -217,7 +245,9 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                                   Expanded(
                                     flex: 2,
                                     child: AppTextField(
-                                      controller: _priceControllers[key] ?? TextEditingController(),
+                                      controller:
+                                          _priceControllers[key] ??
+                                          TextEditingController(),
                                       prefixIcon: Icons.payments_outlined,
                                       keyboardType: TextInputType.text,
                                       textInputAction: TextInputAction.next,
@@ -246,10 +276,14 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: Text('Contact Information', style: AppTypography.titleLarge),
+                                  child: Text(
+                                    'Contact Information',
+                                    style: AppTypography.titleLarge,
+                                  ),
                                 ),
                                 GestureDetector(
-                                  onTap: () => setState(() => _isEditing = !_isEditing),
+                                  onTap: () =>
+                                      setState(() => _isEditing = !_isEditing),
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 180),
                                     padding: const EdgeInsets.symmetric(
@@ -257,13 +291,17 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                                       vertical: AppSpacing.sm,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: _isEditing ? AppColors.surfaceAlt : AppColors.primarySurface,
+                                      color: _isEditing
+                                          ? AppColors.surfaceAlt
+                                          : AppColors.primarySurface,
                                       borderRadius: AppRadii.rFull,
                                     ),
                                     child: Text(
                                       _isEditing ? 'Cancel' : 'Edit info',
                                       style: AppTypography.labelMedium.copyWith(
-                                        color: _isEditing ? AppColors.textSecondary : AppColors.primaryDark,
+                                        color: _isEditing
+                                            ? AppColors.textSecondary
+                                            : AppColors.primaryDark,
                                       ),
                                     ),
                                   ),
@@ -273,7 +311,10 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                             AppSpacing.vSm,
                             Text(
                               "This data is securely displayed on the Emergency page 'Contact Us' module.",
-                              style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary, height: 1.5),
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.textTertiary,
+                                height: 1.5,
+                              ),
                             ),
                             AppSpacing.vXxl,
                             AppTextField(
@@ -282,7 +323,9 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                               prefixIcon: Icons.phone_outlined,
                               readOnly: !_isEditing,
                               keyboardType: TextInputType.phone,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
                               textInputAction: TextInputAction.next,
                             ),
                             AppSpacing.vLg,
@@ -335,10 +378,16 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                                 AppSpacing.hLg,
                                 Text(
                                   'Sign out securely',
-                                  style: AppTypography.titleMedium.copyWith(color: AppColors.danger),
+                                  style: AppTypography.titleMedium.copyWith(
+                                    color: AppColors.danger,
+                                  ),
                                 ),
                                 const Spacer(),
-                                const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.danger),
+                                const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 14,
+                                  color: AppColors.danger,
+                                ),
                               ],
                             ),
                           ),

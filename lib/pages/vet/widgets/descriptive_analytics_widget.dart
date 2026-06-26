@@ -12,7 +12,10 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppCard(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const AnalyticsDetailsPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AnalyticsDetailsPage()),
+        );
       },
       padding: const EdgeInsets.all(AppSpacing.xxl),
       child: Column(
@@ -30,7 +33,9 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
                     AppSpacing.vXs,
                     Text(
                       'Daily clinic intake this week',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textTertiary,
+                      ),
                     ),
                   ],
                 ),
@@ -42,7 +47,11 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
                   color: AppColors.surfaceAlt,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textTertiary),
+                child: const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: AppColors.textTertiary,
+                ),
               ),
             ],
           ),
@@ -53,14 +62,18 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
               stream: FirestoreService().getAllAppointmentsStream(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
                 }
 
                 final appointments = snapshot.data!;
                 final now = DateTime.now();
 
                 final int offsetFromSunday = now.weekday == 7 ? 0 : now.weekday;
-                final startOfWeek = now.subtract(Duration(days: offsetFromSunday));
+                final startOfWeek = now.subtract(
+                  Duration(days: offsetFromSunday),
+                );
 
                 final weeklyData = List<int>.filled(7, 0);
                 final days = List<String>.filled(7, '');
@@ -69,17 +82,22 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
                 for (int i = 0; i < 7; i++) {
                   final targetDay = startOfWeek.add(Duration(days: i));
                   days[i] = DateFormat('E\nM/d').format(targetDay);
-                  if (now.year == targetDay.year && now.month == targetDay.month && now.day == targetDay.day) {
+                  if (now.year == targetDay.year &&
+                      now.month == targetDay.month &&
+                      now.day == targetDay.day) {
                     isToday[i] = true;
                   }
                 }
 
                 for (final appt in appointments) {
                   if (appt['createdAt'] != null) {
-                    final dt = (appt['createdAt'] as dynamic).toDate() as DateTime;
+                    final dt =
+                        (appt['createdAt'] as dynamic).toDate() as DateTime;
                     for (int i = 0; i < 7; i++) {
                       final targetDay = startOfWeek.add(Duration(days: i));
-                      if (dt.year == targetDay.year && dt.month == targetDay.month && dt.day == targetDay.day) {
+                      if (dt.year == targetDay.year &&
+                          dt.month == targetDay.month &&
+                          dt.day == targetDay.day) {
                         weeklyData[i]++;
                         break;
                       }
@@ -87,14 +105,18 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
                   }
                 }
 
-                int maxVal = weeklyData.reduce((curr, next) => curr > next ? curr : next);
+                int maxVal = weeklyData.reduce(
+                  (curr, next) => curr > next ? curr : next,
+                );
                 if (maxVal < 5) maxVal = 5;
 
                 return Column(
                   children: [
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                        ),
                         child: CustomPaint(
                           size: const Size(double.infinity, double.infinity),
                           painter: BarChartPainter(
@@ -119,7 +141,9 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
                               Text(
                                 weeklyData[index].toString(),
                                 style: AppTypography.labelSmall.copyWith(
-                                  color: isToday[index] ? AppColors.primary : AppColors.textTertiary,
+                                  color: isToday[index]
+                                      ? AppColors.primary
+                                      : AppColors.textTertiary,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -128,8 +152,12 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
                                 days[index],
                                 textAlign: TextAlign.center,
                                 style: AppTypography.labelSmall.copyWith(
-                                  color: isToday[index] ? AppColors.textPrimary : AppColors.textTertiary,
-                                  fontWeight: isToday[index] ? FontWeight.w700 : FontWeight.w500,
+                                  color: isToday[index]
+                                      ? AppColors.textPrimary
+                                      : AppColors.textTertiary,
+                                  fontWeight: isToday[index]
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                   fontSize: 10,
                                 ),
                               ),
@@ -176,7 +204,9 @@ class BarChartPainter extends CustomPainter {
     final double gap = totalSpacing / (count + 1);
 
     for (int i = 0; i < count; i++) {
-      final double barHeight = maxVal == 0 ? 0 : (data[i] / maxVal) * (size.height - 4);
+      final double barHeight = maxVal == 0
+          ? 0
+          : (data[i] / maxVal) * (size.height - 4);
       final double left = gap + i * (barWidth + gap);
       final double top = size.height - barHeight;
 
@@ -184,7 +214,10 @@ class BarChartPainter extends CustomPainter {
 
       if (barHeight < 1) {
         canvas.drawRRect(
-          RRect.fromRectAndRadius(Rect.fromLTWH(left, size.height - 3, barWidth, 3), const Radius.circular(3)),
+          RRect.fromRectAndRadius(
+            Rect.fromLTWH(left, size.height - 3, barWidth, 3),
+            const Radius.circular(3),
+          ),
           Paint()..color = emptyColor,
         );
         continue;
@@ -214,7 +247,10 @@ class BarChartPainter extends CustomPainter {
 
       if (barHeight > 10) {
         canvas.drawRRect(
-          RRect.fromRectAndRadius(Rect.fromLTWH(left, top, barWidth, 4), const Radius.circular(6)),
+          RRect.fromRectAndRadius(
+            Rect.fromLTWH(left, top, barWidth, 4),
+            const Radius.circular(6),
+          ),
           Paint()..color = Colors.white.withOpacity(0.3),
         );
       }

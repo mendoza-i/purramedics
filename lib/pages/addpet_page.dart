@@ -35,7 +35,9 @@ class _AddPetPageState extends State<AddPetPage> {
   @override
   void initState() {
     super.initState();
-    ownerEmailCtrl = TextEditingController(text: widget.prefilledOwnerEmail ?? '');
+    ownerEmailCtrl = TextEditingController(
+      text: widget.prefilledOwnerEmail ?? '',
+    );
   }
 
   @override
@@ -72,7 +74,9 @@ class _AddPetPageState extends State<AddPetPage> {
         name: nameCtrl.text.trim(),
         species: selectedSpecies,
         breed: breedCtrl.text.isEmpty ? 'Unknown' : breedCtrl.text.trim(),
-        birthdate: birthdateCtrl.text.isEmpty ? 'Unknown' : birthdateCtrl.text.trim(),
+        birthdate: birthdateCtrl.text.isEmpty
+            ? 'Unknown'
+            : birthdateCtrl.text.trim(),
         weight: weightCtrl.text.isEmpty ? '--' : weightCtrl.text.trim(),
         gender: selectedGender,
         color: colorCtrl.text.isEmpty ? 'Unknown' : colorCtrl.text.trim(),
@@ -94,15 +98,19 @@ class _AddPetPageState extends State<AddPetPage> {
   }
 
   void _showSnack(String msg, Color bg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: bg),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: bg));
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentName = nameCtrl.text.trim().isEmpty ? 'New patient' : nameCtrl.text.trim();
-    final currentBreed = breedCtrl.text.trim().isEmpty ? selectedSpecies : breedCtrl.text.trim();
+    final currentName = nameCtrl.text.trim().isEmpty
+        ? 'New patient'
+        : nameCtrl.text.trim();
+    final currentBreed = breedCtrl.text.trim().isEmpty
+        ? selectedSpecies
+        : breedCtrl.text.trim();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -128,7 +136,12 @@ class _AddPetPageState extends State<AddPetPage> {
                   builder: (context, constraints) {
                     final isMobile = constraints.maxWidth < 650;
                     return isMobile
-                        ? Column(children: [_buildSidebar(currentName, currentBreed, true), _buildForm()])
+                        ? Column(
+                            children: [
+                              _buildSidebar(currentName, currentBreed, true),
+                              _buildForm(),
+                            ],
+                          )
                         : IntrinsicHeight(
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -160,7 +173,9 @@ class _AddPetPageState extends State<AddPetPage> {
       ),
       padding: const EdgeInsets.all(AppSpacing.xxl),
       child: Column(
-        crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        crossAxisAlignment: isMobile
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -173,14 +188,18 @@ class _AddPetPageState extends State<AddPetPage> {
           AppSpacing.vMd,
           Text(
             name,
-            style: AppTypography.titleLarge.copyWith(color: AppColors.textInverse),
+            style: AppTypography.titleLarge.copyWith(
+              color: AppColors.textInverse,
+            ),
             textAlign: isMobile ? TextAlign.center : TextAlign.left,
             overflow: TextOverflow.ellipsis,
           ),
           AppSpacing.vXs,
           Text(
             breed,
-            style: AppTypography.bodySmall.copyWith(color: Colors.white.withOpacity(0.7)),
+            style: AppTypography.bodySmall.copyWith(
+              color: Colors.white.withOpacity(0.7),
+            ),
             textAlign: isMobile ? TextAlign.center : TextAlign.left,
             overflow: TextOverflow.ellipsis,
           ),
@@ -190,7 +209,10 @@ class _AddPetPageState extends State<AddPetPage> {
             AppSpacing.vSm,
             Text(
               'Fill out the clinical record to register this new patient. Changes sync to the cloud.',
-              style: AppTypography.bodySmall.copyWith(color: Colors.white.withOpacity(0.55), height: 1.5),
+              style: AppTypography.bodySmall.copyWith(
+                color: Colors.white.withOpacity(0.55),
+                height: 1.5,
+              ),
             ),
           ],
         ],
@@ -208,8 +230,12 @@ class _AddPetPageState extends State<AddPetPage> {
           Text('Register Patient', style: AppTypography.displaySmall),
           AppSpacing.vXs,
           Text(
-            isVet ? 'Link this pet to an existing owner account' : 'Add a new pet to your profile',
-            style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+            isVet
+                ? 'Link this pet to an existing owner account'
+                : 'Add a new pet to your profile',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
           ),
           AppSpacing.vXl,
 
@@ -235,53 +261,63 @@ class _AddPetPageState extends State<AddPetPage> {
             AppSpacing.vLg,
           ],
 
-          Text('Species', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+          Text(
+            'Species',
+            style: AppTypography.labelLarge.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
           AppSpacing.vSm,
           Wrap(
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
-            children: const [
-              {'label': 'Dog', 'emoji': '🐶'},
-              {'label': 'Cat', 'emoji': '🐱'},
-              {'label': 'Other', 'emoji': '🐾'},
-            ].map((s) {
-              final label = s['label']!;
-              final emoji = s['emoji']!;
-              final active = selectedSpecies == label;
-              return GestureDetector(
-                onTap: () => setState(() {
-                  selectedSpecies = label;
-                  selectedEmoji = emoji;
-                }),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                    vertical: AppSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: active ? AppColors.primary : AppColors.surfaceAlt,
-                    borderRadius: AppRadii.rFull,
-                    border: Border.all(
-                      color: active ? AppColors.primary : AppColors.border,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(emoji, style: const TextStyle(fontSize: 16)),
-                      AppSpacing.hXs,
-                      Text(
-                        label,
-                        style: AppTypography.labelMedium.copyWith(
-                          color: active ? AppColors.textInverse : AppColors.textPrimary,
+            children:
+                const [
+                  {'label': 'Dog', 'emoji': '🐶'},
+                  {'label': 'Cat', 'emoji': '🐱'},
+                  {'label': 'Other', 'emoji': '🐾'},
+                ].map((s) {
+                  final label = s['label']!;
+                  final emoji = s['emoji']!;
+                  final active = selectedSpecies == label;
+                  return GestureDetector(
+                    onTap: () => setState(() {
+                      selectedSpecies = label;
+                      selectedEmoji = emoji;
+                    }),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.sm,
+                      ),
+                      decoration: BoxDecoration(
+                        color: active
+                            ? AppColors.primary
+                            : AppColors.surfaceAlt,
+                        borderRadius: AppRadii.rFull,
+                        border: Border.all(
+                          color: active ? AppColors.primary : AppColors.border,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(emoji, style: const TextStyle(fontSize: 16)),
+                          AppSpacing.hXs,
+                          Text(
+                            label,
+                            style: AppTypography.labelMedium.copyWith(
+                              color: active
+                                  ? AppColors.textInverse
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
           AppSpacing.vLg,
 
@@ -322,7 +358,12 @@ class _AddPetPageState extends State<AddPetPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Gender', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+                    Text(
+                      'Gender',
+                      style: AppTypography.labelLarge.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                     AppSpacing.vSm,
                     Wrap(
                       spacing: AppSpacing.sm,
@@ -337,14 +378,22 @@ class _AddPetPageState extends State<AddPetPage> {
                               vertical: AppSpacing.sm,
                             ),
                             decoration: BoxDecoration(
-                              color: active ? AppColors.primary : AppColors.surfaceAlt,
+                              color: active
+                                  ? AppColors.primary
+                                  : AppColors.surfaceAlt,
                               borderRadius: AppRadii.rFull,
-                              border: Border.all(color: active ? AppColors.primary : AppColors.border),
+                              border: Border.all(
+                                color: active
+                                    ? AppColors.primary
+                                    : AppColors.border,
+                              ),
                             ),
                             child: Text(
                               g,
                               style: AppTypography.labelMedium.copyWith(
-                                color: active ? AppColors.textInverse : AppColors.textPrimary,
+                                color: active
+                                    ? AppColors.textInverse
+                                    : AppColors.textPrimary,
                               ),
                             ),
                           ),
@@ -400,7 +449,12 @@ class _AddPetPageState extends State<AddPetPage> {
 
           Row(
             children: [
-              Text('Neutered?', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+              Text(
+                'Neutered?',
+                style: AppTypography.labelLarge.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
               const Spacer(),
               Switch(
                 value: isNeutered,
@@ -435,7 +489,9 @@ class _AddPetPageState extends State<AddPetPage> {
       ),
     );
     if (picked != null && mounted) {
-      setState(() => birthdateCtrl.text = DateFormat('MMM d, yyyy').format(picked));
+      setState(
+        () => birthdateCtrl.text = DateFormat('MMM d, yyyy').format(picked),
+      );
     }
   }
 
@@ -450,11 +506,17 @@ class _AddPetPageState extends State<AddPetPage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Owner', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+            Text(
+              'Owner',
+              style: AppTypography.labelLarge.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
             AppSpacing.vSm,
             Autocomplete<Map<String, dynamic>>(
               initialValue: TextEditingValue(text: ownerEmailCtrl.text),
-              displayStringForOption: (o) => "${o['name'] ?? 'Unknown'} (${o['email'] ?? ''})",
+              displayStringForOption: (o) =>
+                  "${o['name'] ?? 'Unknown'} (${o['email'] ?? ''})",
               optionsBuilder: (tev) {
                 if (tev.text.isEmpty) return owners;
                 final q = tev.text.toLowerCase();
@@ -468,26 +530,37 @@ class _AddPetPageState extends State<AddPetPage> {
                 ownerEmailCtrl.text = selection['email'] ?? '';
                 FocusScope.of(context).unfocus();
               },
-              fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                if (ownerEmailCtrl.text.isNotEmpty && controller.text.isEmpty) {
-                  try {
-                    final m = owners.firstWhere((o) => o['email'] == ownerEmailCtrl.text);
-                    controller.text = "${m['name']} (${m['email']})";
-                  } catch (_) {
-                    controller.text = ownerEmailCtrl.text;
-                  }
-                }
-                return TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  onEditingComplete: onEditingComplete,
-                  decoration: InputDecoration(
-                    hintText: 'Search / select owner',
-                    prefixIcon: const Icon(Icons.person_search_rounded, color: AppColors.textTertiary, size: 20),
-                    suffixIcon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primary),
-                  ),
-                );
-              },
+              fieldViewBuilder:
+                  (context, controller, focusNode, onEditingComplete) {
+                    if (ownerEmailCtrl.text.isNotEmpty &&
+                        controller.text.isEmpty) {
+                      try {
+                        final m = owners.firstWhere(
+                          (o) => o['email'] == ownerEmailCtrl.text,
+                        );
+                        controller.text = "${m['name']} (${m['email']})";
+                      } catch (_) {
+                        controller.text = ownerEmailCtrl.text;
+                      }
+                    }
+                    return TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      onEditingComplete: onEditingComplete,
+                      decoration: InputDecoration(
+                        hintText: 'Search / select owner',
+                        prefixIcon: const Icon(
+                          Icons.person_search_rounded,
+                          color: AppColors.textTertiary,
+                          size: 20,
+                        ),
+                        suffixIcon: const Icon(
+                          Icons.arrow_drop_down_rounded,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    );
+                  },
               optionsViewBuilder: (context, onSelected, options) {
                 return Align(
                   alignment: Alignment.topLeft,
@@ -499,11 +572,17 @@ class _AddPetPageState extends State<AddPetPage> {
                       borderRadius: AppRadii.rLg,
                       clipBehavior: Clip.antiAlias,
                       child: Container(
-                        constraints: const BoxConstraints(maxHeight: 250, maxWidth: 360),
+                        constraints: const BoxConstraints(
+                          maxHeight: 250,
+                          maxWidth: 360,
+                        ),
                         child: ListView.separated(
                           padding: EdgeInsets.zero,
                           shrinkWrap: true,
-                          separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.divider),
+                          separatorBuilder: (_, __) => const Divider(
+                            height: 1,
+                            color: AppColors.divider,
+                          ),
                           itemCount: options.length,
                           itemBuilder: (context, index) {
                             final option = options.elementAt(index);
@@ -520,14 +599,18 @@ class _AddPetPageState extends State<AddPetPage> {
                                       radius: 14,
                                       backgroundColor: AppColors.primarySurface,
                                       child: Text(
-                                        (option['name'] ?? '?').toString()[0].toUpperCase(),
-                                        style: AppTypography.labelMedium.copyWith(color: AppColors.primary),
+                                        (option['name'] ?? '?')
+                                            .toString()[0]
+                                            .toUpperCase(),
+                                        style: AppTypography.labelMedium
+                                            .copyWith(color: AppColors.primary),
                                       ),
                                     ),
                                     AppSpacing.hMd,
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             option['name'] ?? 'Unknown',
@@ -536,7 +619,10 @@ class _AddPetPageState extends State<AddPetPage> {
                                           ),
                                           Text(
                                             option['email'] ?? '',
-                                            style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                                            style: AppTypography.bodySmall
+                                                .copyWith(
+                                                  color: AppColors.textTertiary,
+                                                ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ],

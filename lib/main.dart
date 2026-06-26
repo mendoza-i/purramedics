@@ -20,9 +20,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await Hive.initFlutter();
 
@@ -51,7 +49,9 @@ class MyApp extends StatelessWidget {
           create: (_) => ChatProvider(
             apiService: ClaudeApiService(
               apiKey: kIsWeb ? '' : claudeApiKey,
-              proxyUrl: kIsWeb ? Uri.base.resolve('/api/chat').toString() : null,
+              proxyUrl: kIsWeb
+                  ? Uri.base.resolve('/api/chat').toString()
+                  : null,
             ),
           ),
         ),
@@ -60,7 +60,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Purramedics',
         theme: AppTheme.light,
-        home: const SplashScreen(), // Boot to new custom Animated Splash Screen instead of IntroPage
+        home:
+            const SplashScreen(), // Boot to new custom Animated Splash Screen instead of IntroPage
       ),
     );
   }

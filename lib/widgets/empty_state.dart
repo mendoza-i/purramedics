@@ -38,10 +38,18 @@ class EmptyState extends StatelessWidget {
               color: AppColors.surfaceAlt,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: AppColors.textTertiary, size: compact ? 28 : 36),
+            child: Icon(
+              icon,
+              color: AppColors.textTertiary,
+              size: compact ? 28 : 36,
+            ),
           ),
           AppSpacing.vLg,
-          Text(title, style: AppTypography.titleLarge, textAlign: TextAlign.center),
+          Text(
+            title,
+            style: AppTypography.titleLarge,
+            textAlign: TextAlign.center,
+          ),
           if (message != null) ...[
             AppSpacing.vXs,
             Text(

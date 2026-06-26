@@ -49,7 +49,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
     await _firestoreService.sendMessage(
       senderId: currentUser.uid,
-      senderName: currentUser.displayName ?? (widget.isVet ? 'Vet' : widget.chatUserName),
+      senderName:
+          currentUser.displayName ??
+          (widget.isVet ? 'Vet' : widget.chatUserName),
       text: text,
       isVetSender: widget.isVet,
       chatId: widget.chatId,
@@ -83,7 +85,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               stream: _firestoreService.getMessagesStream(widget.chatId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
                 }
 
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -104,11 +108,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           ),
                         ),
                         AppSpacing.vMd,
-                        Text('No messages yet', style: AppTypography.titleMedium),
+                        Text(
+                          'No messages yet',
+                          style: AppTypography.titleMedium,
+                        ),
                         AppSpacing.vXs,
                         Text(
                           'Say hi to start the conversation',
-                          style: AppTypography.bodyMedium.copyWith(color: AppColors.textTertiary),
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textTertiary,
+                          ),
                         ),
                       ],
                     ),
@@ -130,7 +139,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     final timestamp = message['timestamp'] as Timestamp?;
 
                     return Align(
-                      alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isMine
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Container(
                         margin: const EdgeInsets.only(bottom: AppSpacing.md),
                         padding: const EdgeInsets.symmetric(
@@ -151,12 +162,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           boxShadow: AppShadows.sm,
                         ),
                         child: Column(
-                          crossAxisAlignment: isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                          crossAxisAlignment: isMine
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
                           children: [
                             Text(
                               message['text'] ?? '',
                               style: AppTypography.bodyLarge.copyWith(
-                                color: isMine ? AppColors.textInverse : AppColors.textPrimary,
+                                color: isMine
+                                    ? AppColors.textInverse
+                                    : AppColors.textPrimary,
                               ),
                             ),
                             AppSpacing.vXs,
@@ -204,7 +219,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                         style: AppTypography.bodyLarge,
                         decoration: InputDecoration(
                           hintText: 'Type a message...',
-                          hintStyle: AppTypography.bodyLarge.copyWith(color: AppColors.textTertiary),
+                          hintStyle: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.textTertiary,
+                          ),
                           filled: true,
                           fillColor: AppColors.surfaceAlt,
                           border: OutlineInputBorder(
@@ -233,7 +250,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                       onTap: _sendMessage,
                       child: const Padding(
                         padding: EdgeInsets.all(12),
-                        child: Icon(Icons.send_rounded, color: AppColors.textInverse, size: 20),
+                        child: Icon(
+                          Icons.send_rounded,
+                          color: AppColors.textInverse,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),

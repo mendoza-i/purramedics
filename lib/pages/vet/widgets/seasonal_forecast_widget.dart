@@ -43,7 +43,8 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
         final current = data['current'];
         setState(() {
           _temperature = (current['temperature_2m'] as num?)?.toDouble();
-          _apparentTemperature = (current['apparent_temperature'] as num?)?.toDouble();
+          _apparentTemperature = (current['apparent_temperature'] as num?)
+              ?.toDouble();
           _weatherCode = current['weather_code'] as int?;
           _processWeatherData();
           _isLoading = false;
@@ -68,23 +69,68 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
 
   void _processWeatherData() {
     switch (_weatherCode) {
-      case 0: _weatherDescription = 'Clear Sky'; break;
-      case 1: _weatherDescription = 'Mainly Clear'; break;
-      case 2: _weatherDescription = 'Partly Cloudy'; break;
-      case 3: _weatherDescription = 'Overcast'; break;
-      case 45: case 48: _weatherDescription = 'Foggy'; break;
-      case 51: case 53: case 55: _weatherDescription = 'Drizzle'; break;
-      case 56: case 57: _weatherDescription = 'Freezing Drizzle'; break;
-      case 61: _weatherDescription = 'Slight Rain'; break;
-      case 63: _weatherDescription = 'Moderate Rain'; break;
-      case 65: _weatherDescription = 'Heavy Rain'; break;
-      case 66: case 67: _weatherDescription = 'Freezing Rain'; break;
-      case 71: case 73: case 75: _weatherDescription = 'Snowfall'; break;
-      case 77: _weatherDescription = 'Snow Grains'; break;
-      case 80: case 81: case 82: _weatherDescription = 'Rain Showers'; break;
-      case 85: case 86: _weatherDescription = 'Snow Showers'; break;
-      case 95: case 96: case 99: _weatherDescription = 'Thunderstorms'; break;
-      default: _weatherDescription = 'Varying Conditions';
+      case 0:
+        _weatherDescription = 'Clear Sky';
+        break;
+      case 1:
+        _weatherDescription = 'Mainly Clear';
+        break;
+      case 2:
+        _weatherDescription = 'Partly Cloudy';
+        break;
+      case 3:
+        _weatherDescription = 'Overcast';
+        break;
+      case 45:
+      case 48:
+        _weatherDescription = 'Foggy';
+        break;
+      case 51:
+      case 53:
+      case 55:
+        _weatherDescription = 'Drizzle';
+        break;
+      case 56:
+      case 57:
+        _weatherDescription = 'Freezing Drizzle';
+        break;
+      case 61:
+        _weatherDescription = 'Slight Rain';
+        break;
+      case 63:
+        _weatherDescription = 'Moderate Rain';
+        break;
+      case 65:
+        _weatherDescription = 'Heavy Rain';
+        break;
+      case 66:
+      case 67:
+        _weatherDescription = 'Freezing Rain';
+        break;
+      case 71:
+      case 73:
+      case 75:
+        _weatherDescription = 'Snowfall';
+        break;
+      case 77:
+        _weatherDescription = 'Snow Grains';
+        break;
+      case 80:
+      case 81:
+      case 82:
+        _weatherDescription = 'Rain Showers';
+        break;
+      case 85:
+      case 86:
+        _weatherDescription = 'Snow Showers';
+        break;
+      case 95:
+      case 96:
+      case 99:
+        _weatherDescription = 'Thunderstorms';
+        break;
+      default:
+        _weatherDescription = 'Varying Conditions';
     }
 
     if (_weatherCode! <= 3) {
@@ -105,7 +151,7 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
       _color = AppColors.textSecondary;
       _icon = Icons.cloud_rounded;
     } else if ((_weatherCode! >= 51 && _weatherCode! <= 67) ||
-               (_weatherCode! >= 80 && _weatherCode! <= 82)) {
+        (_weatherCode! >= 80 && _weatherCode! <= 82)) {
       _risk = 'Rain Risk · Leptospirosis & Dengue';
       _advice = 'Warn about standing water. Lepto for pets, Dengue for humans.';
       _color = AppColors.info;
@@ -214,13 +260,18 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(_weatherDescription, style: AppTypography.titleLarge),
+                            Text(
+                              _weatherDescription,
+                              style: AppTypography.titleLarge,
+                            ),
                             AppSpacing.vXs,
                             Text(
                               _temperature != null
                                   ? '${_temperature!.toStringAsFixed(1)}°C · Feels ${_apparentTemperature!.toStringAsFixed(1)}°C'
                                   : 'Local area',
-                              style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.textTertiary,
+                              ),
                             ),
                           ],
                         ),
@@ -228,9 +279,18 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
                     ],
                   ),
                   AppSpacing.vLg,
-                  Text(_risk, style: AppTypography.titleSmall.copyWith(color: _color)),
+                  Text(
+                    _risk,
+                    style: AppTypography.titleSmall.copyWith(color: _color),
+                  ),
                   AppSpacing.vSm,
-                  Text(_advice, style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary, height: 1.5)),
+                  Text(
+                    _advice,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
+                  ),
                   AppSpacing.vXl,
                   const Divider(color: AppColors.divider, height: 1),
                   AppSpacing.vLg,
@@ -238,14 +298,20 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
                   AppSpacing.vSm,
                   Text(
                     'High-risk diseases',
-                    style: AppTypography.labelSmall.copyWith(color: AppColors.textTertiary, letterSpacing: 0.5),
+                    style: AppTypography.labelSmall.copyWith(
+                      color: AppColors.textTertiary,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                   AppSpacing.vXs,
                   Text(insights['diseases']!, style: AppTypography.bodyMedium),
                   AppSpacing.vMd,
                   Text(
                     'Recommended stock',
-                    style: AppTypography.labelSmall.copyWith(color: AppColors.textTertiary, letterSpacing: 0.5),
+                    style: AppTypography.labelSmall.copyWith(
+                      color: AppColors.textTertiary,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                   AppSpacing.vXs,
                   Text(insights['stockUp']!, style: AppTypography.bodyMedium),
@@ -260,7 +326,10 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
                       _temperature != null
                           ? 'Weather data from Open-Meteo for real-time risk assessment.'
                           : 'Unable to fetch live weather. Showing historical averages.',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.info, height: 1.5),
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.info,
+                        height: 1.5,
+                      ),
                     ),
                   ),
                   AppSpacing.vLg,
@@ -268,7 +337,12 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text('Close', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+                      child: Text(
+                        'Close',
+                        style: AppTypography.labelLarge.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -359,7 +433,10 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
                   ],
                 ),
                 AppSpacing.vMd,
-                Text(_risk, style: AppTypography.titleLarge.copyWith(color: Colors.white)),
+                Text(
+                  _risk,
+                  style: AppTypography.titleLarge.copyWith(color: Colors.white),
+                ),
                 AppSpacing.vSm,
                 Row(
                   children: [
@@ -373,7 +450,11 @@ class _SeasonalForecastWidgetState extends State<SeasonalForecastWidget> {
                       ),
                     ),
                     AppSpacing.hSm,
-                    Icon(Icons.chevron_right_rounded, size: 20, color: Colors.white.withOpacity(0.8)),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: Colors.white.withOpacity(0.8),
+                    ),
                   ],
                 ),
               ],

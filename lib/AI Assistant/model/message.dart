@@ -3,7 +3,6 @@ class Message {
   final bool isUser;
   final DateTime timestamp;
 
-
   Message({
     required this.content,
     required this.isUser,

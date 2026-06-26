@@ -37,23 +37,49 @@ class _PetsPageState extends State<PetsPage> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: AppRadii.rLg),
-          title: Text('Edit ${pet['name']}', style: AppTypography.headlineSmall),
+          title: Text(
+            'Edit ${pet['name']}',
+            style: AppTypography.headlineSmall,
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                AppTextField(controller: nameCtrl, label: 'Name', prefixIcon: Icons.pets_rounded),
+                AppTextField(
+                  controller: nameCtrl,
+                  label: 'Name',
+                  prefixIcon: Icons.pets_rounded,
+                ),
                 AppSpacing.vMd,
-                AppTextField(controller: breedCtrl, label: 'Breed', prefixIcon: Icons.category_outlined),
+                AppTextField(
+                  controller: breedCtrl,
+                  label: 'Breed',
+                  prefixIcon: Icons.category_outlined,
+                ),
                 AppSpacing.vMd,
-                AppTextField(controller: weightCtrl, label: 'Weight (kg)', prefixIcon: Icons.monitor_weight_outlined),
+                AppTextField(
+                  controller: weightCtrl,
+                  label: 'Weight (kg)',
+                  prefixIcon: Icons.monitor_weight_outlined,
+                ),
                 AppSpacing.vMd,
-                AppTextField(controller: colorCtrl, label: 'Color', prefixIcon: Icons.palette_outlined),
+                AppTextField(
+                  controller: colorCtrl,
+                  label: 'Color',
+                  prefixIcon: Icons.palette_outlined,
+                ),
                 AppSpacing.vMd,
-                AppTextField(controller: emojiCtrl, label: 'Emoji', prefixIcon: Icons.emoji_emotions_outlined),
+                AppTextField(
+                  controller: emojiCtrl,
+                  label: 'Emoji',
+                  prefixIcon: Icons.emoji_emotions_outlined,
+                ),
                 AppSpacing.vMd,
                 SwitchListTile(
-                  title: Text('Neutered / Spayed', style: AppTypography.bodyMedium),
+                  title: Text(
+                    'Neutered / Spayed',
+                    style: AppTypography.bodyMedium,
+                  ),
                   value: isNeutered,
                   activeColor: AppColors.primary,
                   onChanged: (v) => setDialogState(() => isNeutered = v),
@@ -64,7 +90,12 @@ class _PetsPageState extends State<PetsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+              child: Text(
+                'Cancel',
+                style: AppTypography.labelLarge.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () async {
@@ -81,11 +112,18 @@ class _PetsPageState extends State<PetsPage> {
                 if (mounted) {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Pet updated successfully 🐾')),
+                    const SnackBar(
+                      content: Text('Pet updated successfully 🐾'),
+                    ),
                   );
                 }
               },
-              child: Text('Save', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+              child: Text(
+                'Save',
+                style: AppTypography.labelLarge.copyWith(
+                  color: AppColors.primary,
+                ),
+              ),
             ),
           ],
         ),
@@ -98,7 +136,10 @@ class _PetsPageState extends State<PetsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: AppRadii.rLg),
-        title: Text('Delete ${pet['name']}?', style: AppTypography.headlineSmall),
+        title: Text(
+          'Delete ${pet['name']}?',
+          style: AppTypography.headlineSmall,
+        ),
         content: Text(
           'This will permanently remove ${pet['name']} and all their health records. This action cannot be undone.',
           style: AppTypography.bodyMedium,
@@ -106,7 +147,12 @@ class _PetsPageState extends State<PetsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+            child: Text(
+              'Cancel',
+              style: AppTypography.labelLarge.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -114,12 +160,15 @@ class _PetsPageState extends State<PetsPage> {
               if (mounted) {
                 Navigator.pop(ctx);
                 setState(() => selectedPet = 0);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Pet removed')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Pet removed')));
               }
             },
-            child: Text('Delete', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+            child: Text(
+              'Delete',
+              style: AppTypography.labelLarge.copyWith(color: AppColors.danger),
+            ),
           ),
         ],
       ),
@@ -130,7 +179,10 @@ class _PetsPageState extends State<PetsPage> {
   Widget build(BuildContext context) {
     if (_currentUser == null) {
       return Center(
-        child: Text('Please log in to view pets.', style: AppTypography.bodyLarge),
+        child: Text(
+          'Please log in to view pets.',
+          style: AppTypography.bodyLarge,
+        ),
       );
     }
 
@@ -142,7 +194,10 @@ class _PetsPageState extends State<PetsPage> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textInverse,
         onPressed: () async {
-          await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddPetPage()));
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddPetPage()),
+          );
           setState(() {});
         },
         icon: const Icon(Icons.add),
@@ -150,14 +205,19 @@ class _PetsPageState extends State<PetsPage> {
       ),
       body: SafeArea(
         child: StreamBuilder<List<Map<String, dynamic>>>(
-          stream: _firestoreService.getUserPetsStream(_currentUser!.email ?? ''),
+          stream: _firestoreService.getUserPetsStream(
+            _currentUser!.email ?? '',
+          ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
               return Center(
-                child: Text('Error loading pets: ${snapshot.error}', style: AppTypography.bodyMedium),
+                child: Text(
+                  'Error loading pets: ${snapshot.error}',
+                  style: AppTypography.bodyMedium,
+                ),
               );
             }
 
@@ -232,11 +292,16 @@ class _PetsPageState extends State<PetsPage> {
                       border: Border.all(color: AppColors.divider),
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.settings_outlined, color: AppColors.textPrimary),
+                      icon: const Icon(
+                        Icons.settings_outlined,
+                        color: AppColors.textPrimary,
+                      ),
                       tooltip: 'Account settings',
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const UserSettingsPage()),
+                        MaterialPageRoute(
+                          builder: (_) => const UserSettingsPage(),
+                        ),
                       ),
                     ),
                   ),
@@ -244,47 +309,65 @@ class _PetsPageState extends State<PetsPage> {
             ),
             AppSpacing.vXl,
             SizedBox(
-              height: 92,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: pets.length,
-                separatorBuilder: (_, __) => AppSpacing.hMd,
-                itemBuilder: (context, index) {
-                  final p = pets[index];
-                  final isSelected = index == selectedPet;
-                  return GestureDetector(
-                    onTap: () => setState(() => selectedPet = index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : AppColors.surface,
-                        borderRadius: AppRadii.rLg,
-                        border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.divider,
-                        ),
-                        boxShadow: isSelected
-                            ? AppShadows.colored(AppColors.primary, opacity: 0.25)
-                            : AppShadows.sm,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(p['emoji'] as String? ?? '🐾', style: const TextStyle(fontSize: 24)),
-                          AppSpacing.vXs,
-                          Text(
-                            p['name'] as String? ?? 'Pet',
-                            style: AppTypography.titleSmall.copyWith(
-                              color: isSelected ? AppColors.textInverse : AppColors.textPrimary,
-                            ),
+                  height: 92,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: pets.length,
+                    separatorBuilder: (_, __) => AppSpacing.hMd,
+                    itemBuilder: (context, index) {
+                      final p = pets[index];
+                      final isSelected = index == selectedPet;
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedPet = index),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg,
+                            vertical: AppSpacing.md,
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ).animate().slideX(begin: 1.0, duration: 500.ms, curve: Curves.easeOut).fadeIn(),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.surface,
+                            borderRadius: AppRadii.rLg,
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.divider,
+                            ),
+                            boxShadow: isSelected
+                                ? AppShadows.colored(
+                                    AppColors.primary,
+                                    opacity: 0.25,
+                                  )
+                                : AppShadows.sm,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                p['emoji'] as String? ?? '🐾',
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                              AppSpacing.vXs,
+                              Text(
+                                p['name'] as String? ?? 'Pet',
+                                style: AppTypography.titleSmall.copyWith(
+                                  color: isSelected
+                                      ? AppColors.textInverse
+                                      : AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                )
+                .animate()
+                .slideX(begin: 1.0, duration: 500.ms, curve: Curves.easeOut)
+                .fadeIn(),
             AppSpacing.vXxxl,
             AppCard(
               padding: const EdgeInsets.all(AppSpacing.xxl),
@@ -303,7 +386,10 @@ class _PetsPageState extends State<PetsPage> {
                             shape: BoxShape.circle,
                           ),
                           alignment: Alignment.center,
-                          child: Text(emoji, style: const TextStyle(fontSize: 58)),
+                          child: Text(
+                            emoji,
+                            style: const TextStyle(fontSize: 58),
+                          ),
                         ),
                         AppSpacing.vLg,
                         Text(name, style: AppTypography.displaySmall),
@@ -318,14 +404,21 @@ class _PetsPageState extends State<PetsPage> {
                                 onPressed: () => _showEditPetDialog(currentPet),
                                 icon: const Icon(Icons.edit_outlined, size: 18),
                                 label: const Text('Edit'),
-                                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.primary,
+                                ),
                               ),
                               AppSpacing.hMd,
                               TextButton.icon(
                                 onPressed: () => _confirmDeletePet(currentPet),
-                                icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                                icon: const Icon(
+                                  Icons.delete_outline_rounded,
+                                  size: 18,
+                                ),
                                 label: const Text('Delete'),
-                                style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.danger,
+                                ),
                               ),
                             ],
                           ),
@@ -338,23 +431,58 @@ class _PetsPageState extends State<PetsPage> {
                   AppSpacing.vXl,
                   Row(
                     children: [
-                      Expanded(child: _statItem('Age', calculatedAge, Icons.cake_outlined)),
+                      Expanded(
+                        child: _statItem(
+                          'Age',
+                          calculatedAge,
+                          Icons.cake_outlined,
+                        ),
+                      ),
                       _statDivider(),
-                      Expanded(child: _statItem('Gender', gender, Icons.pets_outlined)),
+                      Expanded(
+                        child: _statItem('Gender', gender, Icons.pets_outlined),
+                      ),
                       _statDivider(),
-                      Expanded(child: _statItem('Weight', weight, Icons.monitor_weight_outlined)),
+                      Expanded(
+                        child: _statItem(
+                          'Weight',
+                          weight,
+                          Icons.monitor_weight_outlined,
+                        ),
+                      ),
                     ],
                   ),
                   AppSpacing.vLg,
-                  const Divider(indent: AppSpacing.xl, endIndent: AppSpacing.xl),
+                  const Divider(
+                    indent: AppSpacing.xl,
+                    endIndent: AppSpacing.xl,
+                  ),
                   AppSpacing.vLg,
                   Row(
                     children: [
-                      Expanded(child: _statItem('Color', color, Icons.palette_outlined)),
+                      Expanded(
+                        child: _statItem(
+                          'Color',
+                          color,
+                          Icons.palette_outlined,
+                        ),
+                      ),
                       _statDivider(),
-                      Expanded(child: _statItem('Neutered', isNeutered ? 'Yes' : 'No', Icons.medical_services_outlined)),
+                      Expanded(
+                        child: _statItem(
+                          'Neutered',
+                          isNeutered ? 'Yes' : 'No',
+                          Icons.medical_services_outlined,
+                        ),
+                      ),
                       _statDivider(),
-                      Expanded(child: _statItem('Status', 'Healthy', Icons.health_and_safety_outlined)),
+                      Expanded(
+                        child: _statItem(
+                          'Status',
+                          'Healthy',
+                          Icons.health_and_safety_outlined,
+                        ),
+                      ),
                     ],
                   ),
                   AppSpacing.vXl,
@@ -373,7 +501,8 @@ class _PetsPageState extends State<PetsPage> {
     );
   }
 
-  Widget _statDivider() => Container(height: 40, width: 1, color: AppColors.divider);
+  Widget _statDivider() =>
+      Container(height: 40, width: 1, color: AppColors.divider);
 
   Widget _statItem(String label, String value, IconData icon) {
     return Column(
@@ -409,7 +538,10 @@ class _PetsPageState extends State<PetsPage> {
               borderRadius: AppRadii.rMd,
               border: Border.all(color: AppColors.infoSurface),
             ),
-            child: Text('No session notes recorded yet.', style: AppTypography.bodyMedium),
+            child: Text(
+              'No session notes recorded yet.',
+              style: AppTypography.bodyMedium,
+            ),
           );
         }
 
@@ -439,7 +571,12 @@ class _PetsPageState extends State<PetsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(dateStr, style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+                      Text(
+                        dateStr,
+                        style: AppTypography.labelLarge.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
                       Text(
                         n['vetName'] as String? ?? 'Attending vet',
                         style: AppTypography.labelSmall,
@@ -447,7 +584,10 @@ class _PetsPageState extends State<PetsPage> {
                     ],
                   ),
                   AppSpacing.vSm,
-                  Text(n['note'] as String? ?? '', style: AppTypography.bodyMedium),
+                  Text(
+                    n['note'] as String? ?? '',
+                    style: AppTypography.bodyMedium,
+                  ),
                 ],
               ),
             );
@@ -480,11 +620,16 @@ class _PetsPageState extends State<PetsPage> {
                     border: Border.all(color: AppColors.divider),
                   ),
                   child: IconButton(
-                    icon: const Icon(Icons.settings_outlined, color: AppColors.textPrimary),
+                    icon: const Icon(
+                      Icons.settings_outlined,
+                      color: AppColors.textPrimary,
+                    ),
                     tooltip: 'Account settings',
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const UserSettingsPage()),
+                      MaterialPageRoute(
+                        builder: (_) => const UserSettingsPage(),
+                      ),
                     ),
                   ),
                 ),
@@ -495,11 +640,16 @@ class _PetsPageState extends State<PetsPage> {
               child: EmptyState(
                 icon: Icons.pets_rounded,
                 title: 'No companions yet',
-                message: isVet ? 'Add your first patient to get started.' : 'Ask your vet to add your pets!',
+                message: isVet
+                    ? 'Add your first patient to get started.'
+                    : 'Ask your vet to add your pets!',
                 actionLabel: isVet ? 'Add patient' : null,
                 onAction: isVet
                     ? () async {
-                        await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddPetPage()));
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const AddPetPage()),
+                        );
                         setState(() {});
                       }
                     : null,
@@ -511,11 +661,19 @@ class _PetsPageState extends State<PetsPage> {
     );
   }
 
-  void _showRequestDialog(BuildContext context, String petId, String petName, String requestType) {
+  void _showRequestDialog(
+    BuildContext context,
+    String petId,
+    String petName,
+    String requestType,
+  ) {
     final reasonController = TextEditingController();
     bool isSubmitting = false;
 
-    Future<void> submit(BuildContext context, StateSetter setDialogState) async {
+    Future<void> submit(
+      BuildContext context,
+      StateSetter setDialogState,
+    ) async {
       if (reasonController.text.trim().isEmpty) return;
       setDialogState(() => isSubmitting = true);
       try {
@@ -530,13 +688,17 @@ class _PetsPageState extends State<PetsPage> {
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$requestType submitted to your vet for review.')),
+            SnackBar(
+              content: Text('$requestType submitted to your vet for review.'),
+            ),
           );
         }
       } catch (e) {
         if (context.mounted) {
           setDialogState(() => isSubmitting = false);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error: $e')));
         }
       }
     }
@@ -551,7 +713,10 @@ class _PetsPageState extends State<PetsPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Please state the reason for your request regarding $petName:', style: AppTypography.bodyMedium),
+                Text(
+                  'Please state the reason for your request regarding $petName:',
+                  style: AppTypography.bodyMedium,
+                ),
                 AppSpacing.vLg,
                 KeyboardListener(
                   focusNode: FocusNode(),
@@ -573,7 +738,10 @@ class _PetsPageState extends State<PetsPage> {
               ],
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
               PrimaryButton(
                 label: 'Submit',
                 size: AppButtonSize.medium,
@@ -593,7 +761,8 @@ class _PetsPageState extends State<PetsPage> {
     return StreamBuilder<List<Map<String, dynamic>>>(
       stream: _firestoreService.getPetRequestsForOwnerStream(_currentUser!.uid),
       builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data!.isEmpty) return const SizedBox.shrink();
+        if (!snapshot.hasData || snapshot.data!.isEmpty)
+          return const SizedBox.shrink();
         final requests = snapshot.data!;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -612,8 +781,8 @@ class _PetsPageState extends State<PetsPage> {
                   final tone = status == 'Declined'
                       ? BadgeTone.danger
                       : status == 'Approved'
-                          ? BadgeTone.success
-                          : BadgeTone.warning;
+                      ? BadgeTone.success
+                      : BadgeTone.warning;
                   return Container(
                     width: 260,
                     padding: const EdgeInsets.all(AppSpacing.md),
@@ -640,7 +809,8 @@ class _PetsPageState extends State<PetsPage> {
                           child: Text(
                             (req['vetReply'] as String?)?.isNotEmpty == true
                                 ? 'Reply: ${req['vetReply']}'
-                                : (req['requestType'] as String? ?? 'General request'),
+                                : (req['requestType'] as String? ??
+                                      'General request'),
                             style: AppTypography.bodySmall,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,

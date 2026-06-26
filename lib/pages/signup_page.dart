@@ -92,12 +92,20 @@ class _SignUpPageState extends State<SignUpPage> {
           Positioned(
             top: -60,
             right: -120,
-            child: Icon(Icons.circle_outlined, size: 420, color: Colors.white.withOpacity(0.05)),
+            child: Icon(
+              Icons.circle_outlined,
+              size: 420,
+              color: Colors.white.withOpacity(0.05),
+            ),
           ),
           Positioned(
             bottom: -160,
             left: -60,
-            child: Icon(Icons.circle_outlined, size: 620, color: Colors.white.withOpacity(0.05)),
+            child: Icon(
+              Icons.circle_outlined,
+              size: 620,
+              color: Colors.white.withOpacity(0.05),
+            ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +120,10 @@ class _SignUpPageState extends State<SignUpPage> {
                       borderRadius: AppRadii.rMd,
                     ),
                     padding: const EdgeInsets.all(6),
-                    child: Image.asset('lib/images/logo1.png', fit: BoxFit.contain),
+                    child: Image.asset(
+                      'lib/images/logo1.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
                   AppSpacing.hMd,
                   Text(
@@ -143,15 +154,23 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               const Spacer(),
-              _benefit(Icons.calendar_month_outlined, 'Easy appointment booking'),
+              _benefit(
+                Icons.calendar_month_outlined,
+                'Easy appointment booking',
+              ),
               AppSpacing.vMd,
               _benefit(Icons.pets_rounded, 'Full pet health records'),
               AppSpacing.vMd,
-              _benefit(Icons.chat_bubble_outline_rounded, 'Direct vet communication'),
+              _benefit(
+                Icons.chat_bubble_outline_rounded,
+                'Direct vet communication',
+              ),
               AppSpacing.vXxl,
               Text(
                 '© ${DateTime.now().year} Purramedics. All rights reserved.',
-                style: AppTypography.bodySmall.copyWith(color: Colors.white.withOpacity(0.5)),
+                style: AppTypography.bodySmall.copyWith(
+                  color: Colors.white.withOpacity(0.5),
+                ),
               ),
             ],
           ),
@@ -174,7 +193,9 @@ class _SignUpPageState extends State<SignUpPage> {
         AppSpacing.hMd,
         Text(
           label,
-          style: AppTypography.bodyMedium.copyWith(color: Colors.white.withOpacity(0.85)),
+          style: AppTypography.bodyMedium.copyWith(
+            color: Colors.white.withOpacity(0.85),
+          ),
         ),
       ],
     );
@@ -194,7 +215,10 @@ class _SignUpPageState extends State<SignUpPage> {
             Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                Text('Already have an account? ', style: AppTypography.bodyMedium),
+                Text(
+                  'Already have an account? ',
+                  style: AppTypography.bodyMedium,
+                ),
                 GestureDetector(
                   onTap: () => Navigator.pushReplacement(
                     context,
@@ -238,11 +262,14 @@ class _SignUpPageState extends State<SignUpPage> {
               onSubmitted: (_) => _signUp(),
               suffix: IconButton(
                 icon: Icon(
-                  _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                  _obscurePassword
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
                   color: AppColors.textTertiary,
                   size: 20,
                 ),
-                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
               ),
             ),
             AppSpacing.vHuge,
@@ -255,7 +282,9 @@ class _SignUpPageState extends State<SignUpPage> {
             Center(
               child: Text(
                 'By signing up, you agree to our Terms & Privacy Policy.',
-                style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textTertiary,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),

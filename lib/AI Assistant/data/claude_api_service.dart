@@ -34,8 +34,8 @@ class ClaudeApiService {
   static const String _directUrl = 'https://api.anthropic.com/v1/messages';
   static const String _apiVersion = '2023-06-01';
 
-  // MODEL: 
-  static const String _model = 'claude-sonnet-4-5-20250929'; 
+  // MODEL:
+  static const String _model = 'claude-sonnet-4-5-20250929';
   static const int _maxTokens = 1024;
 
   final String _apiKey;
@@ -45,8 +45,8 @@ class ClaudeApiService {
   /// instead of Anthropic directly. The proxy adds the API key server-side,
   /// so the key never reaches the browser.
   ClaudeApiService({required String apiKey, String? proxyUrl})
-      : _apiKey = apiKey,
-        _endpointUrl = proxyUrl ?? _directUrl;
+    : _apiKey = apiKey,
+      _endpointUrl = proxyUrl ?? _directUrl;
 
   bool get _isProxied => _endpointUrl != _directUrl;
 
@@ -85,13 +85,16 @@ class ClaudeApiService {
 
       if (streamedResponse.statusCode != 200) {
         final errorBody = await streamedResponse.stream.bytesToString();
-        onChunk('\nError: API status ${streamedResponse.statusCode}\n$errorBody');
+        onChunk(
+          '\nError: API status ${streamedResponse.statusCode}\n$errorBody',
+        );
         return;
       }
 
-      await for (final line in streamedResponse.stream
-          .transform(utf8.decoder)
-          .transform(const LineSplitter())) {
+      await for (final line
+          in streamedResponse.stream
+              .transform(utf8.decoder)
+              .transform(const LineSplitter())) {
         if (line.startsWith('data: ')) {
           final jsonString = line.substring(6).trim();
           if (jsonString == '[DONE]') continue;

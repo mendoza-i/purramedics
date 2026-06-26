@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:purramedics/services/firestore_service.dart';
 
@@ -37,17 +36,21 @@ class AuthService {
   Future<String?> login(String email, String password) async {
     try {
       final trimmedEmail = email.trim();
-      await _auth.signInWithEmailAndPassword(email: trimmedEmail, password: password);
+      await _auth.signInWithEmailAndPassword(
+        email: trimmedEmail,
+        password: password,
+      );
       _determineRole(trimmedEmail);
-      
+
       // SYNC USER TO FIRESTORE (Self-healing for existing users)
       if (_auth.currentUser != null) {
         try {
           await FirestoreService().saveUser(
-            _auth.currentUser!.uid, 
-            trimmedEmail, 
-            _auth.currentUser!.displayName ?? "Returning User", // Use existing name or default
-            _currentUserRole ?? "owner"
+            _auth.currentUser!.uid,
+            trimmedEmail,
+            _auth.currentUser!.displayName ??
+                "Returning User", // Use existing name or default
+            _currentUserRole ?? "owner",
           );
         } catch (e) {
           print("Firestore sync failed during login (non-fatal): $e");
@@ -63,26 +66,34 @@ class AuthService {
   }
 
   // Sign Up
-  Future<String?> signUp(String email, String password, bool isVet, {String? name}) async {
+  Future<String?> signUp(
+    String email,
+    String password,
+    bool isVet, {
+    String? name,
+  }) async {
     try {
       final trimmedEmail = email.trim();
-      final credential = await _auth.createUserWithEmailAndPassword(email: trimmedEmail, password: password);
-      
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: trimmedEmail,
+        password: password,
+      );
+
       // Update Display Name if provided
       if (name != null && credential.user != null) {
         await credential.user!.updateDisplayName(name);
       }
 
       _determineRole(trimmedEmail);
-      
+
       // SAVE TO FIRESTORE (For Vet Selector)
       if (credential.user != null) {
         try {
           await FirestoreService().saveUser(
-            credential.user!.uid, 
-            trimmedEmail, 
-            name ?? "Unknown User", 
-            _currentUserRole ?? "owner"
+            credential.user!.uid,
+            trimmedEmail,
+            name ?? "Unknown User",
+            _currentUserRole ?? "owner",
           );
         } catch (e) {
           print("Firestore sync failed during signUp (non-fatal): $e");
@@ -103,7 +114,7 @@ class AuthService {
       if (currentUser != null) {
         await currentUser!.updateDisplayName(newName);
         // Force reload socurrentUser.displayName updates locally
-        await currentUser!.reload(); 
+        await currentUser!.reload();
         return null;
       }
       return "User not logged in.";
@@ -122,7 +133,8 @@ class AuthService {
 
   // Helper to set role based on email pattern
   void _determineRole(String email) {
-    if (email.toLowerCase().contains('vet') || email.toLowerCase().contains('doctor')) {
+    if (email.toLowerCase().contains('vet') ||
+        email.toLowerCase().contains('doctor')) {
       _currentUserRole = 'vet';
     } else {
       _currentUserRole = 'owner';
@@ -155,4 +167,3 @@ class AuthService {
     }
   }
 }
-

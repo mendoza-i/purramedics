@@ -12,7 +12,8 @@ class ChatProvider with ChangeNotifier {
   final ClaudeApiService apiService;
 
   ChatProvider({ClaudeApiService? apiService})
-      : apiService = apiService ?? ClaudeApiService(apiKey: '', proxyUrl: '/api/chat');
+    : apiService =
+          apiService ?? ClaudeApiService(apiKey: '', proxyUrl: '/api/chat');
 
   final List<Message> _messages = [];
   bool _isLoading = false;
@@ -42,7 +43,10 @@ class ChatProvider with ChangeNotifier {
       // We strip them if present.
       String jsonString = text.trim();
       if (jsonString.startsWith('```json')) {
-        jsonString = jsonString.replaceAll('```json', '').replaceAll('```', '').trim();
+        jsonString = jsonString
+            .replaceAll('```json', '')
+            .replaceAll('```', '')
+            .trim();
       } else if (jsonString.startsWith('```')) {
         jsonString = jsonString.replaceAll('```', '').trim();
       }
@@ -56,12 +60,11 @@ class ChatProvider with ChangeNotifier {
         immediateHomeCare: List<String>.from(data['immediate_home_care'] ?? []),
         potentialCauses: List<String>.from(data['potential_causes'] ?? []),
       );
-
     } catch (e) {
       // 2. Fallback: If JSON parsing fails, treat as raw text or partial markdown
       // This handles cases where the AI might have refused the JSON constraint
       // or if the stream was interrupted.
-      
+
       // We will just return a generic report with the full text in the summary
       // so the user at least sees the content.
       return AiReport(
@@ -103,14 +106,22 @@ class ChatProvider with ChangeNotifier {
           _messages.removeLast();
         }
 
-        _messages.add(Message(content: currentResponse, isUser: false, timestamp: botTimestamp));
+        _messages.add(
+          Message(
+            content: currentResponse,
+            isUser: false,
+            timestamp: botTimestamp,
+          ),
+        );
         notifyListeners();
       });
     } catch (e) {
       if (_messages.isNotEmpty && !_messages.last.isUser) {
         _messages.removeLast();
       }
-      _messages.add(Message(content: 'Error: $e', isUser: false, timestamp: DateTime.now()));
+      _messages.add(
+        Message(content: 'Error: $e', isUser: false, timestamp: DateTime.now()),
+      );
       notifyListeners();
     } finally {
       _isLoading = false;

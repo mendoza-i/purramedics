@@ -6,6 +6,7 @@ import 'package:purramedics/utils/responsive.dart';
 import 'package:purramedics/pages/addpet_page.dart';
 import 'package:purramedics/theme/app_theme.dart';
 import 'package:purramedics/widgets/widgets.dart';
+import 'package:purramedics/pages/vet/widgets/vet_background_pattern.dart';
 
 class VetAppointmentListPage extends StatefulWidget {
   const VetAppointmentListPage({super.key});
@@ -129,88 +130,92 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         centerTitle: true,
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: firestoreService.getAllAppointmentsStream(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
-          }
-          if (!snapshot.hasData) {
-            return const EmptyState(
-              icon: Icons.calendar_today_outlined,
-              title: 'No appointments yet',
-            );
-          }
-
-          final appointments = snapshot.data!;
-          final now = DateTime.now();
-
-          final yearApts = <Map<String, dynamic>>[];
-          for (final apt in appointments) {
-            try {
-              final parts = apt['date'].toString().split('-');
-              if (parts.length == 3 && int.parse(parts[0]) == _selectedYear) {
-                yearApts.add(apt);
-              }
-            } catch (_) {}
-          }
-          yearApts.sort((a, b) => (b['date'] ?? '').compareTo(a['date'] ?? ''));
-
-          final grouped = <int, List<Map<String, dynamic>>>{};
-          for (final apt in yearApts) {
-            try {
-              final parts = apt['date'].toString().split('-');
-              if (parts.length == 3) {
-                final m = int.parse(parts[1]);
-                grouped.putIfAbsent(m, () => []).add(apt);
-              }
-            } catch (_) {}
-          }
-
-          final displayMonths = <int>[];
-          if (_selectedYear == now.year) {
-            displayMonths.add(now.month);
-            for (var i = 12; i >= 1; i--) {
-              if (i != now.month) displayMonths.add(i);
+      body: VetBackgroundPattern(
+        child: StreamBuilder<List<Map<String, dynamic>>>(
+          stream: firestoreService.getAllAppointmentsStream(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
             }
-          } else {
-            for (var i = 12; i >= 1; i--) {
-              displayMonths.add(i);
+            if (!snapshot.hasData) {
+              return const EmptyState(
+                icon: Icons.calendar_today_outlined,
+                title: 'No appointments yet',
+              );
             }
-          }
 
-          return RefreshIndicator(
-            color: AppColors.primary,
-            onRefresh: () async =>
-                await Future.delayed(const Duration(milliseconds: 600)),
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(AppSpacing.xxl),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: Responsive.contentMaxWidth(context),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildYearToggle(),
-                      AppSpacing.vXxl,
-                      ...displayMonths.map((m) {
-                        final list = grouped[m] ?? [];
-                        final isCurrent =
-                            _selectedYear == now.year && m == now.month;
-                        return _buildMonthSection(m, list, isCurrent, now);
-                      }),
-                    ],
+            final appointments = snapshot.data!;
+            final now = DateTime.now();
+
+            final yearApts = <Map<String, dynamic>>[];
+            for (final apt in appointments) {
+              try {
+                final parts = apt['date'].toString().split('-');
+                if (parts.length == 3 && int.parse(parts[0]) == _selectedYear) {
+                  yearApts.add(apt);
+                }
+              } catch (_) {}
+            }
+            yearApts.sort(
+              (a, b) => (b['date'] ?? '').compareTo(a['date'] ?? ''),
+            );
+
+            final grouped = <int, List<Map<String, dynamic>>>{};
+            for (final apt in yearApts) {
+              try {
+                final parts = apt['date'].toString().split('-');
+                if (parts.length == 3) {
+                  final m = int.parse(parts[1]);
+                  grouped.putIfAbsent(m, () => []).add(apt);
+                }
+              } catch (_) {}
+            }
+
+            final displayMonths = <int>[];
+            if (_selectedYear == now.year) {
+              displayMonths.add(now.month);
+              for (var i = 12; i >= 1; i--) {
+                if (i != now.month) displayMonths.add(i);
+              }
+            } else {
+              for (var i = 12; i >= 1; i--) {
+                displayMonths.add(i);
+              }
+            }
+
+            return RefreshIndicator(
+              color: AppColors.primary,
+              onRefresh: () async =>
+                  await Future.delayed(const Duration(milliseconds: 600)),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(AppSpacing.xxl),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: Responsive.contentMaxWidth(context),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildYearToggle(),
+                        AppSpacing.vXxl,
+                        ...displayMonths.map((m) {
+                          final list = grouped[m] ?? [];
+                          final isCurrent =
+                              _selectedYear == now.year && m == now.month;
+                          return _buildMonthSection(m, list, isCurrent, now);
+                        }),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

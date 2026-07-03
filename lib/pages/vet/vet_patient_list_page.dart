@@ -7,6 +7,7 @@ import 'package:purramedics/pages/addpet_page.dart';
 import 'package:purramedics/theme/app_theme.dart';
 import 'package:purramedics/utils/responsive.dart';
 import 'package:purramedics/widgets/widgets.dart';
+import 'package:purramedics/pages/vet/widgets/vet_background_pattern.dart';
 
 class VetPatientListPage extends StatefulWidget {
   const VetPatientListPage({super.key});
@@ -79,32 +80,34 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
         centerTitle: false,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: Responsive.pagePadding(context),
-            vertical: AppSpacing.lg,
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: Responsive.contentMaxWidth(context),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppTextField(
-                    controller: _searchController,
-                    hint: 'Search by pet or owner name…',
-                    prefixIcon: Icons.search_rounded,
-                    onChanged: (val) =>
-                        setState(() => _searchQuery = val.toLowerCase()),
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (_) => FocusScope.of(context).unfocus(),
-                  ),
-                  AppSpacing.vLg,
-                  Expanded(child: _buildBody()),
-                ],
+      body: VetBackgroundPattern(
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: Responsive.pagePadding(context),
+              vertical: AppSpacing.lg,
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: Responsive.contentMaxWidth(context),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppTextField(
+                      controller: _searchController,
+                      hint: 'Search by pet or owner name…',
+                      prefixIcon: Icons.search_rounded,
+                      onChanged: (val) =>
+                          setState(() => _searchQuery = val.toLowerCase()),
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                    ),
+                    AppSpacing.vLg,
+                    Expanded(child: _buildBody()),
+                  ],
+                ),
               ),
             ),
           ),

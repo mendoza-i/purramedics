@@ -12,6 +12,7 @@ import 'package:purramedics/pages/vet/vet_availability_page.dart';
 import 'package:purramedics/pages/vet/widgets/seasonal_forecast_widget.dart';
 import 'package:purramedics/pages/vet/widgets/descriptive_analytics_widget.dart';
 import 'package:purramedics/pages/vet/widgets/revenue_stats_widget.dart';
+import 'package:purramedics/pages/vet/widgets/vet_background_pattern.dart';
 import 'package:purramedics/theme/app_theme.dart';
 import 'package:purramedics/utils/responsive.dart';
 import 'package:purramedics/utils/audio_utils.dart';
@@ -157,14 +158,16 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
         toolbarHeight: 0,
       ),
       body: SafeArea(
-        child: isWide
-            ? Row(
-                children: [
-                  _buildSidebar(),
-                  Expanded(child: _buildMainContent()),
-                ],
-              )
-            : _buildMainContent(),
+        child: VetBackgroundPattern(
+          child: isWide
+              ? Row(
+                  children: [
+                    _buildSidebar(),
+                    Expanded(child: _buildMainContent()),
+                  ],
+                )
+              : _buildMainContent(),
+        ),
       ),
     );
   }

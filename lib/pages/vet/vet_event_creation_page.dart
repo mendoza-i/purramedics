@@ -181,11 +181,12 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
     if (_titleController.text.isEmpty ||
         finalLocation.isEmpty ||
         _startDateController.text.isEmpty ||
-        _endDateController.text.isEmpty) {
+        _endDateController.text.isEmpty ||
+        _descriptionController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(
-            'Please fill title, location, and start/end dates',
+            'Please fill all details including description',
           ),
           backgroundColor: AppColors.danger,
         ),
@@ -457,17 +458,18 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                         ),
                       ),
                       AppSpacing.hMd,
-                      PrimaryButton(
-                        label: isEditing ? 'Save Event' : 'Publish Event',
-                        backgroundColor: AppColors.success,
-                        icon: isEditing
-                            ? Icons.check_rounded
-                            : Icons.cloud_upload_outlined,
-                        onPressed: _saveEvent,
-                        isLoading: _isSaving,
+                          PrimaryButton(
+                            label: isEditing ? 'Save Event' : 'Publish Event',
+                            backgroundColor: AppColors.success,
+                            icon: isEditing
+                                ? Icons.check_rounded
+                                : Icons.cloud_upload_outlined,
+                            onPressed: _saveEvent,
+                            isLoading: _isSaving,
+                            isExpanded: false,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
                 ],
               ),
             ),

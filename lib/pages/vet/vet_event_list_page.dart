@@ -389,7 +389,7 @@ class _VetEventListPageState extends State<VetEventListPage> {
         return false;
       },
       child: AppCard(
-        onTap: () => _editEvent(event),
+        onTap: isPast ? null : () => _editEvent(event),
         padding: const EdgeInsets.all(AppSpacing.xxl),
         color: isPast ? AppColors.surfaceAlt : AppColors.surface,
         child: Column(

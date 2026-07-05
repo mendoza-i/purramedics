@@ -782,39 +782,12 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                                         letterSpacing: 0.6,
                                       ),
                                     ),
-                                    GestureDetector(
-                                      onTap: () => _showAddMedicalHistoryDialog(
-                                        context,
-                                        pet,
-                                      ),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: AppSpacing.md,
-                                          vertical: AppSpacing.xs,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primarySurface,
-                                          borderRadius: AppRadii.rFull,
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Icon(
-                                              Icons.add_rounded,
-                                              size: 14,
-                                              color: AppColors.primary,
-                                            ),
-                                            AppSpacing.hXs,
-                                            Text(
-                                              'Add note',
-                                              style: AppTypography.labelMedium
-                                                  .copyWith(
-                                                    color: AppColors.primary,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                    PrimaryButton(
+                                      label: 'Add Clinical Note',
+                                      icon: Icons.note_add_rounded,
+                                      size: AppButtonSize.small,
+                                      isExpanded: false,
+                                      onPressed: () => _showAddMedicalHistoryDialog(context, pet),
                                     ),
                                   ],
                                 ),
@@ -875,53 +848,99 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                                               );
                                         } catch (_) {}
                                         return Container(
-                                          padding: const EdgeInsets.all(
-                                            AppSpacing.md,
-                                          ),
+                                          clipBehavior: Clip.antiAlias,
                                           decoration: BoxDecoration(
                                             color: AppColors.surface,
                                             borderRadius: AppRadii.rMd,
-                                            border: Border.all(
-                                              color: AppColors.border,
-                                            ),
+                                            border: Border.all(color: AppColors.border),
+                                            boxShadow: AppShadows.sm,
                                           ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    dateStr,
-                                                    style: AppTypography
-                                                        .labelSmall
-                                                        .copyWith(
-                                                          color:
-                                                              AppColors.primary,
-                                                          fontWeight:
-                                                              FontWeight.w700,
+                                          child: IntrinsicHeight(
+                                            child: Row(
+                                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                                              children: [
+                                                Container(
+                                                  width: 4,
+                                                  color: AppColors.primary,
+                                                ),
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(AppSpacing.lg),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Expanded(
+                                                              child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  Text(
+                                                                    dateStr,
+                                                                    style: AppTypography.labelLarge.copyWith(
+                                                                      color: AppColors.textPrimary,
+                                                                      fontWeight: FontWeight.w700,
+                                                                    ),
+                                                                  ),
+                                                                  AppSpacing.vXs,
+                                                                  Text(
+                                                                    'Clinical Record',
+                                                                    style: AppTypography.labelSmall.copyWith(
+                                                                      color: AppColors.primary,
+                                                                      letterSpacing: 0.5,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                              decoration: BoxDecoration(
+                                                                color: AppColors.surfaceAlt,
+                                                                borderRadius: AppRadii.rMd,
+                                                                border: Border.all(color: AppColors.divider),
+                                                              ),
+                                                              child: Row(
+                                                                mainAxisSize: MainAxisSize.min,
+                                                                children: [
+                                                                  const Icon(Icons.person_outline_rounded, size: 14, color: AppColors.textSecondary),
+                                                                  AppSpacing.hSm,
+                                                                  Text(
+                                                                    'Dr. ${n['vetName'] ?? 'Vet'}',
+                                                                    style: AppTypography.labelSmall.copyWith(
+                                                                      color: AppColors.textSecondary,
+                                                                      fontWeight: FontWeight.w600,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                  ),
-                                                  Text(
-                                                    'Dr. ${n['vetName'] ?? 'Vet'}',
-                                                    style: AppTypography
-                                                        .labelSmall
-                                                        .copyWith(
-                                                          color: AppColors
-                                                              .textTertiary,
+                                                        AppSpacing.vLg,
+                                                        Container(
+                                                          width: double.infinity,
+                                                          padding: const EdgeInsets.all(AppSpacing.md),
+                                                          decoration: BoxDecoration(
+                                                            color: AppColors.background,
+                                                            borderRadius: AppRadii.rSm,
+                                                          ),
+                                                          child: Text(
+                                                            n['note'] ?? '',
+                                                            style: AppTypography.bodyMedium.copyWith(
+                                                              height: 1.6,
+                                                              color: AppColors.textPrimary,
+                                                            ),
+                                                          ),
                                                         ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ],
-                                              ),
-                                              AppSpacing.vXs,
-                                              Text(
-                                                n['note'] ?? '',
-                                                style: AppTypography.bodyMedium,
-                                              ),
-                                            ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         );
                                       },

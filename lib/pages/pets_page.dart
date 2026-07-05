@@ -546,11 +546,10 @@ class _PetsPageState extends State<PetsPage> {
         }
 
         final notes = snapshot.data!;
-        return ListView.separated(
+        return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: notes.length,
-          separatorBuilder: (_, __) => AppSpacing.vMd,
           itemBuilder: (context, index) {
             final n = notes[index];
             String dateStr = 'Unknown date';
@@ -558,35 +557,116 @@ class _PetsPageState extends State<PetsPage> {
               final dt = (n['createdAt'] as dynamic).toDate() as DateTime;
               dateStr = DateFormat('MMM d, yyyy').format(dt);
             }
-            return Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceAlt,
-                borderRadius: AppRadii.rMd,
-                border: Border.all(color: AppColors.divider),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            return IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        dateStr,
-                        style: AppTypography.labelLarge.copyWith(
-                          color: AppColors.primary,
+                  SizedBox(
+                    width: 40,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Positioned.fill(
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Container(
+                              width: 2,
+                              color: index == notes.length - 1
+                                  ? Colors.transparent // No line below the last item
+                                  : AppColors.primary.withOpacity(0.2),
+                            ),
+                          ),
+                        ),
+                        // Connect to previous
+                        if (index > 0)
+                          Positioned(
+                            top: 0,
+                            bottom: null,
+                            child: Container(
+                              width: 2,
+                              height: 12, // half way to dot
+                              color: AppColors.primary.withOpacity(0.2),
+                            ),
+                          ),
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            margin: const EdgeInsets.only(top: 8),
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: AppColors.primarySurface,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.primary, width: 2),
+                            ),
+                            child: const Icon(
+                              Icons.medical_services_rounded,
+                              size: 14,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  AppSpacing.hSm,
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          bottom: index == notes.length - 1 ? 0 : AppSpacing.xl),
+                      child: Container(
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: AppRadii.rLg,
+                          boxShadow: AppShadows.sm,
+                          border: Border.all(color: AppColors.border.withOpacity(0.5)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    dateStr,
+                                    style: AppTypography.titleSmall.copyWith(
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.infoSurface,
+                                    borderRadius: AppRadii.rFull,
+                                  ),
+                                  child: Text(
+                                    'Dr. ${n['vetName'] ?? 'Vet'}',
+                                    style: AppTypography.labelSmall.copyWith(
+                                      color: AppColors.info,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            AppSpacing.vSm,
+                            Text(
+                              n['note'] as String? ?? '',
+                              style: AppTypography.bodyMedium.copyWith(
+                                height: 1.5,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Text(
-                        n['vetName'] as String? ?? 'Attending vet',
-                        style: AppTypography.labelSmall,
-                      ),
-                    ],
-                  ),
-                  AppSpacing.vSm,
-                  Text(
-                    n['note'] as String? ?? '',
-                    style: AppTypography.bodyMedium,
+                    ),
                   ),
                 ],
               ),

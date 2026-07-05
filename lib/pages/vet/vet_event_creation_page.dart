@@ -459,6 +459,7 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                       AppSpacing.hMd,
                       PrimaryButton(
                         label: isEditing ? 'Save Event' : 'Publish Event',
+                        backgroundColor: AppColors.success,
                         icon: isEditing
                             ? Icons.check_rounded
                             : Icons.cloud_upload_outlined,

@@ -105,6 +105,10 @@ class _AddPetPageState extends State<AddPetPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!AuthService().isVet) {
+      return _buildPetOwnerView();
+    }
+
     final currentName = nameCtrl.text.trim().isEmpty
         ? 'New patient'
         : nameCtrl.text.trim();
@@ -155,6 +159,221 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPetOwnerView() {
+    final dogBreeds = ['Mixed / Aspin', 'Shih Tzu', 'Pomeranian', 'Chihuahua', 'Poodle', 'Golden Retriever', 'Husky', 'Beagle', 'Pug', 'Bulldog'];
+    final catBreeds = ['Mixed / Puspin', 'Persian', 'Siamese', 'Maine Coon', 'British Shorthair', 'Scottish Fold', 'Sphynx', 'Ragdoll'];
+    final breeds = selectedSpecies == 'Cat' ? catBreeds : dogBreeds;
+    
+    String currentBreed = breedCtrl.text;
+    if (!breeds.contains(currentBreed)) {
+      currentBreed = breeds.first;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && breedCtrl.text != breeds.first) {
+          breedCtrl.text = breeds.first;
+        }
+      });
+    }
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: Text('Add a Pet', style: AppTypography.headlineLarge),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Tell us about your pet', style: AppTypography.titleLarge, textAlign: TextAlign.center),
+              AppSpacing.vSm,
+              Text('Fill in these details so we can give them the best care.', style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary), textAlign: TextAlign.center),
+              AppSpacing.vXxl,
+              
+              AppTextField(
+                controller: nameCtrl,
+                label: 'Pet Name *',
+                hint: 'e.g. Bella',
+                prefixIcon: Icons.pets_rounded,
+                textInputAction: TextInputAction.next,
+              ),
+              AppSpacing.vLg,
+
+              Text('Species *', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+              AppSpacing.vSm,
+              Row(
+                children: [
+                  _speciesButton('Dog', '🐶'),
+                  AppSpacing.hMd,
+                  _speciesButton('Cat', '🐱'),
+                ],
+              ),
+              AppSpacing.vLg,
+
+              Text('Breed *', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+              AppSpacing.vSm,
+              Container(
+                decoration: BoxDecoration(color: AppColors.surfaceAlt, borderRadius: AppRadii.rMd),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    value: currentBreed,
+                    items: breeds.map((b) => DropdownMenuItem(value: b, child: Text(b, style: AppTypography.bodyMedium))).toList(),
+                    onChanged: (v) {
+                      if (v != null) setState(() => breedCtrl.text = v);
+                    },
+                  ),
+                ),
+              ),
+              AppSpacing.vLg,
+
+              Text('Gender *', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+              AppSpacing.vSm,
+              Row(
+                children: [
+                  _genderButton('Male', Icons.male_rounded),
+                  AppSpacing.hMd,
+                  _genderButton('Female', Icons.female_rounded),
+                ],
+              ),
+              AppSpacing.vLg,
+
+              GestureDetector(
+                onTap: _pickBirthdate,
+                child: AbsorbPointer(
+                  child: AppTextField(
+                    controller: birthdateCtrl,
+                    label: 'Birthdate *',
+                    hint: 'Tap to select',
+                    prefixIcon: Icons.calendar_today_rounded,
+                  ),
+                ),
+              ),
+              AppSpacing.vLg,
+
+              Row(
+                children: [
+                  Expanded(
+                    child: AppTextField(
+                      controller: colorCtrl,
+                      label: 'Coat Color *',
+                      hint: 'e.g. Brown',
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
+                  AppSpacing.hMd,
+                  Expanded(
+                    child: AppTextField(
+                      controller: weightCtrl,
+                      label: 'Weight (kg) *',
+                      hint: 'e.g. 4.5',
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                    ),
+                  ),
+                ],
+              ),
+              AppSpacing.vLg,
+
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(color: AppColors.surfaceAlt, borderRadius: AppRadii.rMd),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text('Is your pet neutered / spayed?', style: AppTypography.bodyMedium),
+                    ),
+                    Switch(
+                      value: isNeutered,
+                      onChanged: (v) => setState(() => isNeutered = v),
+                      activeColor: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ),
+              AppSpacing.vXxl,
+
+              PrimaryButton(
+                label: 'Save Pet',
+                icon: Icons.check_rounded,
+                onPressed: () {
+                  if (nameCtrl.text.trim().isEmpty || birthdateCtrl.text.trim().isEmpty || colorCtrl.text.trim().isEmpty || weightCtrl.text.trim().isEmpty) {
+                    _showSnack('Please fill in all required fields.', AppColors.danger);
+                    return;
+                  }
+                  _savePet();
+                },
+                isLoading: _isLoading,
+              ),
+              AppSpacing.vXxl,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _speciesButton(String label, String emoji) {
+    final active = selectedSpecies == label;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() {
+          selectedSpecies = label;
+          selectedEmoji = emoji;
+          breedCtrl.text = ''; // Reset breed when species changes
+        }),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          decoration: BoxDecoration(
+            color: active ? AppColors.primary : AppColors.surfaceAlt,
+            borderRadius: AppRadii.rLg,
+            border: Border.all(color: active ? AppColors.primary : AppColors.border),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 20)),
+              AppSpacing.hSm,
+              Text(label, style: AppTypography.titleSmall.copyWith(color: active ? AppColors.textInverse : AppColors.textPrimary)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _genderButton(String label, IconData icon) {
+    final active = selectedGender == label;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => selectedGender = label),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          decoration: BoxDecoration(
+            color: active ? (label == 'Male' ? AppColors.info : AppColors.danger) : AppColors.surfaceAlt,
+            borderRadius: AppRadii.rLg,
+            border: Border.all(color: active ? (label == 'Male' ? AppColors.info : AppColors.danger) : AppColors.border),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 20, color: active ? Colors.white : AppColors.textSecondary),
+              AppSpacing.hSm,
+              Text(label, style: AppTypography.titleSmall.copyWith(color: active ? Colors.white : AppColors.textPrimary)),
+            ],
           ),
         ),
       ),

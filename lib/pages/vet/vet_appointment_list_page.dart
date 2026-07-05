@@ -26,10 +26,55 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
     firestoreService.markAppointmentsAsRead();
   }
 
-  void _updateStatus(String docId, String newStatus) {
-    FirebaseFirestore.instance.collection('appointments').doc(docId).update({
-      'status': newStatus,
-    });
+  void _updateStatus(String docId, String newStatus, [String? reason]) {
+    final data = <String, dynamic>{'status': newStatus};
+    if (reason != null && reason.isNotEmpty) {
+      data['declineReason'] = reason;
+    }
+    FirebaseFirestore.instance.collection('appointments').doc(docId).update(data);
+  }
+
+  void _showDeclineDialog(String docId) {
+    final reasonCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.rLg),
+        title: Text('Decline Appointment', style: AppTypography.headlineSmall),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Are you sure you want to decline this appointment?',
+              style: AppTypography.bodyMedium,
+            ),
+            AppSpacing.vMd,
+            TextField(
+              controller: reasonCtrl,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Reason for declining (required)',
+                border: OutlineInputBorder(borderRadius: AppRadii.rMd),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (reasonCtrl.text.trim().isEmpty) return;
+              _updateStatus(docId, 'Declined', reasonCtrl.text.trim());
+              Navigator.pop(context);
+            },
+            child: Text('Decline', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+          ),
+        ],
+      ),
+    );
   }
 
   Color _statusColor(String status, bool isPast) {
@@ -564,7 +609,7 @@ class _VetAppointmentListPageState extends State<VetAppointmentListPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           TextButton(
-            onPressed: () => _updateStatus(id, 'Declined'),
+            onPressed: () => _showDeclineDialog(id),
             child: Text(
               'Decline',
               style: AppTypography.labelLarge.copyWith(color: AppColors.danger),

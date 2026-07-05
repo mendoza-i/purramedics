@@ -204,12 +204,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
           MaterialPageRoute(builder: (_) => const VetEventListPage()),
         );
       }),
-      _SidebarItem('Requests', Icons.medical_services_rounded, () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const VetRequestsPage()),
-        );
-      }),
+
       _SidebarItem(
         'Inbox',
         Icons.inbox_rounded,
@@ -700,18 +695,6 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const VetEventListPage()),
-          );
-        },
-      ),
-      _Tool(
-        'Requests',
-        'Review & approve',
-        Icons.medical_services_rounded,
-        AppColors.primary,
-        () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const VetRequestsPage()),
           );
         },
       ),

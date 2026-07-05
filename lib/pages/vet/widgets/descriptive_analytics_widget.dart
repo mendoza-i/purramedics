@@ -78,6 +78,11 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
                 final weeklyData = List<int>.filled(7, 0);
                 final days = List<String>.filled(7, '');
                 final isToday = List<bool>.filled(7, false);
+                int thisMonthTotal = 0;
+                int lastMonthTotal = 0;
+                
+                final thisMonth = DateTime(now.year, now.month);
+                final lastMonth = DateTime(now.year, now.month - 1);
 
                 for (int i = 0; i < 7; i++) {
                   final targetDay = startOfWeek.add(Duration(days: i));
@@ -91,8 +96,15 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
 
                 for (final appt in appointments) {
                   if (appt['createdAt'] != null) {
-                    final dt =
-                        (appt['createdAt'] as dynamic).toDate() as DateTime;
+                    final dt = (appt['createdAt'] as dynamic).toDate() as DateTime;
+                    final apptMonth = DateTime(dt.year, dt.month);
+                    
+                    if (apptMonth == thisMonth) {
+                      thisMonthTotal++;
+                    } else if (apptMonth == lastMonth) {
+                      lastMonthTotal++;
+                    }
+
                     for (int i = 0; i < 7; i++) {
                       final targetDay = startOfWeek.add(Duration(days: i));
                       if (dt.year == targetDay.year &&
@@ -105,6 +117,16 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
                   }
                 }
 
+                double changePercent = 0;
+                bool isGrowing = true;
+                if (lastMonthTotal > 0) {
+                  changePercent = ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
+                  isGrowing = changePercent >= 0;
+                } else if (thisMonthTotal > 0) {
+                  changePercent = 100;
+                  isGrowing = true;
+                }
+
                 int maxVal = weeklyData.reduce(
                   (curr, next) => curr > next ? curr : next,
                 );
@@ -112,6 +134,24 @@ class DescriptiveAnalyticsWidget extends StatelessWidget {
 
                 return Column(
                   children: [
+                    Row(
+                      children: [
+                        Icon(
+                          isGrowing ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                          color: isGrowing ? AppColors.success : AppColors.danger,
+                          size: 16,
+                        ),
+                        AppSpacing.hXs,
+                        Text(
+                          '${isGrowing ? '+' : ''}${changePercent.toStringAsFixed(1)}% vs last month ($thisMonthTotal vs $lastMonthTotal)',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: isGrowing ? AppColors.success : AppColors.danger,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    AppSpacing.vLg,
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(

@@ -123,30 +123,31 @@ class FirestoreService {
     });
   }
 
-  // Count active bookings (Pending or Confirmed) for a user
-  Future<int> getActiveBookingCount(String userId) async {
+  // Count how many bookings the user made today
+  Future<int> getDailyBookingCount(String userId) async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    
     final query = await _appointmentsCollection
         .where('userId', isEqualTo: userId)
+        .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
         .get();
+        
+    return query.docs.length;
+  }
+
+  // Count how many times the user cancelled today
+  Future<int> getDailyCancellationCount(String userId) async {
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    return query.docs.where((doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      final status = (data['status'] ?? '').toString();
-      final dateStr = (data['date'] ?? '').toString();
-      try {
-        final parts = dateStr.split('-');
-        if (parts.length == 3) {
-          final d = DateTime(
-            int.parse(parts[0]),
-            int.parse(parts[1]),
-            int.parse(parts[2]),
-          );
-          if (d.isBefore(today)) return false; // Ignore past dates
-        }
-      } catch (_) {}
-      return status == 'Pending' || status == 'Confirmed';
-    }).length;
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    
+    final query = await _appointmentsCollection
+        .where('userId', isEqualTo: userId)
+        .where('status', isEqualTo: 'Cancelled')
+        .where('cancelledAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+        .get();
+        
+    return query.docs.length;
   }
 
   // Get Appointments Stream (For specific User)

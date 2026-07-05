@@ -76,11 +76,6 @@ class _VetEventListPageState extends State<VetEventListPage> {
       'checkup': Icons.health_and_safety_rounded,
       'community': Icons.people_rounded,
       'emergency': Icons.warning_amber_rounded,
-      'dental': Icons.medical_services_rounded,
-      'training': Icons.school_rounded,
-      'grooming': Icons.cut_rounded,
-      'food': Icons.restaurant_rounded,
-      'meetup': Icons.groups_rounded,
     };
     return icons[name] ?? Icons.event_rounded;
   }
@@ -183,7 +178,7 @@ class _VetEventListPageState extends State<VetEventListPage> {
           Padding(
             padding: const EdgeInsets.only(right: AppSpacing.lg),
             child: PrimaryButton(
-              label: 'Create',
+              label: 'Publish',
               icon: Icons.add_rounded,
               size: AppButtonSize.small,
               onPressed: () => Navigator.push(

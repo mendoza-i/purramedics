@@ -35,18 +35,16 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
     AppColors.success,
   ];
 
-  final Map<String, IconData> _availableIcons = const {
-    'vaccine': Icons.vaccines_rounded,
-    'adoption': Icons.pets_rounded,
-    'checkup': Icons.health_and_safety_rounded,
-    'community': Icons.people_rounded,
-    'emergency': Icons.warning_amber_rounded,
-    'dental': Icons.medical_services_rounded,
-    'training': Icons.school_rounded,
-    'grooming': Icons.cut_rounded,
-    'food': Icons.restaurant_rounded,
-    'meetup': Icons.groups_rounded,
-  };
+  final List<Map<String, dynamic>> _iconOptions = const [
+    {'name': 'vaccine', 'icon': Icons.vaccines_rounded, 'desc': 'Free vaccination drives'},
+    {'name': 'adoption', 'icon': Icons.pets_rounded, 'desc': 'Pet adoption events'},
+    {'name': 'checkup', 'icon': Icons.health_and_safety_rounded, 'desc': 'General health checkups'},
+    {'name': 'community', 'icon': Icons.people_rounded, 'desc': 'Community meetups & education'},
+    {'name': 'emergency', 'icon': Icons.warning_amber_rounded, 'desc': 'Emergency & rescue ops'},
+  ];
+
+  DateTime? _startDateTime;
+  DateTime? _endDateTime;
 
   String _selectedLocationPreset = 'Main Clinic';
   final List<String> _locationPresets = const [
@@ -130,6 +128,28 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
       }
     }
 
+    final selectedDateTime = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    if (!isStart && _startDateTime != null) {
+      if (selectedDateTime.isBefore(_startDateTime!) || selectedDateTime.isAtSameMomentAs(_startDateTime!)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("End date must be strictly after the start date"),
+              backgroundColor: AppColors.danger,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
     final formattedDate =
         "${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}";
     final formattedTime = time.format(context);
@@ -138,8 +158,15 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
     setState(() {
       if (isStart) {
         _startDateController.text = combined;
+        _startDateTime = selectedDateTime;
+        // Reset end date if invalid
+        if (_endDateTime != null && (_endDateTime!.isBefore(_startDateTime!) || _endDateTime!.isAtSameMomentAs(_startDateTime!))) {
+          _endDateTime = null;
+          _endDateController.text = '';
+        }
       } else {
         _endDateController.text = combined;
+        _endDateTime = selectedDateTime;
       }
     });
   }
@@ -303,32 +330,34 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                           height: 72,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
-                            itemCount: _availableIcons.length,
+                            itemCount: _iconOptions.length,
                             separatorBuilder: (_, __) => AppSpacing.hSm,
                             itemBuilder: (context, i) {
-                              final entry = _availableIcons.entries.elementAt(
-                                i,
-                              );
-                              final selected = _selectedIconName == entry.key;
-                              return GestureDetector(
-                                onTap: () => setState(
-                                  () => _selectedIconName = entry.key,
-                                ),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 180),
-                                  width: 68,
-                                  decoration: BoxDecoration(
-                                    color: selected
-                                        ? AppColors.primary
-                                        : AppColors.surfaceAlt,
-                                    borderRadius: AppRadii.rLg,
+                              final option = _iconOptions[i];
+                              final selected = _selectedIconName == option['name'];
+                              return Tooltip(
+                                message: option['desc'],
+                                preferBelow: false,
+                                child: GestureDetector(
+                                  onTap: () => setState(
+                                    () => _selectedIconName = option['name'],
                                   ),
-                                  child: Icon(
-                                    entry.value,
-                                    size: 30,
-                                    color: selected
-                                        ? AppColors.textInverse
-                                        : AppColors.textSecondary,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 180),
+                                    width: 68,
+                                    decoration: BoxDecoration(
+                                      color: selected
+                                          ? AppColors.primary
+                                          : AppColors.surfaceAlt,
+                                      borderRadius: AppRadii.rLg,
+                                    ),
+                                    child: Icon(
+                                      option['icon'],
+                                      size: 30,
+                                      color: selected
+                                          ? AppColors.textInverse
+                                          : AppColors.textSecondary,
+                                    ),
                                   ),
                                 ),
                               );

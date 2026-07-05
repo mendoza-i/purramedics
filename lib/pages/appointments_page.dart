@@ -16,14 +16,14 @@ class AppointmentsPage extends StatefulWidget {
     final _user = FirebaseAuth.instance.currentUser;
 
     if (_user != null) {
-      final activeCount = await _firestoreService.getActiveBookingCount(
+      final dailyCount = await _firestoreService.getDailyBookingCount(
         _user.uid,
       );
-      if (activeCount >= 2 && context.mounted) {
+      if (dailyCount >= 2 && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'You can only have up to 2 active bookings at a time.',
+              'You can only make up to 2 bookings per day.',
             ),
             backgroundColor: AppColors.warning,
           ),
@@ -1151,6 +1151,7 @@ class _AppointmentsPageState extends State<AppointmentsPage>
         : isConfirmed
         ? BadgeTone.success
         : BadgeTone.warning;
+    final declineReason = apt['declineReason'] as String?;
 
     showModalBottomSheet(
       context: context,
@@ -1222,6 +1223,21 @@ class _AppointmentsPageState extends State<AppointmentsPage>
               ),
               child: Text(info, style: AppTypography.bodyMedium),
             ),
+            if (status == 'Declined' && declineReason != null) ...[
+              AppSpacing.vXl,
+              Text('Declined Reason', style: AppTypography.labelLarge.copyWith(color: AppColors.danger)),
+              AppSpacing.vSm,
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withOpacity(0.1),
+                  borderRadius: AppRadii.rMd,
+                  border: Border.all(color: AppColors.danger.withOpacity(0.3)),
+                ),
+                child: Text(declineReason, style: AppTypography.bodyMedium.copyWith(color: AppColors.danger)),
+              ),
+            ],
             AppSpacing.vXl,
             if (!isPast && (status == 'Pending' || status == 'Confirmed')) ...[
               Row(
@@ -1229,12 +1245,29 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                   Expanded(
                     child: TextButton(
                       onPressed: () async {
+                        final user = FirebaseAuth.instance.currentUser;
+                        if (user != null) {
+                          final cancelCount = await FirestoreService().getDailyCancellationCount(user.uid);
+                          if (cancelCount >= 2 && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Daily cancellation limit reached (max 2 per day).'),
+                                backgroundColor: AppColors.danger,
+                              ),
+                            );
+                            return;
+                          }
+                        }
+
                         final id = apt['id'];
                         if (id != null) {
                           await FirebaseFirestore.instance
                               .collection('appointments')
                               .doc(id)
-                              .update({'status': 'Cancelled'});
+                              .update({
+                                'status': 'Cancelled',
+                                'cancelledAt': FieldValue.serverTimestamp(),
+                              });
                           if (context.mounted) Navigator.pop(context);
                         }
                       },

@@ -249,7 +249,8 @@ class _VetSettingsPageState extends State<VetSettingsPage> {
                                           _priceControllers[key] ??
                                           TextEditingController(),
                                       prefixIcon: Icons.payments_outlined,
-                                      keyboardType: TextInputType.text,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                       textInputAction: TextInputAction.next,
                                     ),
                                   ),

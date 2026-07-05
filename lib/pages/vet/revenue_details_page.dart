@@ -12,9 +12,57 @@ class RevenueDetailsPage extends StatefulWidget {
 }
 
 class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
+  late DateTime _selectedMonth;
+
+  static const List<String> _monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _selectedMonth = DateTime(now.year, now.month);
+  }
+
   String _formatAmount(int amount) {
     final formatter = RegExp(r'\B(?=(\d{3})+(?!\d))');
     return amount.toString().replaceAll(formatter, ',');
+  }
+
+  Widget _miniPicker({
+    required DateTime date,
+    required VoidCallback onPrev,
+    required VoidCallback onNext,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: onPrev,
+          child: const Icon(Icons.chevron_left_rounded, size: 28, color: Colors.white70),
+        ),
+        AppSpacing.hLg,
+        Column(
+          children: [
+            Text(
+              _monthNames[date.month - 1].toUpperCase(),
+              style: AppTypography.titleSmall.copyWith(color: Colors.white, letterSpacing: 1.2),
+            ),
+            Text(
+              '${date.year}',
+              style: AppTypography.labelSmall.copyWith(color: Colors.white70),
+            ),
+          ],
+        ),
+        AppSpacing.hLg,
+        GestureDetector(
+          onTap: onNext,
+          child: const Icon(Icons.chevron_right_rounded, size: 28, color: Colors.white70),
+        ),
+      ],
+    );
   }
 
   @override
@@ -37,8 +85,6 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
             );
           }
           final all = snapshot.data!;
-          final now = DateTime.now();
-          final thisMonth = DateTime(now.year, now.month);
 
           int thisRevenue = 0;
           final thisMonthByType = <String, int>{};
@@ -63,7 +109,7 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
             if (date == null) continue;
 
             final apptMonth = DateTime(date.year, date.month);
-            if (apptMonth == thisMonth) {
+            if (apptMonth == _selectedMonth) {
               final fee = feeFor(appt['visitType'] ?? '');
               thisRevenue += fee;
 
@@ -72,22 +118,6 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
               countsByType[type] = (countsByType[type] ?? 0) + 1;
             }
           }
-
-          const monthNames = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December',
-          ];
-          final currentLabel = '${monthNames[now.month - 1]} ${now.year}';
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -113,14 +143,23 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              currentLabel.toUpperCase(),
-                              style: AppTypography.labelMedium.copyWith(
-                                color: Colors.white.withOpacity(0.85),
-                                letterSpacing: 1.2,
-                              ),
+                            _miniPicker(
+                              date: _selectedMonth,
+                              onPrev: () {
+                                setState(() {
+                                  _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1);
+                                });
+                              },
+                              onNext: () {
+                                final next = DateTime(_selectedMonth.year, _selectedMonth.month + 1);
+                                if (!next.isAfter(DateTime.now())) {
+                                  setState(() {
+                                    _selectedMonth = next;
+                                  });
+                                }
+                              },
                             ),
-                            AppSpacing.vMd,
+                            AppSpacing.vLg,
                             Text(
                               '₱${_formatAmount(thisRevenue)}',
                               style: AppTypography.displayLarge.copyWith(

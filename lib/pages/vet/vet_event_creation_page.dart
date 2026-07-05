@@ -313,11 +313,28 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                                 children: [
                                   _label('End', 'When it concludes'),
                                   AppSpacing.vSm,
-                                  _datePickerField(
-                                    _endDateController,
-                                    'Select end',
-                                    false,
-                                  ),
+                                    _startDateTime == null
+                                        ? Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              AppTextField(
+                                                controller: _endDateController,
+                                                hint: 'Select end',
+                                                readOnly: true,
+                                                prefixIcon: Icons.calendar_today_rounded,
+                                              ),
+                                              AppSpacing.vXs,
+                                              Text(
+                                                'Select start time first',
+                                                style: AppTypography.labelSmall.copyWith(color: AppColors.danger),
+                                              ),
+                                            ],
+                                          )
+                                        : _datePickerField(
+                                            _endDateController,
+                                            'Select end',
+                                            false,
+                                          ),
                                 ],
                               ),
                             ),
@@ -441,7 +458,7 @@ class _VetEventCreationPageState extends State<VetEventCreationPage> {
                       ),
                       AppSpacing.hMd,
                       PrimaryButton(
-                        label: isEditing ? 'Save' : 'Publish',
+                        label: isEditing ? 'Save Event' : 'Publish Event',
                         icon: isEditing
                             ? Icons.check_rounded
                             : Icons.cloud_upload_outlined,

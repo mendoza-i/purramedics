@@ -14,7 +14,7 @@ class VetBackgroundPattern extends StatelessWidget {
         Positioned.fill(
           child: CustomPaint(
             painter: _PawPatternPainter(
-              color: AppColors.primary.withOpacity(0.08),
+              color: AppColors.primary.withOpacity(0.15),
             ),
           ),
         ),

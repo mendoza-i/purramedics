@@ -128,12 +128,17 @@ class FirestoreService {
     final now = DateTime.now();
     final startOfDay = DateTime(now.year, now.month, now.day);
     
+    // Fetch all for user and filter locally to avoid composite index requirement
     final query = await _appointmentsCollection
         .where('userId', isEqualTo: userId)
-        .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
         .get();
         
-    return query.docs.length;
+    return query.docs.where((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      if (data['createdAt'] == null) return false;
+      final createdAt = (data['createdAt'] as Timestamp).toDate();
+      return createdAt.isAfter(startOfDay) || createdAt.isAtSameMomentAs(startOfDay);
+    }).length;
   }
 
   // Count how many times the user cancelled today
@@ -141,13 +146,18 @@ class FirestoreService {
     final now = DateTime.now();
     final startOfDay = DateTime(now.year, now.month, now.day);
     
+    // Fetch all for user and filter locally to avoid composite index requirement
     final query = await _appointmentsCollection
         .where('userId', isEqualTo: userId)
-        .where('status', isEqualTo: 'Cancelled')
-        .where('cancelledAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
         .get();
         
-    return query.docs.length;
+    return query.docs.where((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      if (data['status'] != 'Cancelled') return false;
+      if (data['cancelledAt'] == null) return false;
+      final cancelledAt = (data['cancelledAt'] as Timestamp).toDate();
+      return cancelledAt.isAfter(startOfDay) || cancelledAt.isAtSameMomentAs(startOfDay);
+    }).length;
   }
 
   // Get Appointments Stream (For specific User)

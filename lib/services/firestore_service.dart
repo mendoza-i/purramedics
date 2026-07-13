@@ -276,6 +276,9 @@ class FirestoreService {
     required String color,
     required bool isNeutered,
     required String emoji,
+    String? species,
+    String? gender,
+    String? vetName,
     String? notes,
   }) async {
     await _petsCollection.doc(id).update({
@@ -286,6 +289,9 @@ class FirestoreService {
       'color': color,
       'isNeutered': isNeutered,
       'emoji': emoji,
+      if (species != null) 'species': species,
+      if (gender != null) 'gender': gender,
+      if (vetName != null) 'vetName': vetName,
       if (notes != null) 'notes': notes,
     });
   }

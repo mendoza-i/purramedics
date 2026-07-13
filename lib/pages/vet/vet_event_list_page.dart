@@ -174,20 +174,6 @@ class _VetEventListPageState extends State<VetEventListPage> {
         elevation: 0,
         centerTitle: false,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.lg),
-            child: PrimaryButton(
-              label: 'Publish',
-              icon: Icons.add_rounded,
-              size: AppButtonSize.small,
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const VetEventCreationPage()),
-              ),
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: StreamBuilder<List<Map<String, dynamic>>>(
@@ -264,6 +250,18 @@ class _VetEventListPageState extends State<VetEventListPage> {
               ),
             );
           },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const VetEventCreationPage()),
+        ),
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        label: Text(
+          'Create Event',
+          style: AppTypography.labelLarge.copyWith(color: Colors.white),
         ),
       ),
     );

@@ -11,7 +11,8 @@ import 'package:intl/intl.dart';
 
 class AddPetPage extends StatefulWidget {
   final String? prefilledOwnerEmail;
-  const AddPetPage({super.key, this.prefilledOwnerEmail});
+  final Map<String, dynamic>? petToEdit;
+  const AddPetPage({super.key, this.prefilledOwnerEmail, this.petToEdit});
 
   @override
   State<AddPetPage> createState() => _AddPetPageState();
@@ -38,6 +39,22 @@ class _AddPetPageState extends State<AddPetPage> {
     ownerEmailCtrl = TextEditingController(
       text: widget.prefilledOwnerEmail ?? '',
     );
+    if (widget.petToEdit != null) {
+      final pet = widget.petToEdit!;
+      nameCtrl.text = pet['name'] ?? '';
+      breedCtrl.text = pet['breed'] ?? '';
+      birthdateCtrl.text = pet['birthdate'] ?? '';
+      weightCtrl.text = pet['weight'] ?? '';
+      vetNameCtrl.text = pet['vetName'] ?? '';
+      colorCtrl.text = pet['color'] ?? '';
+      selectedSpecies = pet['species'] ?? 'Dog';
+      selectedGender = pet['gender'] ?? 'Male';
+      isNeutered = pet['isNeutered'] ?? false;
+      selectedEmoji = pet['emoji'] ?? '🐶';
+      if (AuthService().isVet) {
+        ownerEmailCtrl.text = pet['ownerEmail'] ?? '';
+      }
+    }
   }
 
   @override
@@ -70,24 +87,45 @@ class _AddPetPageState extends State<AddPetPage> {
           ? ownerEmailCtrl.text.trim()
           : AuthService().currentUser?.email ?? '';
 
-      await firestore.addPet(
-        name: nameCtrl.text.trim(),
-        species: selectedSpecies,
-        breed: breedCtrl.text.isEmpty ? 'Unknown' : breedCtrl.text.trim(),
-        birthdate: birthdateCtrl.text.isEmpty
-            ? 'Unknown'
-            : birthdateCtrl.text.trim(),
-        weight: weightCtrl.text.isEmpty ? '--' : weightCtrl.text.trim(),
-        gender: selectedGender,
-        color: colorCtrl.text.isEmpty ? 'Unknown' : colorCtrl.text.trim(),
-        isNeutered: isNeutered,
-        ownerEmail: targetOwnerEmail,
-        emoji: selectedEmoji,
-        vetName: vetNameCtrl.text.trim(),
-      );
+      if (widget.petToEdit != null) {
+        await firestore.updatePet(
+          widget.petToEdit!['id'],
+          name: nameCtrl.text.trim(),
+          species: selectedSpecies,
+          gender: selectedGender,
+          vetName: vetNameCtrl.text.trim(),
+          breed: breedCtrl.text.isEmpty ? 'Unknown' : breedCtrl.text.trim(),
+          birthdate: birthdateCtrl.text.isEmpty
+              ? 'Unknown'
+              : birthdateCtrl.text.trim(),
+          weight: weightCtrl.text.isEmpty ? '--' : weightCtrl.text.trim(),
+          color: colorCtrl.text.isEmpty ? 'Unknown' : colorCtrl.text.trim(),
+          isNeutered: isNeutered,
+          emoji: selectedEmoji,
+        );
+      } else {
+        await firestore.addPet(
+          name: nameCtrl.text.trim(),
+          species: selectedSpecies,
+          breed: breedCtrl.text.isEmpty ? 'Unknown' : breedCtrl.text.trim(),
+          birthdate: birthdateCtrl.text.isEmpty
+              ? 'Unknown'
+              : birthdateCtrl.text.trim(),
+          weight: weightCtrl.text.isEmpty ? '--' : weightCtrl.text.trim(),
+          gender: selectedGender,
+          color: colorCtrl.text.isEmpty ? 'Unknown' : colorCtrl.text.trim(),
+          isNeutered: isNeutered,
+          ownerEmail: targetOwnerEmail,
+          emoji: selectedEmoji,
+          vetName: vetNameCtrl.text.trim(),
+        );
+      }
 
       if (mounted) {
-        _showSnack('Pet registered successfully', AppColors.success);
+        _showSnack(
+          widget.petToEdit != null ? 'Pet updated successfully' : 'Pet registered successfully',
+          AppColors.success,
+        );
         Navigator.pop(context);
       }
     } catch (e) {
@@ -183,7 +221,7 @@ class _AddPetPageState extends State<AddPetPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Add a Pet', style: AppTypography.headlineLarge),
+        title: Text(widget.petToEdit != null ? 'Edit Pet' : 'Add a Pet', style: AppTypography.headlineLarge),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -305,7 +343,7 @@ class _AddPetPageState extends State<AddPetPage> {
               AppSpacing.vXxl,
 
               PrimaryButton(
-                label: 'Save Pet',
+                label: widget.petToEdit != null ? 'Update Pet' : 'Save Pet',
                 icon: Icons.check_rounded,
                 onPressed: () {
                   if (nameCtrl.text.trim().isEmpty || birthdateCtrl.text.trim().isEmpty || colorCtrl.text.trim().isEmpty || weightCtrl.text.trim().isEmpty) {
@@ -685,7 +723,7 @@ class _AddPetPageState extends State<AddPetPage> {
           AppSpacing.vXxl,
 
           PrimaryButton(
-            label: 'Save patient record',
+            label: widget.petToEdit != null ? 'Update patient record' : 'Save patient record',
             onPressed: _savePet,
             isLoading: _isLoading,
           ),

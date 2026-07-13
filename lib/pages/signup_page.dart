@@ -295,6 +295,80 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
+  Widget _buildMobileLayout() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: AppColors.primaryGradient,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.18),
+                      borderRadius: AppRadii.rMd,
+                    ),
+                    padding: const EdgeInsets.all(6),
+                    child: Image.asset(
+                      'lib/images/logo1.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  AppSpacing.hMd,
+                  Text(
+                    'Purramedics',
+                    style: AppTypography.headlineMedium.copyWith(
+                      color: AppColors.textInverse,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, -5),
+                    )
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                  child: _buildForm(false),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isWide = kIsWeb && Responsive.isWide(context);
@@ -312,12 +386,8 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
-      ),
-      body: SafeArea(child: _buildForm(false)),
+      backgroundColor: AppColors.primary,
+      body: _buildMobileLayout(),
     );
   }
 }

@@ -176,18 +176,14 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildFormPanel(bool isWide) {
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.huge),
+        padding: EdgeInsets.all(isWide ? AppSpacing.huge : AppSpacing.xxl),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (!isWide) ...[
-                Text('Purramedics', style: AppTypography.displaySmall),
-                AppSpacing.vHuge,
-              ] else
-                AppSpacing.vXxl,
+              AppSpacing.vXxl,
               Text('Welcome Back', style: AppTypography.displayMedium),
               AppSpacing.vSm,
               Wrap(
@@ -256,19 +252,99 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _buildMobileLayout() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: AppColors.primaryGradient,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.18),
+                      borderRadius: AppRadii.rMd,
+                    ),
+                    padding: const EdgeInsets.all(6),
+                    child: Image.asset(
+                      'lib/images/logo1.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  AppSpacing.hMd,
+                  Text(
+                    'Purramedics',
+                    style: AppTypography.headlineMedium.copyWith(
+                      color: AppColors.textInverse,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, -5),
+                    )
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                  child: _buildFormPanel(false),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isWide = Responsive.isWide(context);
+    
+    if (isWide) {
+      return Scaffold(
+        backgroundColor: AppColors.surface,
+        body: Row(
+          children: [
+            Expanded(child: _buildBrandPanel()),
+            Expanded(child: _buildFormPanel(true)),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: AppColors.surface,
-      body: isWide
-          ? Row(
-              children: [
-                Expanded(child: _buildBrandPanel()),
-                Expanded(child: _buildFormPanel(true)),
-              ],
-            )
-          : SafeArea(child: _buildFormPanel(false)),
+      backgroundColor: AppColors.primary,
+      body: _buildMobileLayout(),
     );
   }
 }

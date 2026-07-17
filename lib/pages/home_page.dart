@@ -233,7 +233,20 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
           onTap: () {
             final user = FirebaseAuth.instance.currentUser;
-            if (user == null) return;
+            if (user == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Please sign in to chat with a vet.'),
+                  backgroundColor: AppColors.primary,
+                  action: SnackBarAction(
+                    label: 'Sign In',
+                    textColor: Colors.white,
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              );
+              return;
+            }
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -355,6 +368,21 @@ class _HomePageState extends State<HomePage> {
               icon: s.icon,
               color: s.color,
               onTap: () {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Please sign in to book an appointment.'),
+                      backgroundColor: AppColors.primary,
+                      action: SnackBarAction(
+                        label: 'Sign In',
+                        textColor: Colors.white,
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                  );
+                  return;
+                }
                 navigateBottomBar(1);
                 AppointmentsPage.showBookDialog(
                   context,
@@ -902,6 +930,27 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final isGuest = user == null;
+
+    if (isGuest) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+            onPressed: () => Navigator.pop(context),
+            tooltip: 'Back',
+          ),
+          title: Text('Guest Mode', style: AppTypography.titleMedium),
+          centerTitle: true,
+        ),
+        body: SafeArea(child: _buildHome()),
+      );
+    }
+
     final pages = <Widget>[
       _buildHome(),
       const AppointmentsPage(),

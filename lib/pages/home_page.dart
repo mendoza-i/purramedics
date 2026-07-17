@@ -36,6 +36,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     final user = FirebaseAuth.instance.currentUser;
+    
+    // Run the lazy decline cleanup quietly in the background
+    FirestoreService().lazyDeclineStaleAppointments();
+    
     if (user != null) {
       _appointmentsSub = FirestoreService()
           .getUserAppointmentsStream(user.uid)

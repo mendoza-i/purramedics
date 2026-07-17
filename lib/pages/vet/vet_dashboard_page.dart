@@ -39,6 +39,10 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
   @override
   void initState() {
     super.initState();
+    
+    // Run the lazy decline cleanup quietly in the background
+    _firestoreService.lazyDeclineStaleAppointments();
+    
     _pendingSub = _firestoreService.getPendingAppointmentsCountStream().listen((
       count,
     ) {

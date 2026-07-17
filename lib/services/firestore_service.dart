@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
 import '../models/event.dart';
 
 /// ============================================================================

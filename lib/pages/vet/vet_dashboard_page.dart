@@ -11,6 +11,7 @@ import 'package:purramedics/pages/vet/vet_settings_page.dart';
 import 'package:purramedics/pages/vet/vet_availability_page.dart';
 import 'package:purramedics/pages/vet/widgets/seasonal_forecast_widget.dart';
 import 'package:purramedics/pages/vet/widgets/descriptive_analytics_widget.dart';
+import 'package:purramedics/pages/vet/widgets/predictive_analytics_widget.dart';
 import 'package:purramedics/pages/vet/widgets/revenue_stats_widget.dart';
 import 'package:purramedics/pages/vet/widgets/vet_background_pattern.dart';
 import 'package:purramedics/theme/app_theme.dart';
@@ -481,6 +482,14 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
               const DescriptiveAnalyticsWidget(),
               AppSpacing.vXxxl,
               _sectionTitle(
+                'Predictive Analytics',
+                Icons.insights_rounded,
+                AppColors.primary,
+              ),
+              AppSpacing.vMd,
+              const PredictiveAnalyticsWidget(),
+              AppSpacing.vXxxl,
+              _sectionTitle(
                 'Weather Forecast',
                 Icons.show_chart_rounded,
                 AppColors.info,
@@ -521,6 +530,14 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
         ),
         AppSpacing.vMd,
         const DescriptiveAnalyticsWidget(),
+        AppSpacing.vXxxl,
+        _sectionTitle(
+          'Predictive Analytics',
+          Icons.insights_rounded,
+          AppColors.primary,
+        ),
+        AppSpacing.vMd,
+        const PredictiveAnalyticsWidget(),
         AppSpacing.vXxxl,
         _sectionTitle(
           'Weather Forecast',

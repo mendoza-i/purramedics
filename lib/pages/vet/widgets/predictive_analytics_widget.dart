@@ -29,12 +29,12 @@ class _PredictiveAnalyticsWidgetState extends State<PredictiveAnalyticsWidget> {
     _firestoreService.getAllAppointmentsStream().listen((appointments) {
       if (!mounted) return;
 
-      // Map dates to counts for the last 30 days
+      // Map dates to counts for the last 7 days
       final now = DateTime.now();
       final Map<String, int> dailyCounts = {};
 
-      // Initialize last 30 days with 0
-      for (int i = 29; i >= 0; i--) {
+      // Initialize last 7 days with 0
+      for (int i = 6; i >= 0; i--) {
         final d = now.subtract(Duration(days: i));
         final dateStr = "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
         dailyCounts[dateStr] = 0;
@@ -54,15 +54,15 @@ class _PredictiveAnalyticsWidgetState extends State<PredictiveAnalyticsWidget> {
 
       // Extract y values (counts) in chronological order
       final yValues = dailyCounts.values.map((e) => e.toDouble()).toList();
-      // Extract x values (days 1 to 30)
+      // Extract x values (days 1 to 7)
       final xValues = List.generate(yValues.length, (index) => (index + 1).toDouble());
 
       // Train model
       final model = LinearRegression.calculate(xValues, yValues);
 
-      // Forecast next 7 days (days 31 to 37)
+      // Forecast next 7 days (days 8 to 14)
       final forecast = <double>[];
-      for (int i = 31; i <= 37; i++) {
+      for (int i = 8; i <= 14; i++) {
         // Ensure we don't predict negative patients
         double prediction = model.predict(i.toDouble());
         if (prediction < 0) prediction = 0;
@@ -224,7 +224,7 @@ class _ModelTesterDialog extends StatefulWidget {
 }
 
 class _ModelTesterDialogState extends State<_ModelTesterDialog> {
-  final TextEditingController _customDayCtrl = TextEditingController(text: '31');
+  final TextEditingController _customDayCtrl = TextEditingController(text: '8');
   double? _customPrediction;
 
   @override
@@ -256,9 +256,12 @@ class _ModelTesterDialogState extends State<_ModelTesterDialog> {
               ),
               AppSpacing.vSm,
               Text(
-                '1. We took your appointment data from the last 30 days and mapped it on a graph.\n'
-                '2. The algorithm then calculated a "line of best fit" through those points to find the trend.\n'
-                '3. Using the equation of that line (y = mx + b), we can predict future days!',
+                '1. We pull the patient counts from the last 7 days.\n'
+                '2. To do the math, the algorithm converts those dates into simple numbers:\n'
+                '     • Day 1 = 6 Days Ago\n'
+                '     • Day 7 = Today\n'
+                '3. It calculates a "line of best fit" through those 7 points to find the trend.\n'
+                '4. Using the equation of that line (y = mx + b), we can predict future days (like Day 8 for Tomorrow)!',
                 style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary, height: 1.5),
               ),
               AppSpacing.vLg,
@@ -279,12 +282,16 @@ class _ModelTesterDialogState extends State<_ModelTesterDialog> {
                     Text('  (Traffic is changing by this many patients per day)', style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary)),
                     AppSpacing.vSm,
                     Text('• Intercept (b): ${widget.model?.intercept.toStringAsFixed(4)}', style: AppTypography.bodyMedium),
-                    Text('  (The starting baseline of the graph)', style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary)),
+                    Text('  (The mathematical starting point)', style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary)),
                   ],
                 ),
               ),
               AppSpacing.vLg,
               Text('Try it yourself!', style: AppTypography.labelLarge),
+              Text(
+                'Type a number to predict a day. For example, since Today is Day 7, type 8 to predict Tomorrow.',
+                style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+              ),
               AppSpacing.vSm,
               Row(
                 children: [
@@ -293,7 +300,7 @@ class _ModelTesterDialogState extends State<_ModelTesterDialog> {
                       controller: _customDayCtrl,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        labelText: 'Enter Future Day (e.g. 31)',
+                        labelText: 'Enter Future Day (e.g. 8)',
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),

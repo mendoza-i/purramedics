@@ -29,12 +29,12 @@ class _PredictiveAnalyticsWidgetState extends State<PredictiveAnalyticsWidget> {
     _firestoreService.getAllAppointmentsStream().listen((appointments) {
       if (!mounted) return;
 
-      // Map dates to counts for the last 7 days
+      // Map dates to counts for the last 30 days
       final now = DateTime.now();
       final Map<String, int> dailyCounts = {};
 
-      // Initialize last 7 days with 0
-      for (int i = 6; i >= 0; i--) {
+      // Initialize last 30 days with 0
+      for (int i = 29; i >= 0; i--) {
         final d = now.subtract(Duration(days: i));
         final dateStr = "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
         dailyCounts[dateStr] = 0;
@@ -54,15 +54,15 @@ class _PredictiveAnalyticsWidgetState extends State<PredictiveAnalyticsWidget> {
 
       // Extract y values (counts) in chronological order
       final yValues = dailyCounts.values.map((e) => e.toDouble()).toList();
-      // Extract x values (days 1 to 7)
+      // Extract x values (days 1 to 30)
       final xValues = List.generate(yValues.length, (index) => (index + 1).toDouble());
 
       // Train model
       final model = LinearRegression.calculate(xValues, yValues);
 
-      // Forecast next 7 days (days 8 to 14)
+      // Forecast next 7 days (days 31 to 37)
       final forecast = <double>[];
-      for (int i = 8; i <= 14; i++) {
+      for (int i = 31; i <= 37; i++) {
         // Ensure we don't predict negative patients
         double prediction = model.predict(i.toDouble());
         if (prediction < 0) prediction = 0;
@@ -224,7 +224,7 @@ class _ModelTesterDialog extends StatefulWidget {
 }
 
 class _ModelTesterDialogState extends State<_ModelTesterDialog> {
-  final TextEditingController _customDayCtrl = TextEditingController(text: '8');
+  final TextEditingController _customDayCtrl = TextEditingController(text: '31');
   double? _customPrediction;
 
   @override
@@ -251,8 +251,15 @@ class _ModelTesterDialogState extends State<_ModelTesterDialog> {
               ),
               AppSpacing.vLg,
               Text(
-                'This dialog is built to demonstrate the Linear Regression algorithm for the panel defense.',
-                style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                'How does this work?',
+                style: AppTypography.labelLarge.copyWith(color: AppColors.primary),
+              ),
+              AppSpacing.vSm,
+              Text(
+                '1. We took your appointment data from the last 30 days and mapped it on a graph.\n'
+                '2. The algorithm then calculated a "line of best fit" through those points to find the trend.\n'
+                '3. Using the equation of that line (y = mx + b), we can predict future days!',
+                style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary, height: 1.5),
               ),
               AppSpacing.vLg,
               Container(
@@ -264,21 +271,20 @@ class _ModelTesterDialogState extends State<_ModelTesterDialog> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('1. Data Points (Last 7 Days)', style: AppTypography.labelLarge),
+                    Text('Your Calculated Formula:', style: AppTypography.labelLarge),
                     AppSpacing.vSm,
-                    Text('X (Days): [1, 2, 3, 4, 5, 6, 7]', style: AppTypography.bodyMedium),
-                    Text('Y (Patients): ${widget.historicalCounts.map((e) => e.round()).toList()}', style: AppTypography.bodyMedium),
-                    AppSpacing.vLg,
-                    Text('2. Calculated Formula', style: AppTypography.labelLarge),
+                    Text('Future Patients = (Slope × Day) + Intercept', style: AppTypography.bodyMedium.copyWith(fontFamily: 'monospace', color: AppColors.primary)),
+                    AppSpacing.vMd,
+                    Text('• Slope (m): ${widget.model?.slope.toStringAsFixed(4)}', style: AppTypography.bodyMedium),
+                    Text('  (Traffic is changing by this many patients per day)', style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary)),
                     AppSpacing.vSm,
-                    Text('y = mx + b', style: AppTypography.bodyMedium.copyWith(fontFamily: 'monospace')),
-                    Text('Slope (m): ${widget.model?.slope.toStringAsFixed(4)}', style: AppTypography.bodyMedium),
-                    Text('Intercept (b): ${widget.model?.intercept.toStringAsFixed(4)}', style: AppTypography.bodyMedium),
+                    Text('• Intercept (b): ${widget.model?.intercept.toStringAsFixed(4)}', style: AppTypography.bodyMedium),
+                    Text('  (The starting baseline of the graph)', style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary)),
                   ],
                 ),
               ),
               AppSpacing.vLg,
-              Text('3. Test the Equation', style: AppTypography.labelLarge),
+              Text('Try it yourself!', style: AppTypography.labelLarge),
               AppSpacing.vSm,
               Row(
                 children: [
@@ -287,7 +293,7 @@ class _ModelTesterDialogState extends State<_ModelTesterDialog> {
                       controller: _customDayCtrl,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        labelText: 'Enter Future Day (e.g. 8)',
+                        labelText: 'Enter Future Day (e.g. 31)',
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),

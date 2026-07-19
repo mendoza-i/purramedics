@@ -137,7 +137,7 @@ class _PredictiveAnalyticsWidgetState extends State<PredictiveAnalyticsWidget> {
               TextButton.icon(
                 onPressed: _showModelTester,
                 icon: const Icon(Icons.science_rounded, size: 16),
-                label: const Text('Test Model (Defense)'),
+                label: const Text('Test Model'),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   textStyle: AppTypography.labelMedium,

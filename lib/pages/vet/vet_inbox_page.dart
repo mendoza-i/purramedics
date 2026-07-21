@@ -21,6 +21,33 @@ class VetInboxPage extends StatelessWidget {
     return DateFormat('MMM d').format(time);
   }
 
+  void _showDeleteConfirmation(BuildContext context, String chatId, FirestoreService firestoreService) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Message'),
+        content: const Text('Are you sure you want to delete this message thread? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              firestoreService.deleteChat(chatId);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Message deleted')),
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final firestoreService = FirestoreService();
@@ -163,6 +190,12 @@ class VetInboxPage extends StatelessWidget {
                                   ),
                                 ],
                               ],
+                            ),
+                            AppSpacing.hSm,
+                            IconButton(
+                              onPressed: () => _showDeleteConfirmation(context, chat['id'], firestoreService),
+                              icon: const Icon(Icons.delete_outline_rounded, color: AppColors.danger, size: 20),
+                              tooltip: 'Delete message',
                             ),
                           ],
                         ),

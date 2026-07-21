@@ -227,6 +227,11 @@ class FirestoreService {
     return false;
   }
 
+  // Delete a chat room (for error handling)
+  Future<void> deleteChat(String chatId) async {
+    await _chatsCollection.doc(chatId).delete();
+  }
+
   // Delete Appointment
   Future<void> deleteAppointment(String id) async {
     await _appointmentsCollection.doc(id).delete();

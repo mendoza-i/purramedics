@@ -336,8 +336,12 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
     final rawBirthdate = pet['birthdate']?.toString();
     final birthdate = _formatDateString(rawBirthdate);
     final ageStr = _calculateAge(rawBirthdate);
-    final birthDisplay = ageStr.isNotEmpty ? '$birthdate ($ageStr)' : birthdate;
     final gender = pet['gender'] ?? '?';
+    final weight = pet['weight']?.toString() ?? '-- kg';
+    final notes = pet['notes']?.toString();
+    
+    // Fallback if weight doesn't have units
+    final weightDisplay = weight.contains(RegExp(r'[a-zA-Z]')) || weight == '-- kg' ? weight : '$weight kg';
 
     return Container(
       decoration: BoxDecoration(
@@ -346,122 +350,149 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
         border: Border.all(color: AppColors.primary.withOpacity(0.15)),
         boxShadow: AppShadows.sm,
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: AppRadii.rLg,
-          onTap: () => _showViewPetDialog(context, pet),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header: Emoji, Name, Breed, Status Badge
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.primarySurface,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Text(
-                          emoji,
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                      ),
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySurface,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Center(
+                    child: Text(
+                      emoji,
+                      style: const TextStyle(fontSize: 24),
                     ),
-                    AppSpacing.hMd,
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
-                            style: AppTypography.titleMedium.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          AppSpacing.vXs,
-                          Text(
-                            breed,
-                            style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuButton<String>(
-                      icon: const Icon(
-                        Icons.more_horiz_rounded,
-                        color: AppColors.textTertiary,
-                      ),
-                      onSelected: (value) {
-                        if (value == 'edit') _showEditPetDialog(context, pet);
-                        if (value == 'delete')
-                          _showDeleteConfirmation(context, pet['id'], name);
-                      },
-                      itemBuilder: (_) => [
-                        PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.edit_outlined,
-                                size: 18,
-                                color: AppColors.textSecondary,
-                              ),
-                              AppSpacing.hSm,
-                              Text('Edit', style: AppTypography.bodyMedium),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.delete_outline_rounded,
-                                size: 18,
-                                color: AppColors.danger,
-                              ),
-                              AppSpacing.hSm,
-                              Text(
-                                'Delete',
-                                style: AppTypography.bodyMedium.copyWith(
-                                  color: AppColors.danger,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-                AppSpacing.vMd,
-                Wrap(
-                  spacing: AppSpacing.xs,
-                  runSpacing: AppSpacing.xs,
-                  children: [
-                    _chip(Icons.pets_rounded, breed),
-                    _chip(
-                      gender == 'Female'
-                          ? Icons.female_rounded
-                          : Icons.male_rounded,
-                      gender,
-                    ),
-                    _chip(Icons.cake_outlined, birthDisplay),
-                  ],
+                AppSpacing.hMd,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: AppTypography.titleMedium.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      AppSpacing.vXs,
+                      Text(
+                        breed,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                AppBadge(
+                  label: 'Active Patient',
+                  tone: BadgeTone.success,
                 ),
               ],
             ),
-          ),
+            AppSpacing.vMd,
+            
+            // Vitals Row
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                _chip(Icons.monitor_weight_outlined, weightDisplay),
+                _chip(
+                  gender == 'Female'
+                      ? Icons.female_rounded
+                      : Icons.male_rounded,
+                  gender,
+                ),
+                _chip(Icons.cake_outlined, ageStr.isNotEmpty ? ageStr : birthdate),
+              ],
+            ),
+            AppSpacing.vMd,
+            
+            // Medical Notes Preview
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: AppRadii.rMd,
+                border: Border.all(color: AppColors.divider),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.medical_information_outlined, size: 14, color: AppColors.textSecondary),
+                      AppSpacing.hXs,
+                      Text(
+                        'LATEST MEDICAL NOTE',
+                        style: AppTypography.labelSmall.copyWith(
+                          color: AppColors.textSecondary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  AppSpacing.vXs,
+                  Text(
+                    (notes != null && notes.isNotEmpty) 
+                        ? notes 
+                        : 'No recent medical notes. Click "Edit Record" to add.',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: (notes != null && notes.isNotEmpty) ? AppColors.textPrimary : AppColors.textTertiary,
+                      fontStyle: (notes != null && notes.isNotEmpty) ? FontStyle.normal : FontStyle.italic,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            AppSpacing.vLg,
+            
+            // Action Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showEditPetDialog(context, pet),
+                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    label: const Text('Edit Record'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+                    ),
+                  ),
+                ),
+                AppSpacing.hSm,
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showViewPetDialog(context, pet),
+                    icon: const Icon(Icons.folder_shared_outlined, size: 18),
+                    label: const Text('View Full'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.textInverse,
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

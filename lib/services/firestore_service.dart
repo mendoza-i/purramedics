@@ -125,6 +125,39 @@ class FirestoreService {
     });
   }
 
+  // Add Walk-In Appointment (For Vets)
+  Future<void> addWalkInAppointment(
+    String pet,
+    String ownerName,
+    String type,
+  ) async {
+    final now = DateTime.now();
+    final dateString =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    
+    // Convert 24-hour time to 12-hour format string (Flutter uses TimeOfDay natively, so we just format it manually)
+    final hour12 = now.hour == 0 ? 12 : (now.hour > 12 ? now.hour - 12 : now.hour);
+    final period = now.hour < 12 ? 'AM' : 'PM';
+    final timeString = '$hour12:${now.minute.toString().padLeft(2, '0')} $period';
+
+    await _appointmentsCollection.add({
+      'clinicName': 'Purramedics Vet', // Default for now
+      'doctorName': 'Attending Vet', // Default for now
+      'date': dateString,
+      'time': timeString,
+      'petName': pet,
+      'visitType': type,
+      'userId': 'walk-in',
+      'userName': ownerName,
+      'userEmail': 'walk-in@purramedics.com',
+      'additionalInfo': 'Walk-in patient',
+      'consultationMethod': 'In Person',
+      'status': 'Accepted', // Accepted means the model counts it!
+      'isWalkIn': true,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   // Count how many bookings the user made today
   Future<int> getDailyBookingCount(String userId) async {
     final now = DateTime.now();

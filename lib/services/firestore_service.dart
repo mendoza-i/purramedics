@@ -723,6 +723,11 @@ class FirestoreService {
           ? Timestamp.fromDate(customDate)
           : FieldValue.serverTimestamp(),
     });
+
+    // Update the latest note on the pet document itself for quick preview
+    await _petsCollection.doc(petId).update({
+      'notes': note,
+    });
   }
 
   // Get stream of session notes for a specific pet

@@ -833,6 +833,8 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
         );
       },
     );
+  }
+
   void _showAddWalkInDialog(BuildContext context) {
     final petNameCtrl = TextEditingController();
     final ownerNameCtrl = TextEditingController();

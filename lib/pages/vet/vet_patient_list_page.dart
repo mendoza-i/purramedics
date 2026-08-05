@@ -21,6 +21,16 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
   final Map<String, bool> _expandedOwners = {};
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  
+  late final Stream<List<Map<String, dynamic>>> _ownersStream;
+  late final Stream<List<Map<String, dynamic>>> _petsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _ownersStream = _firestoreService.getOwnersStream();
+    _petsStream = _firestoreService.getAllPetsStream();
+  }
 
   @override
   void dispose() {
@@ -119,7 +129,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
 
   Widget _buildBody() {
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: _firestoreService.getOwnersStream(),
+      stream: _ownersStream,
       builder: (context, ownerSnapshot) {
         if (ownerSnapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -134,7 +144,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
         };
 
         return StreamBuilder<List<Map<String, dynamic>>>(
-          stream: _firestoreService.getAllPetsStream(),
+          stream: _petsStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -300,31 +310,41 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
               ),
             ),
           ),
-          if (expanded) ...[
-            const Divider(height: 1, color: AppColors.divider),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final cols = Responsive.isWide(context) ? 2 : 1;
-                  final width =
-                      (constraints.maxWidth - (AppSpacing.md * (cols - 1))) /
-                          cols -
-                      0.1;
-                  return Wrap(
-                    spacing: AppSpacing.md,
-                    runSpacing: AppSpacing.md,
-                    children: pets
-                        .map(
-                          (p) =>
-                              SizedBox(width: width, child: _buildPetCard(p)),
-                        )
-                        .toList(),
-                  );
-                },
-              ),
-            ),
-          ],
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: expanded
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Divider(height: 1, color: AppColors.divider),
+                      Padding(
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final cols = Responsive.isWide(context) ? 2 : 1;
+                            final width =
+                                (constraints.maxWidth - (AppSpacing.md * (cols - 1))) /
+                                    cols -
+                                0.1;
+                            return Wrap(
+                              spacing: AppSpacing.md,
+                              runSpacing: AppSpacing.md,
+                              children: pets
+                                  .map(
+                                    (p) =>
+                                        SizedBox(width: width, child: _buildPetCard(p)),
+                                  )
+                                  .toList(),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
@@ -460,11 +480,12 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                         (latestNoteText != null && latestNoteText.isNotEmpty) 
                             ? latestNoteText 
                             : 'No recent medical notes. Click "Add Record" to add.',
+                        textAlign: TextAlign.left,
                         style: AppTypography.bodySmall.copyWith(
                           color: (latestNoteText != null && latestNoteText.isNotEmpty) ? AppColors.textPrimary : AppColors.textTertiary,
                           fontStyle: (latestNoteText != null && latestNoteText.isNotEmpty) ? FontStyle.normal : FontStyle.italic,
                         ),
-                        maxLines: 2,
+                        maxLines: 4,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -513,7 +534,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: 6,
+        vertical: 8,
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceAlt,
@@ -522,11 +543,11 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: AppColors.textSecondary),
-          AppSpacing.hXs,
+          Icon(icon, size: 16, color: AppColors.textSecondary),
+          AppSpacing.hSm,
           Text(
             text,
-            style: AppTypography.labelSmall.copyWith(
+            style: AppTypography.labelMedium.copyWith(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),

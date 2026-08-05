@@ -673,7 +673,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
       _Tool(
         'Walk-In',
         'Register patient',
-        Icons.add_circle_outline_rounded,
+        Icons.directions_walk_rounded,
         AppColors.success,
         () => _showAddWalkInDialog(context),
       ),

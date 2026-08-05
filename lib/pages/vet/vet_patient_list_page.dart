@@ -463,6 +463,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.medical_information_outlined, size: 14, color: AppColors.textSecondary),
                           AppSpacing.hXs,
@@ -485,7 +486,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                           color: (latestNoteText != null && latestNoteText.isNotEmpty) ? AppColors.textPrimary : AppColors.textTertiary,
                           fontStyle: (latestNoteText != null && latestNoteText.isNotEmpty) ? FontStyle.normal : FontStyle.italic,
                         ),
-                        maxLines: 4,
+                        maxLines: 8,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],

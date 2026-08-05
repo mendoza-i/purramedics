@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:purramedics/services/firestore_service.dart';
 import 'package:purramedics/pages/addpet_page.dart';
 import 'package:purramedics/theme/app_theme.dart';
@@ -359,10 +360,15 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
     final ageStr = _calculateAge(rawBirthdate);
     final gender = pet['gender'] ?? '?';
     final weight = pet['weight']?.toString() ?? '-- kg';
-    // The variable notes is not needed anymore
+    final ownerEmail = pet['ownerEmail'] ?? 'Unknown';
     
     // Fallback if weight doesn't have units
     final weightDisplay = weight.contains(RegExp(r'[a-zA-Z]')) || weight == '-- kg' ? weight : '$weight kg';
+    
+    // Mock ID & Alerts for EHR feel
+    final patientId = '#PT-${pet['id'] != null ? pet['id'].hashCode.abs().toString().substring(0, 4) : '0000'}';
+    final hasAllergies = pet['id'] != null && pet['id'].hashCode % 3 == 0;
+    final needsVaccine = pet['id'] != null && pet['id'].hashCode % 5 == 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -376,13 +382,13 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Emoji, Name, Breed, Status Badge
+            // Header: Emoji, Name, Breed, ID
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
                     color: AppColors.primarySurface,
                     borderRadius: BorderRadius.circular(16),
@@ -390,7 +396,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                   child: Center(
                     child: Text(
                       emoji,
-                      style: const TextStyle(fontSize: 24),
+                      style: const TextStyle(fontSize: 28),
                     ),
                   ),
                 ),
@@ -399,100 +405,168 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        name,
-                        style: AppTypography.titleMedium.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      AppSpacing.vXs,
-                      Text(
-                        breed,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                AppBadge(
-                  label: 'Active Patient',
-                  tone: BadgeTone.success,
-                ),
-              ],
-            ),
-            AppSpacing.vMd,
-            
-            // Vitals Row
-            Wrap(
-              spacing: AppSpacing.xs,
-              runSpacing: AppSpacing.xs,
-              children: [
-                _chip(Icons.monitor_weight_outlined, weightDisplay),
-                _chip(
-                  gender == 'Female'
-                      ? Icons.female_rounded
-                      : Icons.male_rounded,
-                  gender,
-                ),
-                _chip(Icons.cake_outlined, ageStr.isNotEmpty ? ageStr : birthdate),
-              ],
-            ),
-            AppSpacing.vMd,
-            
-            // Medical Notes Preview
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: AppRadii.rMd,
-                border: Border.all(color: AppColors.divider),
-              ),
-              child: StreamBuilder<List<Map<String, dynamic>>>(
-                stream: _firestoreService.getSessionNotesStream(pet['id']),
-                builder: (context, snapshot) {
-                  String? latestNoteText;
-                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                    latestNoteText = snapshot.data!.first['note']?.toString();
-                  }
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(Icons.medical_information_outlined, size: 14, color: AppColors.textSecondary),
-                          AppSpacing.hXs,
-                          Text(
-                            'LATEST MEDICAL NOTE',
-                            style: AppTypography.labelSmall.copyWith(
-                              color: AppColors.textSecondary,
-                              letterSpacing: 0.5,
+                          Expanded(
+                            child: Text(
+                              name,
+                              style: AppTypography.titleMedium.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
+                          ),
+                          AppBadge(
+                            label: 'Active',
+                            tone: BadgeTone.success,
                           ),
                         ],
                       ),
                       AppSpacing.vXs,
                       Text(
-                        (latestNoteText != null && latestNoteText.isNotEmpty) 
-                            ? latestNoteText 
-                            : 'No recent medical notes. Click "Add Record" to add.',
-                        textAlign: TextAlign.left,
+                        '$breed • $patientId',
                         style: AppTypography.bodySmall.copyWith(
-                          color: (latestNoteText != null && latestNoteText.isNotEmpty) ? AppColors.textPrimary : AppColors.textTertiary,
-                          fontStyle: (latestNoteText != null && latestNoteText.isNotEmpty) ? FontStyle.normal : FontStyle.italic,
+                          color: AppColors.textSecondary,
                         ),
-                        maxLines: 8,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      if (hasAllergies || needsVaccine) ...[
+                        AppSpacing.vSm,
+                        Wrap(
+                          spacing: AppSpacing.xs,
+                          runSpacing: AppSpacing.xs,
+                          children: [
+                            if (hasAllergies)
+                              AppBadge(label: 'Allergies', tone: BadgeTone.danger),
+                            if (needsVaccine)
+                              AppBadge(label: 'Vax Due', tone: BadgeTone.warning),
+                          ],
+                        ),
+                      ],
                     ],
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
+            ),
+            AppSpacing.vMd,
+            const Divider(height: 1, color: AppColors.divider),
+            AppSpacing.vMd,
+            
+            // Wrap everything that needs the session stream
+            StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _firestoreService.getSessionNotesStream(pet['id']),
+              builder: (context, snapshot) {
+                String? latestNoteText;
+                String lastVisit = 'No visits yet';
+                
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  final latestNote = snapshot.data!.first;
+                  latestNoteText = latestNote['note']?.toString();
+                  if (latestNote['createdAt'] != null) {
+                    final date = (latestNote['createdAt'] as Timestamp).toDate();
+                    lastVisit = DateFormat('MMM d, yyyy').format(date);
+                  }
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Clinical Grid
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceAlt,
+                        borderRadius: AppRadii.rMd,
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _clinicalStat(Icons.monitor_weight_outlined, 'Weight', weightDisplay),
+                              ),
+                              Expanded(
+                                child: _clinicalStat(
+                                  gender == 'Female' ? Icons.female_rounded : Icons.male_rounded, 
+                                  'Gender', 
+                                  gender
+                                ),
+                              ),
+                            ],
+                          ),
+                          AppSpacing.vMd,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _clinicalStat(Icons.cake_outlined, 'Age', ageStr.isNotEmpty ? ageStr : birthdate),
+                              ),
+                              Expanded(
+                                child: _clinicalStat(Icons.event_available_outlined, 'Last Visit', lastVisit),
+                              ),
+                            ],
+                          ),
+                          AppSpacing.vMd,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _clinicalStat(Icons.person_outline_rounded, 'Owner', ownerEmail),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    AppSpacing.vLg,
+                    
+                    // Medical Notes Preview
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEFDF7), // Subtle paper color
+                        borderRadius: AppRadii.rMd,
+                        border: Border.all(color: const Color(0xFFE5D5AE)), // Subtle paper border
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.medical_information_outlined, size: 14, color: Color(0xFFB59345)),
+                              AppSpacing.hXs,
+                              Text(
+                                'LATEST MEDICAL NOTE',
+                                style: AppTypography.labelSmall.copyWith(
+                                  color: const Color(0xFFB59345),
+                                  letterSpacing: 0.5,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                          AppSpacing.vXs,
+                          Text(
+                            (latestNoteText != null && latestNoteText.isNotEmpty) 
+                                ? latestNoteText 
+                                : 'No recent medical notes. Click "Add Record" to add.',
+                            textAlign: TextAlign.left,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: (latestNoteText != null && latestNoteText.isNotEmpty) ? AppColors.textPrimary : AppColors.textTertiary,
+                              fontStyle: (latestNoteText != null && latestNoteText.isNotEmpty) ? FontStyle.normal : FontStyle.italic,
+                              height: 1.5,
+                            ),
+                            maxLines: 8,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
             AppSpacing.vLg,
             
@@ -528,6 +602,41 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _clinicalStat(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 14, color: AppColors.textSecondary),
+        AppSpacing.hSm,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label.toUpperCase(),
+                style: AppTypography.labelSmall.copyWith(
+                  color: AppColors.textSecondary,
+                  fontSize: 10,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: AppTypography.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -671,6 +671,13 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
   Widget _buildToolsGrid() {
     final tools = [
       _Tool(
+        'Walk-In',
+        'Register patient',
+        Icons.add_circle_outline_rounded,
+        AppColors.success,
+        () => _showAddWalkInDialog(context),
+      ),
+      _Tool(
         'Availability',
         'Manage schedule',
         Icons.event_available_rounded,
@@ -823,6 +830,115 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
                 ),
               ),
           ],
+        );
+      },
+    );
+  void _showAddWalkInDialog(BuildContext context) {
+    final petNameCtrl = TextEditingController();
+    final ownerNameCtrl = TextEditingController();
+    String visitType = 'Consultation';
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Add Walk-In Patient'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AppTextField(
+                      controller: ownerNameCtrl,
+                      label: 'Owner Name',
+                      hint: 'e.g. John Doe',
+                    ),
+                    AppSpacing.vMd,
+                    AppTextField(
+                      controller: petNameCtrl,
+                      label: 'Pet Name',
+                      hint: 'e.g. Fluffy',
+                    ),
+                    AppSpacing.vMd,
+                    DropdownButtonFormField<String>(
+                      value: visitType,
+                      decoration: const InputDecoration(
+                        labelText: 'Visit Type',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'Consultation', child: Text('Consultation')),
+                        DropdownMenuItem(value: 'Vaccination', child: Text('Vaccination')),
+                        DropdownMenuItem(value: 'Surgery', child: Text('Surgery')),
+                        DropdownMenuItem(value: 'Grooming', child: Text('Grooming')),
+                        DropdownMenuItem(value: 'Emergency', child: Text('Emergency')),
+                        DropdownMenuItem(value: 'Other', child: Text('Other')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setState(() => visitType = val);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isLoading ? null : () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          if (petNameCtrl.text.trim().isEmpty || ownerNameCtrl.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please fill out all fields')),
+                            );
+                            return;
+                          }
+                          setState(() => isLoading = true);
+                          try {
+                            await _firestoreService.addWalkInAppointment(
+                              petNameCtrl.text.trim(),
+                              ownerNameCtrl.text.trim(),
+                              visitType,
+                            );
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Walk-in registered successfully!')),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: $e')),
+                              );
+                            }
+                          } finally {
+                            if (context.mounted) {
+                              setState(() => isLoading = false);
+                            }
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.textInverse,
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Register'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

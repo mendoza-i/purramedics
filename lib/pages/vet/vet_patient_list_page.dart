@@ -468,9 +468,9 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () => _showEditPetDialog(context, pet),
-                    icon: const Icon(Icons.edit_outlined, size: 18),
-                    label: const Text('Edit Record'),
+                    onPressed: () => _showAddMedicalHistoryDialog(context, pet),
+                    icon: const Icon(Icons.note_add_outlined, size: 18),
+                    label: const Text('Add Record'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       side: BorderSide(color: AppColors.primary.withOpacity(0.3)),
@@ -548,7 +548,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
           AppSpacing.vXs,
           Text(
             value.isEmpty || value == 'Unknown' ? '—' : value,
-            style: AppTypography.labelLarge.copyWith(color: Colors.white),
+            style: AppTypography.titleMedium.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -575,7 +575,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                   value.isEmpty || value == 'Unknown' || value == 'null'
                       ? '—'
                       : value,
-                  style: AppTypography.bodyMedium.copyWith(
+                  style: AppTypography.titleMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -661,43 +661,6 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                           ],
                         ),
                         const Spacer(),
-                        SizedBox(
-                          width: double.infinity,
-                          child: PrimaryButton(
-                            label: 'Edit',
-                            icon: Icons.edit_outlined,
-                            size: AppButtonSize.small,
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppColors.primary,
-                            isExpanded: true,
-                            onPressed: () {
-                              Navigator.pop(dialogCtx);
-                              _showEditPetDialog(context, pet);
-                            },
-                          ),
-                        ),
-                        AppSpacing.vSm,
-                        TextButton.icon(
-                          onPressed: () {
-                            Navigator.pop(dialogCtx);
-                            _showDeleteConfirmation(
-                              context,
-                              pet['id'],
-                              pet['name'] ?? 'this pet',
-                            );
-                          },
-                          icon: Icon(
-                            Icons.delete_outline_rounded,
-                            color: Colors.white.withOpacity(0.85),
-                            size: 16,
-                          ),
-                          label: Text(
-                            'Delete',
-                            style: AppTypography.labelMedium.copyWith(
-                              color: Colors.white.withOpacity(0.85),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -1062,7 +1025,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                   child: AppTextField(
                     controller: noteCtrl,
                     hint: 'Conclusions, prescriptions, observations…',
-                    maxLines: 4,
+                    maxLines: 12,
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) =>
                         _saveHistory(ctx, pet, noteCtrl, selectedDate),

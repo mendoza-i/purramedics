@@ -339,7 +339,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
     final ageStr = _calculateAge(rawBirthdate);
     final gender = pet['gender'] ?? '?';
     final weight = pet['weight']?.toString() ?? '-- kg';
-    final notes = pet['notes']?.toString();
+    // The variable notes is not needed anymore
     
     // Fallback if weight doesn't have units
     final weightDisplay = weight.contains(RegExp(r'[a-zA-Z]')) || weight == '-- kg' ? weight : '$weight kg';
@@ -431,35 +431,45 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                 borderRadius: AppRadii.rMd,
                 border: Border.all(color: AppColors.divider),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: _firestoreService.getSessionNotesStream(pet['id']),
+                builder: (context, snapshot) {
+                  String? latestNoteText;
+                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    latestNoteText = snapshot.data!.first['note']?.toString();
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.medical_information_outlined, size: 14, color: AppColors.textSecondary),
-                      AppSpacing.hXs,
+                      Row(
+                        children: [
+                          Icon(Icons.medical_information_outlined, size: 14, color: AppColors.textSecondary),
+                          AppSpacing.hXs,
+                          Text(
+                            'LATEST MEDICAL NOTE',
+                            style: AppTypography.labelSmall.copyWith(
+                              color: AppColors.textSecondary,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      AppSpacing.vXs,
                       Text(
-                        'LATEST MEDICAL NOTE',
-                        style: AppTypography.labelSmall.copyWith(
-                          color: AppColors.textSecondary,
-                          letterSpacing: 0.5,
+                        (latestNoteText != null && latestNoteText.isNotEmpty) 
+                            ? latestNoteText 
+                            : 'No recent medical notes. Click "Add Record" to add.',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: (latestNoteText != null && latestNoteText.isNotEmpty) ? AppColors.textPrimary : AppColors.textTertiary,
+                          fontStyle: (latestNoteText != null && latestNoteText.isNotEmpty) ? FontStyle.normal : FontStyle.italic,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                  ),
-                  AppSpacing.vXs,
-                  Text(
-                    (notes != null && notes.isNotEmpty) 
-                        ? notes 
-                        : 'No recent medical notes. Click "Edit Record" to add.',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: (notes != null && notes.isNotEmpty) ? AppColors.textPrimary : AppColors.textTertiary,
-                      fontStyle: (notes != null && notes.isNotEmpty) ? FontStyle.normal : FontStyle.italic,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                  );
+                },
               ),
             ),
             AppSpacing.vLg,

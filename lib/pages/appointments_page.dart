@@ -12,12 +12,12 @@ class AppointmentsPage extends StatefulWidget {
     BuildContext context, {
     String? initialVisitType,
   }) async {
-    final _firestoreService = FirestoreService();
-    final _user = FirebaseAuth.instance.currentUser;
+    final firestoreService = FirestoreService();
+    final user = FirebaseAuth.instance.currentUser;
 
-    if (_user != null) {
-      final dailyCount = await _firestoreService.getDailyBookingCount(
-        _user.uid,
+    if (user != null) {
+      final dailyCount = await firestoreService.getDailyBookingCount(
+        user.uid,
       );
       if (dailyCount >= 2 && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -68,8 +68,7 @@ class AppointmentsPage extends StatefulWidget {
     String? selectedTimeSlot;
     final allTimeSlots = <String>[
       for (var h = 8; h <= 21; h++)
-        '${(h == 0 || h == 12) ? 12 : h % 12}'.padLeft(2, '0') +
-            ':00 ${h < 12 ? 'AM' : 'PM'}',
+        '${'${(h == 0 || h == 12) ? 12 : h % 12}'.padLeft(2, '0')}:00 ${h < 12 ? 'AM' : 'PM'}',
     ];
 
     if (!context.mounted) return;
@@ -177,7 +176,7 @@ class AppointmentsPage extends StatefulWidget {
                                       builder: (context, priceSnap) {
                                         final prices = priceSnap.data ?? {};
                                         return DropdownButtonFormField<String>(
-                                          value: selectedVisitType,
+                                          initialValue: selectedVisitType,
                                           decoration: const InputDecoration(
                                             labelText: 'Visit type',
                                             prefixIcon: Icon(
@@ -317,10 +316,12 @@ class AppointmentsPage extends StatefulWidget {
                                           final parts = slot.split(' ');
                                           final timeParts = parts[0].split(':');
                                           var h = int.parse(timeParts[0]);
-                                          if (parts[1] == 'PM' && h != 12)
+                                          if (parts[1] == 'PM' && h != 12) {
                                             h += 12;
-                                          if (parts[1] == 'AM' && h == 12)
+                                          }
+                                          if (parts[1] == 'AM' && h == 12) {
                                             h = 0;
+                                          }
                                           final slotTime = DateTime(
                                             now.year,
                                             now.month,
@@ -349,7 +350,7 @@ class AppointmentsPage extends StatefulWidget {
                                                   )
                                                 else
                                                   FutureBuilder<bool>(
-                                                    future: _firestoreService
+                                                    future: firestoreService
                                                         .isSlotTaken(
                                                           'Pet Treasure',
                                                           "${selectedDate.toLocal()}"
@@ -404,9 +405,10 @@ class AppointmentsPage extends StatefulWidget {
                                       label: 'Book appointment',
                                       isLoading: isBooking,
                                       onPressed: () async {
-                                        if (_user == null) return;
-                                        if (!formKey.currentState!.validate())
+                                        if (user == null) return;
+                                        if (!formKey.currentState!.validate()) {
                                           return;
+                                        }
                                         if (selectedTimeSlot == null) {
                                           ScaffoldMessenger.of(
                                             context,
@@ -519,7 +521,7 @@ class AppointmentsPage extends StatefulWidget {
 
                                         setDialogState(() => isBooking = true);
                                         try {
-                                          await _firestoreService
+                                          await firestoreService
                                               .addAppointment(
                                                 'Pet Treasure',
                                                 '',
@@ -527,10 +529,10 @@ class AppointmentsPage extends StatefulWidget {
                                                 selectedTimeSlot!,
                                                 petController.text.trim(),
                                                 finalVisitType,
-                                                _user.uid,
-                                                _user.displayName ??
+                                                user.uid,
+                                                user.displayName ??
                                                     'Pet Owner',
-                                                _user.email ?? '',
+                                                user.email ?? '',
                                                 infoController.text.trim(),
                                                 selectedMethod,
                                               );
@@ -736,7 +738,7 @@ class _AppointmentsPageState extends State<AppointmentsPage>
           _buildHeader(),
           Expanded(
             child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _firestoreService.getUserAppointmentsStream(_user!.uid),
+              stream: _firestoreService.getUserAppointmentsStream(_user.uid),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());

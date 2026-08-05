@@ -5,7 +5,6 @@ import 'package:purramedics/services/firestore_service.dart';
 import 'package:purramedics/pages/vet/vet_patient_list_page.dart';
 import 'package:purramedics/pages/vet/vet_event_list_page.dart';
 import 'package:purramedics/pages/vet/vet_appointment_list_page.dart';
-import 'package:purramedics/pages/vet/vet_requests_page.dart';
 import 'package:purramedics/pages/vet/vet_inbox_page.dart';
 import 'package:purramedics/pages/vet/vet_settings_page.dart';
 import 'package:purramedics/pages/vet/vet_availability_page.dart';
@@ -321,8 +320,9 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
                                 stream: item.badgeStream,
                                 builder: (context, snapshot) {
                                   final count = snapshot.data ?? 0;
-                                  if (count == 0)
+                                  if (count == 0) {
                                     return const SizedBox.shrink();
+                                  }
                                   return Container(
                                     margin: const EdgeInsets.only(left: 8),
                                     padding: const EdgeInsets.symmetric(
@@ -866,7 +866,7 @@ class _VetDashboardPageState extends State<VetDashboardPage> {
                     ),
                     AppSpacing.vMd,
                     DropdownButtonFormField<String>(
-                      value: visitType,
+                      initialValue: visitType,
                       decoration: const InputDecoration(
                         labelText: 'Visit Type',
                         border: OutlineInputBorder(),

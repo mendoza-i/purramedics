@@ -93,8 +93,9 @@ class _VetEventListPageState extends State<VetEventListPage> {
       try {
         final dateStr = event['date'].toString();
         String compareStr = dateStr;
-        if (dateStr.contains(' to '))
+        if (dateStr.contains(' to ')) {
           compareStr = dateStr.split(' to ')[1].trim();
+        }
         final parts = compareStr.split(' at ');
         if (parts.length == 2) {
           final dateParts = parts[0].split('/');

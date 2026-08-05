@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:purramedics/pages/addpet_page.dart';
-import 'package:purramedics/pages/intro_page.dart';
 import 'package:purramedics/services/auth_service.dart';
 import 'package:purramedics/services/firestore_service.dart';
 import 'package:purramedics/pages/user_settings_page.dart';
@@ -101,7 +99,7 @@ class _PetsPageState extends State<PetsPage> {
       body: SafeArea(
         child: StreamBuilder<List<Map<String, dynamic>>>(
           stream: _firestoreService.getUserPetsStream(
-            _currentUser!.email ?? '',
+            _currentUser.email ?? '',
           ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -663,7 +661,7 @@ class _PetsPageState extends State<PetsPage> {
           petId: petId,
           petName: petName,
           ownerId: _currentUser!.uid,
-          ownerEmail: _currentUser!.email ?? '',
+          ownerEmail: _currentUser.email ?? '',
           requestType: requestType,
           reason: reasonController.text.trim(),
         );
@@ -741,10 +739,11 @@ class _PetsPageState extends State<PetsPage> {
   Widget _buildPetRequests() {
     if (_currentUser == null) return const SizedBox.shrink();
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: _firestoreService.getPetRequestsForOwnerStream(_currentUser!.uid),
+      stream: _firestoreService.getPetRequestsForOwnerStream(_currentUser.uid),
       builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data!.isEmpty)
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const SizedBox.shrink();
+        }
         final requests = snapshot.data!;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

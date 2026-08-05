@@ -41,8 +41,9 @@ class RevenueStatsWidget extends StatelessWidget {
         int thisConfirmedCount = 0;
 
         for (final appt in all) {
-          if ((appt['status'] ?? '').toString().toLowerCase() != 'confirmed')
+          if ((appt['status'] ?? '').toString().toLowerCase() != 'confirmed') {
             continue;
+          }
 
           DateTime? date;
           try {

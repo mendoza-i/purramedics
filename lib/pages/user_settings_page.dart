@@ -32,18 +32,18 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
 
   void _loadProfile() {
     if (_user == null) return;
-    _firestoreService.getUserProfileStream(_user!.uid).first.then((snap) {
+    _firestoreService.getUserProfileStream(_user.uid).first.then((snap) {
       if (!mounted) return;
       if (snap.exists) {
         final data = snap.data() as Map<String, dynamic>;
         setState(() {
-          _nameController.text = data['name'] ?? _user!.displayName ?? '';
+          _nameController.text = data['name'] ?? _user.displayName ?? '';
           _phoneController.text = data['phone'] ?? '';
           _addressController.text = data['address'] ?? '';
         });
       } else {
         setState(() {
-          _nameController.text = _user!.displayName ?? '';
+          _nameController.text = _user.displayName ?? '';
         });
       }
     });
@@ -68,7 +68,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     }
 
     await _firestoreService.updateUserContactDetails(
-      _user!.uid,
+      _user.uid,
       _nameController.text.trim(),
       _phoneController.text.trim(),
       _addressController.text.trim(),
@@ -212,7 +212,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                       AppTextField(
                         label: 'Email address',
                         prefixIcon: Icons.lock_outline_rounded,
-                        controller: TextEditingController(text: _user!.email),
+                        controller: TextEditingController(text: _user.email),
                         readOnly: true,
                         enabled: false,
                       ),

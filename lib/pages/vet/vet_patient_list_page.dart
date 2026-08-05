@@ -29,8 +29,9 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
   }
 
   String _formatDateString(String? dateStr) {
-    if (dateStr == null || dateStr.isEmpty || dateStr == 'Unknown')
+    if (dateStr == null || dateStr.isEmpty || dateStr == 'Unknown') {
       return 'Unknown';
+    }
     try {
       DateTime dt;
       try {
@@ -1086,6 +1087,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
     if (mounted && Navigator.canPop(dialogCtx)) Navigator.pop(dialogCtx);
   }
 
+  // ignore: unused_element
   void _showDeleteConfirmation(
     BuildContext context,
     String petId,
@@ -1132,6 +1134,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
     );
   }
 
+  // ignore: unused_element
   void _showEditPetDialog(BuildContext context, Map<String, dynamic> pet) {
     final nameCtrl = TextEditingController(text: pet['name']);
     final weightCtrl = TextEditingController(
@@ -1414,8 +1417,9 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
                                     lastDate: DateTime.now(),
                                     initialDatePickerMode: DatePickerMode.year,
                                   );
-                                  if (picked != null)
+                                  if (picked != null) {
                                     setSB(() => selectedBirthdate = picked);
+                                  }
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -1740,6 +1744,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
     }
   }
 
+  // ignore: unused_element
   Widget _sectionLabel(String text) => Text(
     text.toUpperCase(),
     style: AppTypography.labelSmall.copyWith(
@@ -1749,6 +1754,7 @@ class _VetPatientListPageState extends State<VetPatientListPage> {
     ),
   );
 
+  // ignore: unused_element
   void _showOwnerSelectorDialog(BuildContext context) {
     showDialog(
       context: context,

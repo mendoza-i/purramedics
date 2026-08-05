@@ -597,8 +597,9 @@ class _HomePageState extends State<HomePage> {
           for (final e in allEvents) {
             try {
               var startStr = e.date;
-              if (e.date.contains(' to '))
+              if (e.date.contains(' to ')) {
                 startStr = e.date.split(' to ')[0].trim();
+              }
               final dt = _parseCustomDate(startStr);
               if (dt == null) continue;
               parsed.add({'event': e, 'startDate': dt});

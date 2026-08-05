@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:purramedics/services/firestore_service.dart';
 import 'package:purramedics/theme/app_theme.dart';
 import 'package:purramedics/utils/linear_regression.dart';
-import 'package:purramedics/widgets/widgets.dart';
 
 class PredictiveAnalyticsWidget extends StatefulWidget {
   const PredictiveAnalyticsWidget({super.key});

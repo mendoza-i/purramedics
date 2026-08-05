@@ -2,6 +2,7 @@
 /// EVENT DETAILS PAGE
 /// Displays full information about a specific drive or event.
 /// ============================================================================
+library;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:purramedics/models/event.dart';

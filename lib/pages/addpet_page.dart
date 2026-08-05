@@ -2,6 +2,7 @@
 /// ADD PET PAGE (FIRESTORE EDITION)
 /// Registers a new pet and (vet-only) links it to an owner account.
 /// ============================================================================
+library;
 import 'package:flutter/material.dart';
 import 'package:purramedics/services/firestore_service.dart';
 import 'package:purramedics/services/auth_service.dart';
@@ -335,7 +336,7 @@ class _AddPetPageState extends State<AddPetPage> {
                     Switch(
                       value: isNeutered,
                       onChanged: (v) => setState(() => isNeutered = v),
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                     ),
                   ],
                 ),
@@ -716,7 +717,7 @@ class _AddPetPageState extends State<AddPetPage> {
               Switch(
                 value: isNeutered,
                 onChanged: (v) => setState(() => isNeutered = v),
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
               ),
             ],
           ),

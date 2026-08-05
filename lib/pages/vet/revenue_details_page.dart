@@ -91,8 +91,9 @@ class _RevenueDetailsPageState extends State<RevenueDetailsPage> {
           final countsByType = <String, int>{};
 
           for (final appt in all) {
-            if ((appt['status'] ?? '').toString().toLowerCase() != 'confirmed')
+            if ((appt['status'] ?? '').toString().toLowerCase() != 'confirmed') {
               continue;
+            }
 
             DateTime? date;
             try {

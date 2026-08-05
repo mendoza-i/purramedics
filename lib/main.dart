@@ -7,7 +7,6 @@ import 'firebase_options.dart';
 
 import 'package:purramedics/AI Assistant/data/claude_api_service.dart';
 import 'package:purramedics/AI Assistant/presentation/chat_provider.dart';
-import 'package:purramedics/pages/intro_page.dart';
 import 'package:purramedics/pages/splash_screen.dart'; // Import Custom Splash Screen
 import 'models/pet.dart';
 import 'models/event.dart';
